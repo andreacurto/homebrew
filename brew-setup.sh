@@ -37,20 +37,46 @@ brew install --cask font-roboto-mono-nerd-font
 echo "✅ Installazione font completata!" && echo ""
 
 # Applicazioni
-echo "👉 Installazione applicazioni..."
-brew install --cask \
-    1password \
-    appcleaner \
-    dropbox \
-    figma \
-    google-chrome \
-    imageoptim \
-    numi \
-    rectangle \
-    spotify \
-    visual-studio-code \
-    whatsapp
-echo "✅ Installazione applicazioni completata!" && echo ""
+echo "👉 Seleziona le applicazioni da installare..."
+
+# Array delle applicazioni disponibili
+declare -a apps=(
+    "1password"
+    "appcleaner"
+    "dropbox"
+    "figma"
+    "google-chrome"
+    "imageoptim"
+    "numi"
+    "rectangle"
+    "spotify"
+    "visual-studio-code"
+    "whatsapp"
+)
+
+# Array per memorizzare le app selezionate
+declare -a selected_apps=()
+
+# Chiede all'utente per ogni applicazione
+for app in "${apps[@]}"; do
+    read -r "REPLY?Installare $app? (y/n): "
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+        selected_apps+=("$app")
+    fi
+done
+
+# Installa solo le app selezionate
+if [ ${#selected_apps[@]} -gt 0 ]; then
+
+    echo "" && echo "👉 Installazione applicazioni..."
+    brew install --cask "${selected_apps[@]}"
+    echo "✅ Installazione applicazioni completata!" && echo ""
+
+else
+
+    echo "✅ Nessuna applicazione selezionata per l'installazione!" && echo ""
+
+fi
 
 # =====================================================
 # 3. Setup Script di aggiornamento

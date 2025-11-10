@@ -59,12 +59,12 @@ echo "✅ Installazione applicazioni completata!" && echo ""
 echo "👉 Configurazione script di aggiornamento..."
 
 # Crea directory Scripts se non esiste
-mkdir -p ~/Scripts
+mkdir -p ~/Shell
 
 # Copia lo script di aggiornamento
 SCRIPT_DIR=$(dirname "$0")
-cp "$SCRIPT_DIR/brew-update.sh" ~/Scripts/brew-update.sh
-chmod +x ~/Scripts/brew-update.sh
+cp "$SCRIPT_DIR/brew-update.sh" ~/Shell/brew-update.sh
+chmod +x ~/Shell/brew-update.sh
 
 echo "✅ Configurazione script di aggiornamento completato!" && echo ""
 

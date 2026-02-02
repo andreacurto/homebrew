@@ -12,7 +12,7 @@ echo "" && echo "🚀 Avvio aggiornamento e manutenzione Homebrew..." && echo ""
 
 # Controlla le applicazioni installate tramite Homebrew Cask che necessitano di aggiornamento
 # L'opzione --greedy include anche le app che normalmente non verrebbero aggiornate automaticamente
-outdated_casks=$(brew outdated --cask --greedy --quiet)
+outdated_casks=$(brew outdated --cask --quiet)
 
 # Controlla se ci sono applicazioni da aggiornare
 if [[ -n "$outdated_casks" ]]; then

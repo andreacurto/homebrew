@@ -5,11 +5,11 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 1. [Setup Iniziale](#setup-iniziale)
 2. [Aggiornamento del Sistema](#aggiornamento-del-sistema)
 3. [Personalizzazione](#personalizzazione)
-    1. [Temi Shell](#temi-shell)
+   1. [Temi Shell](#temi-shell)
 4. [Pacchetti Installati](#pacchetti-installati)
-    1. [Strumenti CLI](#strumenti-cli)
-    2. [Font](#font)
-    3. [Applicazioni](#applicazioni)
+   1. [Strumenti CLI](#strumenti-cli)
+   2. [Font](#font)
+   3. [Applicazioni](#applicazioni)
 
 ## Setup Iniziale
 
@@ -29,10 +29,10 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 
 Lo script eseguirà automaticamente:
 
--   Installazione di Homebrew (se non presente)
--   Installazione dei pacchetti essenziali
--   Configurazione degli script di aggiornamento
--   Setup della shell
+- Installazione di Homebrew (se non presente)
+- Installazione dei pacchetti essenziali
+- Configurazione degli script di aggiornamento
+- Setup della shell
 
 Al termine, **riavvia il terminale** per applicare le modifiche.
 
@@ -46,10 +46,10 @@ brew-update
 
 Lo script si occuperà di:
 
--   Aggiornare le applicazioni
--   Aggiornare i pacchetti Homebrew
--   Pulire i file non necessari
--   Verificare lo stato del sistema
+- Aggiornare le applicazioni
+- Aggiornare i pacchetti Homebrew
+- Pulire i file non necessari
+- Verificare lo stato del sistema
 
 ## Personalizzazione
 
@@ -57,34 +57,36 @@ Lo script si occuperà di:
 
 Per cambiare il tema del terminale, modifica il file `~/.zshrc` e scegli uno dei temi commentati:
 
--   material
--   robbyrussell
--   pararussel
--   zash (default)
+- material
+- robbyrussell
+- pararussel
+- zash (default)
 
 ## Pacchetti Installati
 
 ### Strumenti CLI
 
--   Node.js
--   GitHub CLI
--   Oh My posh (personalizzazione Shell)
+- Node.js
+- GitHub CLI
+- Oh My posh (personalizzazione Shell)
 
 ### Font
 
--   Meslo LG Nerd Font
--   Roboto Mono Nerd Font
+- Meslo LG Nerd Font
+- Roboto Mono Nerd Font
 
 ### Applicazioni
 
--   1password
--   AppCleaner
--   Dropbox
--   Figma
--   Google Chrome
--   ImageOptim
--   Numi
--   Rectangle
--   Spotify
--   Visual Studio Code
--   WhatsApp
+- 1password
+- AppCleaner
+- Claude Code
+- Dropbox
+- Figma
+- Google Chrome
+- ImageOptim
+- Numi
+- Rectangle
+- Spotify
+- Visual Studio Code
+- WailBrew
+- WhatsApp

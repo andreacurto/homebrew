@@ -43,6 +43,7 @@ echo "👉 Seleziona le applicazioni da installare..."
 declare -a apps=(
     "1password"
     "appcleaner"
+    "claude-code"
     "dropbox"
     "figma"
     "google-chrome"
@@ -51,6 +52,7 @@ declare -a apps=(
     "rectangle"
     "spotify"
     "visual-studio-code"
+    "wailbrew"
     "whatsapp"
 )
 

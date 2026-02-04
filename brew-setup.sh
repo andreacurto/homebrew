@@ -5,32 +5,32 @@
 # =====================================================
 
 # Colori (256 terminal colors - Reference: https://www.ditig.com/256-colors-cheat-sheet)
-GUM_COLOR_SUCCESS="2"        # Verde
-GUM_COLOR_ERROR="196"        # Rosso
-GUM_COLOR_WARNING="3"        # Giallo
-GUM_COLOR_INFO="6"           # Cyan
-GUM_COLOR_PRIMARY="5"        # Magenta
-GUM_COLOR_MUTED="240"        # Grigio
+# Palette ispirata a Claude Code - colori soft e moderni
+GUM_COLOR_SUCCESS="10"       # Verde chiaro (più soft)
+GUM_COLOR_ERROR="9"          # Rosso soft
+GUM_COLOR_WARNING="11"       # Giallo soft
+GUM_COLOR_INFO="14"          # Cyan chiaro
+GUM_COLOR_PRIMARY="13"       # Magenta chiaro
+GUM_COLOR_MUTED="244"        # Grigio medio
 
-# Simboli
-GUM_SYMBOL_SUCCESS="✔"       # Simbolo successo
-GUM_SYMBOL_WARNING="⚠"       # Simbolo warning/errore
-GUM_SYMBOL_BULLET="❖"        # Bullet point liste
-GUM_SYMBOL_SKIP="⊘"          # Simbolo operazione saltata
-GUM_SYMBOL_INFO="⚑"          # Simbolo informativo
+# Simboli (minimalisti, stile Claude Code)
+GUM_SYMBOL_SUCCESS="✓"       # Check leggero
+GUM_SYMBOL_WARNING="!"       # Punto esclamativo
+GUM_SYMBOL_BULLET="·"        # Punto medio
+GUM_SYMBOL_SKIP="○"          # Cerchio vuoto
+GUM_SYMBOL_INFO="›"          # Freccia destra
 
 # Spinner
-GUM_SPINNER_TYPE="dot"       # Tipo spinner: dot, line, minidot, jump, pulse, points, globe, moon, monkey, meter, hamburger
+GUM_SPINNER_TYPE="line"      # Spinner lineare più minimal
 
-# Bordi
-GUM_BORDER_ROUNDED="rounded" # Bordo arrotondato
-GUM_BORDER_DOUBLE="double"   # Bordo doppio
-GUM_BORDER_THICK="thick"     # Bordo spesso
+# Bordi (più leggeri)
+GUM_BORDER_NORMAL="normal"   # Bordo standard
+GUM_BORDER_NONE="none"       # Nessun bordo
 
-# Layout
-GUM_PADDING="1 2"            # Padding verticale orizzontale
-GUM_MARGIN="1 0"             # Margin verticale orizzontale
-GUM_ERROR_PADDING="0 1"      # Padding per messaggi errore
+# Layout (più compatto)
+GUM_PADDING="0 1"            # Padding minimo
+GUM_MARGIN="0"               # Margin zero
+GUM_ERROR_PADDING="0 1"      # Padding errori
 
 echo ""
 gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Setup Homebrew - Inizializzazione"

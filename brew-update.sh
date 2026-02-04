@@ -8,18 +8,48 @@ if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
 fi
 
+# =====================================================
+# Configurazione UI (Gum)
+# =====================================================
+
+# Colori (256 terminal colors - Reference: https://www.ditig.com/256-colors-cheat-sheet)
+GUM_COLOR_SUCCESS="2"        # Verde
+GUM_COLOR_ERROR="196"        # Rosso
+GUM_COLOR_WARNING="3"        # Giallo
+GUM_COLOR_INFO="6"           # Cyan
+GUM_COLOR_PRIMARY="5"        # Magenta
+GUM_COLOR_MUTED="240"        # Grigio
+
+# Simboli
+GUM_SYMBOL_SUCCESS="✓"       # Simbolo successo
+GUM_SYMBOL_WARNING="⚠"       # Simbolo warning/errore
+GUM_SYMBOL_BULLET="•"        # Bullet point liste
+
+# Spinner
+GUM_SPINNER_TYPE="dot"       # Tipo spinner: dot, line, minidot, jump, pulse, points, globe, moon, monkey, meter, hamburger
+
+# Bordi
+GUM_BORDER_ROUNDED="rounded" # Bordo arrotondato
+GUM_BORDER_DOUBLE="double"   # Bordo doppio
+GUM_BORDER_THICK="thick"     # Bordo spesso
+
+# Layout
+GUM_PADDING="1 2"            # Padding verticale orizzontale
+GUM_MARGIN="1 0"             # Margin verticale orizzontale
+GUM_ERROR_PADDING="0 1"      # Padding per messaggi errore
+
 # Messaggio di avvio dello script
 echo ""
-gum style --border double --padding "1 2" --margin "1 0" --foreground 5 --bold "Homebrew Update - Aggiornamento Sistema"
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Update - Aggiornamento Sistema"
 echo ""
 
 # =====================================================
 # Selezione Operazioni da Eseguire
 # =====================================================
 
-gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Selezione Operazioni"
+gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Selezione Operazioni"
 echo ""
-gum style --foreground 6 "Seleziona le operazioni da eseguire (usa Spazio per selezionare, Invio per confermare):"
+gum style --foreground "$GUM_COLOR_INFO" "Seleziona le operazioni da eseguire (usa Spazio per selezionare, Invio per confermare):"
 selected_operations=$(gum choose --no-limit \
     --selected="Aggiorna applicazioni,Aggiorna repository,Aggiorna formule,Rimuovi dipendenze,Pulizia cache,Diagnostica sistema" \
     "Aggiorna applicazioni" \
@@ -59,9 +89,9 @@ if [ "$do_cask_upgrade" = true ]; then
 fi
 
 echo ""
-gum style --foreground 2 "✓ Preferenze raccolte con successo!"
+gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Preferenze raccolte con successo!"
 echo ""
-gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Esecuzione Operazioni"
+gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Esecuzione Operazioni"
 echo ""
 
 # =====================================================
@@ -71,7 +101,7 @@ echo ""
 if [ "$do_cask_upgrade" = true ]; then
 
     # Controlla le applicazioni installate tramite Homebrew Cask che necessitano di aggiornamento
-    gum style --foreground 6 "Controllo applicazioni obsolete..."
+    gum style --foreground "$GUM_COLOR_INFO" "Controllo applicazioni obsolete..."
     if [ "$use_greedy" = true ]; then
         outdated_casks=$(brew outdated --cask --greedy --quiet)
     else
@@ -82,29 +112,29 @@ if [ "$do_cask_upgrade" = true ]; then
     if [[ -n "$outdated_casks" ]]; then
 
         # Mostra l'elenco delle applicazioni da aggiornare
-        gum style --foreground 3 "Trovate applicazioni da aggiornare:"
-        echo "$outdated_casks" | sed 's/^/  • /'
+        gum style --foreground "$GUM_COLOR_WARNING" "Trovate applicazioni da aggiornare:"
+        echo "$outdated_casks" | sed "s/^/  $GUM_SYMBOL_BULLET /"
         echo ""
 
         # Esegue l'upgrade solo per le cask trovate
         if [ "$use_greedy" = true ]; then
-            if gum spin --spinner dot --title "Aggiornamento applicazioni (incluso auto-update)..." -- brew upgrade --cask --greedy $outdated_casks 2>/dev/null; then
-                gum style --foreground 2 "✓ Aggiornamento applicazioni completato!"
+            if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni (incluso auto-update)..." -- brew upgrade --cask --greedy $outdated_casks 2>/dev/null; then
+                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Aggiornamento applicazioni completato!"
             else
-                gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento applicazioni. Continuo..."
+                gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento applicazioni. Continuo..."
             fi
         else
-            if gum spin --spinner dot --title "Aggiornamento applicazioni..." -- brew upgrade --cask $outdated_casks 2>/dev/null; then
-                gum style --foreground 2 "✓ Aggiornamento applicazioni completato!"
+            if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni..." -- brew upgrade --cask $outdated_casks 2>/dev/null; then
+                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Aggiornamento applicazioni completato!"
             else
-                gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento applicazioni. Continuo..."
+                gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento applicazioni. Continuo..."
             fi
         fi
         echo ""
 
     else
 
-        gum style --foreground 2 "✓ Nessuna applicazione da aggiornare"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Nessuna applicazione da aggiornare"
         echo ""
 
     fi
@@ -117,69 +147,69 @@ fi
 
 # Aggiorna l'indice dei pacchetti di Homebrew
 if [ "$do_update" = true ]; then
-    if gum spin --spinner dot --title "Aggiornamento repository Homebrew..." -- brew update 2>/dev/null; then
-        gum style --foreground 2 "✓ Repository aggiornato"
+    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento repository Homebrew..." -- brew update 2>/dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Repository aggiornato"
         echo ""
     else
-        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento repository. Continuo..."
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento repository. Continuo..."
         echo ""
     fi
 fi
 
 # Aggiorna tutte le formule installate (pacchetti CLI)
 if [ "$do_upgrade" = true ]; then
-    if gum spin --spinner dot --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade 2>/dev/null; then
-        gum style --foreground 2 "✓ Formule aggiornate"
+    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade 2>/dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Formule aggiornate"
         echo ""
     else
-        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento formule. Continuo..."
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento formule. Continuo..."
         echo ""
     fi
 fi
 
 # Rimuove le dipendenze orfane (non più necessarie da altri pacchetti)
 if [ "$do_autoremove" = true ]; then
-    if gum spin --spinner dot --title "Rimozione dipendenze non necessarie..." -- brew autoremove 2>/dev/null; then
-        gum style --foreground 2 "✓ Dipendenze orfane rimosse"
+    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione dipendenze non necessarie..." -- brew autoremove 2>/dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Dipendenze orfane rimosse"
         echo ""
     else
-        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante rimozione dipendenze. Continuo..."
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante rimozione dipendenze. Continuo..."
         echo ""
     fi
 fi
 
 # Rimuove le vecchie versioni dei pacchetti e svuota la cache
 if [ "$do_cleanup" = true ]; then
-    if gum spin --spinner dot --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all 2>/dev/null; then
-        gum style --foreground 2 "✓ Pulizia completata"
+    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all 2>/dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia completata"
         echo ""
     else
-        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante pulizia. Continuo..."
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante pulizia. Continuo..."
         echo ""
     fi
 fi
 
 # Esegue un controllo diagnostico per identificare potenziali problemi
 if [ "$do_doctor" = true ]; then
-    gum style --foreground 6 "Esecuzione diagnostica sistema..."
+    gum style --foreground "$GUM_COLOR_INFO" "Esecuzione diagnostica sistema..."
     echo ""
-    if brew doctor 2>&1 | gum style --foreground 240; then
+    if brew doctor 2>&1 | gum style --foreground "$GUM_COLOR_MUTED"; then
         echo ""
-        gum style --foreground 2 "✓ Diagnostica completata"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Diagnostica completata"
         echo ""
     else
         echo ""
-        gum style --foreground 3 "⚠ Diagnostica completata con warning"
+        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Diagnostica completata con warning"
         echo ""
     fi
 fi
 
 # Messaggio di completamento
 gum style \
-    --border double \
-    --padding "1 2" \
-    --margin "1 0" \
-    --foreground 2 \
+    --border "$GUM_BORDER_DOUBLE" \
+    --padding "$GUM_PADDING" \
+    --margin "$GUM_MARGIN" \
+    --foreground "$GUM_COLOR_SUCCESS" \
     --bold \
     "Aggiornamento Completato con Successo!" \
     "" \

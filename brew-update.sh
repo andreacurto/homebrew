@@ -3,6 +3,11 @@
 # Esporta il percorso di Homebrew per essere sicuri che il comando venga trovato
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+# Assicura che gum sia installato
+if ! command -v gum &> /dev/null; then
+    brew install gum &> /dev/null
+fi
+
 # Messaggio di avvio dello script
 echo "" && echo "🚀 Avvio aggiornamento e manutenzione Homebrew..." && echo ""
 

@@ -27,7 +27,7 @@ fi
 
 # Strumenti CLI
 echo "👉 Installazione strumenti CLI..."
-brew install node gh oh-my-posh
+brew install node gh oh-my-posh gum
 echo "✅ Installazione strumenti CLI completata!" && echo ""
 
 # Font

@@ -21,9 +21,9 @@ GUM_COLOR_PRIMARY="5"        # Magenta
 GUM_COLOR_MUTED="240"        # Grigio
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✓"       # Simbolo successo
+GUM_SYMBOL_SUCCESS="✔"       # Simbolo successo
 GUM_SYMBOL_WARNING="⚠"       # Simbolo warning/errore
-GUM_SYMBOL_BULLET="•"        # Bullet point liste
+GUM_SYMBOL_BULLET="❖"        # Bullet point liste
 
 # Spinner
 GUM_SPINNER_TYPE="dot"       # Tipo spinner: dot, line, minidot, jump, pulse, points, globe, moon, monkey, meter, hamburger

@@ -5,17 +5,20 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 ## Caratteristiche
 
 ✨ **Interfaccia Interattiva**
+
 - Checkbox e menu di selezione con navigazione da tastiera
 - Spinner animati durante le operazioni
 - Messaggi colorati e formattati per migliore leggibilità
 - Gestione errori non-blocking (continua anche in caso di problemi)
 
 🎯 **Selezione Personalizzata**
+
 - Scegli quali applicazioni installare
 - Scegli il tema della shell durante il setup
 - Seleziona quali operazioni di manutenzione eseguire
 
 ⚡ **Automazione Completa**
+
 - Setup iniziale con un solo comando
 - Aggiornamenti selettivi e veloci
 - Pulizia automatica del sistema
@@ -27,11 +30,11 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 1. [Setup Iniziale](#setup-iniziale)
 2. [Aggiornamento del Sistema](#aggiornamento-del-sistema)
 3. [Personalizzazione](#personalizzazione)
-   1. [Temi Shell](#temi-shell)
+    1. [Temi Shell](#temi-shell)
 4. [Pacchetti Installati](#pacchetti-installati)
-   1. [Strumenti CLI](#strumenti-cli)
-   2. [Font](#font)
-   3. [Applicazioni](#applicazioni)
+    1. [Strumenti CLI](#strumenti-cli)
+    2. [Font](#font)
+    3. [Applicazioni](#applicazioni)
 
 ## Setup Iniziale
 
@@ -59,7 +62,8 @@ Lo script ti guiderà attraverso un'**installazione interattiva**:
 6. **Configurazione automatica** degli script di aggiornamento
 
 Durante il processo vedrai:
-- ✓ Messaggi di successo in verde
+
+- ✔ Messaggi di successo in verde
 - ⚠ Warning in giallo (l'installazione continua)
 - Spinner animati durante le operazioni lunghe
 
@@ -85,6 +89,7 @@ Lo script ti permetterà di **selezionare le operazioni** da eseguire tramite ch
 Tutte le operazioni sono **pre-selezionate di default**. Puoi deselezionare quelle che non vuoi eseguire usando la barra spaziatrice.
 
 Durante l'esecuzione vedrai:
+
 - Spinner animati per ogni operazione
 - Messaggi di completamento o errori
 - Output nascosto per una visualizzazione pulita

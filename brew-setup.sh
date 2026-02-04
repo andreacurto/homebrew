@@ -13,9 +13,9 @@ GUM_COLOR_PRIMARY="5"        # Magenta
 GUM_COLOR_MUTED="240"        # Grigio
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✓"       # Simbolo successo
+GUM_SYMBOL_SUCCESS="✔"       # Simbolo successo
 GUM_SYMBOL_WARNING="⚠"       # Simbolo warning/errore
-GUM_SYMBOL_BULLET="•"        # Bullet point liste
+GUM_SYMBOL_BULLET="❖"        # Bullet point liste
 GUM_SYMBOL_SKIP="⊘"          # Simbolo operazione saltata
 GUM_SYMBOL_INFO="⚑"          # Simbolo informativo
 

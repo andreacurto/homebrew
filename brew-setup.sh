@@ -46,7 +46,7 @@ GUM_ERROR_PADDING="0 1"
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Setup - Inizio 🚀"
+gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_PRIMARY" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Inizio 🚀"
 echo ""
 
 # ===== INSTALLAZIONE HOMEBREW =====
@@ -58,7 +58,7 @@ if ! command -v brew &> /dev/null; then
     if command -v brew &> /dev/null; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione Homebrew"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Homebrew"
         exit 1
     fi
 else
@@ -75,7 +75,7 @@ gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (nod
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
 fi
 
 # ===== SELEZIONE APPLICAZIONI =====
@@ -136,7 +136,7 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
     fi
 else
     gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione selezionata"
@@ -172,7 +172,7 @@ gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configura
 
 # ===== MESSAGGIO FINALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Homebrew Setup - Completato 🎉"
+gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_SUCCESS" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Completato 🎉"
 echo ""
 gum style --foreground "$GUM_COLOR_WARNING" "⚠ Riavvia il terminale per applicare le modifiche"
 echo ""

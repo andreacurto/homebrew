@@ -56,7 +56,7 @@ GUM_ERROR_PADDING="0 1"
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Update - Inizio 🚀"
+gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_PRIMARY" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Inizio 🚀"
 echo ""
 
 # ===== SELEZIONE OPERAZIONI =====
@@ -135,7 +135,7 @@ if [ "$do_cask_upgrade" = true ]; then
             if [ ${PIPESTATUS[0]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
-                gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
+                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
             fi
         else
             # Aggiorna solo app senza auto-update
@@ -146,7 +146,7 @@ if [ "$do_cask_upgrade" = true ]; then
             if [ ${PIPESTATUS[0]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
-                gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
+                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
             fi
         fi
     else
@@ -162,7 +162,7 @@ if [ "$do_update" = true ]; then
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Repository aggiornato"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore aggiornamento repository"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento repository"
     fi
 fi
 
@@ -174,7 +174,7 @@ if [ "$do_upgrade" = true ]; then
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Formule aggiornate"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore aggiornamento formule"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento formule"
     fi
 fi
 
@@ -186,7 +186,7 @@ if [ "$do_autoremove" = true ]; then
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Dipendenze orfane rimosse"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore rimozione dipendenze"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore rimozione dipendenze"
     fi
 fi
 
@@ -198,7 +198,7 @@ if [ "$do_cleanup" = true ]; then
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia completata"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore pulizia"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore pulizia"
     fi
 fi
 
@@ -220,5 +220,5 @@ fi
 
 # ===== MESSAGGIO FINALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Homebrew Update - Completato 🎉"
+gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_SUCCESS" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Completato 🎉"
 echo ""

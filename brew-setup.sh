@@ -46,37 +46,8 @@ GUM_ERROR_PADDING="0 1"
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_PRIMARY" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Inizio 🚀"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Inizio 🚀"
 echo ""
-
-# ===== INSTALLAZIONE HOMEBREW =====
-# Verifica se Homebrew è installato, altrimenti lo installa
-# Homebrew è il package manager per macOS necessario per tutto il resto
-if ! command -v brew &> /dev/null; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Homebrew..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    if command -v brew &> /dev/null; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
-    else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Homebrew"
-        exit 1
-    fi
-else
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew già installato"
-fi
-
-# ===== INSTALLAZIONE STRUMENTI CLI =====
-# Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
-# - node: Runtime JavaScript
-# - gh: GitHub CLI
-# - oh-my-posh: Personalizzazione prompt shell
-# - gum: Tool per interfacce interattive nel terminale
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- sh -c "brew install node gh oh-my-posh gum &>/dev/null"
-if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
-else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
-fi
 
 # ===== SELEZIONE APPLICAZIONI =====
 # Menu interattivo con checkbox per scegliere quali applicazioni installare
@@ -117,6 +88,35 @@ selected_theme=$(gum choose \
     "material" \
     "robbyrussell" \
     "pararussel")
+
+# ===== INSTALLAZIONE HOMEBREW =====
+# Verifica se Homebrew è installato, altrimenti lo installa
+# Homebrew è il package manager per macOS necessario per tutto il resto
+if ! command -v brew &> /dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Homebrew..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    if command -v brew &> /dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
+    else
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Homebrew"
+        exit 1
+    fi
+else
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew già installato"
+fi
+
+# ===== INSTALLAZIONE STRUMENTI CLI =====
+# Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
+# - node: Runtime JavaScript
+# - gh: GitHub CLI
+# - oh-my-posh: Personalizzazione prompt shell
+# - gum: Tool per interfacce interattive nel terminale
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- sh -c "brew install node gh oh-my-posh gum &>/dev/null"
+if [ $? -eq 0 ]; then
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
+else
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
+fi
 
 # ===== INSTALLAZIONE FONT =====
 # Installa font Nerd Font necessari per i temi Oh My Posh
@@ -172,7 +172,7 @@ gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configura
 
 # ===== MESSAGGIO FINALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_SUCCESS" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Completato 🎉"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup - Completato 🎉"
 echo ""
 gum style --foreground "$GUM_COLOR_WARNING" "⚠ Riavvia il terminale per applicare le modifiche"
 echo ""

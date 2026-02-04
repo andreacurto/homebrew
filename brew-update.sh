@@ -28,7 +28,6 @@ GUM_COLOR_SUCCESS="10"    # Verde per operazioni completate
 GUM_COLOR_ERROR="9"       # Rosso per errori
 GUM_COLOR_WARNING="11"    # Giallo per warning
 GUM_COLOR_INFO="14"       # Cyan per informazioni
-GUM_COLOR_PRIMARY="13"    # Magenta per titoli
 GUM_COLOR_MUTED="244"     # Grigio per testo secondario
 
 # Simboli
@@ -56,7 +55,7 @@ GUM_ERROR_PADDING="0 1"
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_PRIMARY" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Inizio 🚀"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Inizio 🚀"
 echo ""
 
 # ===== SELEZIONE OPERAZIONI =====
@@ -220,5 +219,5 @@ fi
 
 # ===== MESSAGGIO FINALE =====
 echo ""
-gum style --border "$GUM_BORDER_DOUBLE" --border-foreground "$GUM_COLOR_SUCCESS" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Completato 🎉"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Completato 🎉"
 echo ""

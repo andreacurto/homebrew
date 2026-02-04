@@ -37,7 +37,9 @@ GUM_PADDING="0 1"
 GUM_MARGIN="0"
 GUM_ERROR_PADDING="0 1"
 
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Update - Aggiornamento Sistema"
+echo ""
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Update - Inizio 🚀"
+echo ""
 
 selected_operations=$(gum choose --no-limit \
     --header="Seleziona le operazioni da eseguire:" \
@@ -118,7 +120,7 @@ if [ "$do_cask_upgrade" = true ]; then
 fi
 
 if [ "$do_update" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento repository Homebrew..." -- brew update &>/dev/null
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento repository Homebrew..." -- sh -c "brew update &>/dev/null"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Repository aggiornato"
     else
@@ -127,7 +129,7 @@ if [ "$do_update" = true ]; then
 fi
 
 if [ "$do_upgrade" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade &>/dev/null
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento formule (pacchetti CLI)..." -- sh -c "brew upgrade &>/dev/null"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Formule aggiornate"
     else
@@ -136,7 +138,7 @@ if [ "$do_upgrade" = true ]; then
 fi
 
 if [ "$do_autoremove" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione dipendenze non necessarie..." -- brew autoremove &>/dev/null
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione dipendenze non necessarie..." -- sh -c "brew autoremove &>/dev/null"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Dipendenze orfane rimosse"
     else
@@ -145,7 +147,7 @@ if [ "$do_autoremove" = true ]; then
 fi
 
 if [ "$do_cleanup" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all &>/dev/null
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache e file obsoleti..." -- sh -c "brew cleanup --prune=all &>/dev/null"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia completata"
     else
@@ -154,12 +156,17 @@ if [ "$do_cleanup" = true ]; then
 fi
 
 if [ "$do_doctor" = true ]; then
-    gum style --foreground "$GUM_COLOR_INFO" "Esecuzione diagnostica sistema..."
-    if brew doctor 2>&1 | gum style --foreground "$GUM_COLOR_MUTED"; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Esecuzione diagnostica sistema..." -- sh -c "brew doctor > /tmp/brew_doctor_output.txt 2>&1"
+    doctor_exit=$?
+    if [ $doctor_exit -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Diagnostica completata"
     else
         gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Diagnostica completata con warning"
     fi
+    cat /tmp/brew_doctor_output.txt | gum style --foreground "$GUM_COLOR_MUTED"
+    rm -f /tmp/brew_doctor_output.txt
 fi
 
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Aggiornamento Completato!" "" "Tutte le operazioni selezionate sono state eseguite"
+echo ""
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Homebrew Update - Completato 🎉"
+echo ""

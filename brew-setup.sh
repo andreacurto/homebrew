@@ -31,7 +31,9 @@ GUM_PADDING="0 1"
 GUM_MARGIN="0"
 GUM_ERROR_PADDING="0 1"
 
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Setup Homebrew - Inizializzazione"
+echo ""
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Homebrew Setup - Inizio 🚀"
+echo ""
 
 if ! command -v brew &> /dev/null; then
     gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Homebrew..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -46,7 +48,7 @@ else
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew già installato"
 fi
 
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- brew install node gh oh-my-posh gum &>/dev/null
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- sh -c "brew install node gh oh-my-posh gum &>/dev/null"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
 else
@@ -86,7 +88,7 @@ selected_theme=$(gum choose \
     "robbyrussell" \
     "pararussel")
 
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font Nerd Font..." -- bash -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font Nerd Font..." -- sh -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
 else
@@ -94,7 +96,7 @@ else
 fi
 
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- brew install --cask "${selected_apps_array[@]}" &>/dev/null
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- sh -c "brew install --cask ${selected_apps_array[*]} &>/dev/null"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
     else
@@ -105,7 +107,7 @@ else
 fi
 
 SCRIPT_DIR=$(dirname "$0")
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script di aggiornamento..." -- bash -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script di aggiornamento..." -- sh -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script di aggiornamento configurato"
 else
@@ -125,5 +127,6 @@ alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
 
 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configurata con tema: $selected_theme"
-
-gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Setup Completato!" "" "Riavvia il terminale per applicare le modifiche"
+echo ""
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Homebrew Setup - Completato 🎉" "" "Riavvia il terminale per applicare le modifiche"
+echo ""

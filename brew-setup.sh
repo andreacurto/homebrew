@@ -193,7 +193,7 @@ cat > ~/.zshrc << EOF
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
-alias brew-update='sh ~/Shell/brew-update.sh'
+alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
 
 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configurata con tema: $selected_theme"

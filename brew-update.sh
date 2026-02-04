@@ -119,15 +119,29 @@ if [ "$do_cask_upgrade" = true ]; then
         echo "$outdated_casks" | sed "s/^/  $GUM_SYMBOL_BULLET /"
         echo ""
 
+        # Converte la lista in array (metodo compatibile bash/zsh)
+        outdated_casks_array=()
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && outdated_casks_array+=("$line")
+        done <<< "$outdated_casks"
+
         # Esegue l'upgrade solo per le cask trovate
         if [ "$use_greedy" = true ]; then
-            if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni (incluso auto-update)..." -- brew upgrade --cask --greedy $outdated_casks 2>/dev/null; then
+            gum style --foreground "$GUM_COLOR_INFO" "Aggiornamento applicazioni (incluso auto-update)..."
+            brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            done
+            if [ ${PIPESTATUS[0]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Aggiornamento applicazioni completato!"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento applicazioni. Continuo..."
             fi
         else
-            if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni..." -- brew upgrade --cask $outdated_casks 2>/dev/null; then
+            gum style --foreground "$GUM_COLOR_INFO" "Aggiornamento applicazioni..."
+            brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            done
+            if [ ${PIPESTATUS[0]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Aggiornamento applicazioni completato!"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante aggiornamento applicazioni. Continuo..."
@@ -150,7 +164,8 @@ fi
 
 # Aggiorna l'indice dei pacchetti di Homebrew
 if [ "$do_update" = true ]; then
-    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento repository Homebrew..." -- brew update 2>/dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento repository Homebrew..." -- brew update &>/dev/null
+    if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Repository aggiornato"
         echo ""
     else
@@ -161,7 +176,8 @@ fi
 
 # Aggiorna tutte le formule installate (pacchetti CLI)
 if [ "$do_upgrade" = true ]; then
-    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade 2>/dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade &>/dev/null
+    if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Formule aggiornate"
         echo ""
     else
@@ -172,7 +188,8 @@ fi
 
 # Rimuove le dipendenze orfane (non più necessarie da altri pacchetti)
 if [ "$do_autoremove" = true ]; then
-    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione dipendenze non necessarie..." -- brew autoremove 2>/dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione dipendenze non necessarie..." -- brew autoremove &>/dev/null
+    if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Dipendenze orfane rimosse"
         echo ""
     else
@@ -183,7 +200,8 @@ fi
 
 # Rimuove le vecchie versioni dei pacchetti e svuota la cache
 if [ "$do_cleanup" = true ]; then
-    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all 2>/dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all &>/dev/null
+    if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia completata"
         echo ""
     else

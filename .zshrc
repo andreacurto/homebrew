@@ -5,4 +5,4 @@ eval "$(oh-my-posh init zsh --config $(brew --prefix oh-my-posh)/themes/zash.omp
 # eval "$(oh-my-posh init zsh --config $(brew --prefix oh-my-posh)/themes/pararussel.omp.json)"
 
 # Alias
-alias brew-update='sh ~/Shell/brew-update.sh'
+alias brew-update='zsh ~/Shell/brew-update.sh'

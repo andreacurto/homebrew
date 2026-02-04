@@ -9,13 +9,17 @@ if ! command -v gum &> /dev/null; then
 fi
 
 # Messaggio di avvio dello script
-echo "" && echo "🚀 Avvio aggiornamento e manutenzione Homebrew..." && echo ""
+echo ""
+gum style --border double --padding "1 2" --margin "1 0" --foreground 5 --bold "Homebrew Update - Aggiornamento Sistema"
+echo ""
 
 # =====================================================
 # Selezione Operazioni da Eseguire
 # =====================================================
 
-echo "Seleziona le operazioni da eseguire (usa Spazio per selezionare, Invio per confermare):"
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Selezione Operazioni"
+echo ""
+gum style --foreground 6 "Seleziona le operazioni da eseguire (usa Spazio per selezionare, Invio per confermare):"
 selected_operations=$(gum choose --no-limit \
     --selected="Aggiorna applicazioni,Aggiorna repository,Aggiorna formule,Rimuovi dipendenze,Pulizia cache,Diagnostica sistema" \
     "Aggiorna applicazioni" \
@@ -54,7 +58,11 @@ if [ "$do_cask_upgrade" = true ]; then
     fi
 fi
 
-echo "" && echo "✅ Preferenze raccolte! Avvio operazioni..." && echo ""
+echo ""
+gum style --foreground 2 "✓ Preferenze raccolte con successo!"
+echo ""
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Esecuzione Operazioni"
+echo ""
 
 # =====================================================
 # FASE 1: Aggiornamento delle applicazioni (Casks)
@@ -63,6 +71,7 @@ echo "" && echo "✅ Preferenze raccolte! Avvio operazioni..." && echo ""
 if [ "$do_cask_upgrade" = true ]; then
 
     # Controlla le applicazioni installate tramite Homebrew Cask che necessitano di aggiornamento
+    gum style --foreground 6 "Controllo applicazioni obsolete..."
     if [ "$use_greedy" = true ]; then
         outdated_casks=$(brew outdated --cask --greedy --quiet)
     else
@@ -73,21 +82,30 @@ if [ "$do_cask_upgrade" = true ]; then
     if [[ -n "$outdated_casks" ]]; then
 
         # Mostra l'elenco delle applicazioni da aggiornare
-        echo "👉 Trovate applicazioni da aggiornare:"
-        echo "$outdated_casks" | sed 's/^/- /' && echo ""
+        gum style --foreground 3 "Trovate applicazioni da aggiornare:"
+        echo "$outdated_casks" | sed 's/^/  • /'
+        echo ""
 
         # Esegue l'upgrade solo per le cask trovate
-        echo "👉 Avvio aggiornamento..."
         if [ "$use_greedy" = true ]; then
-            brew upgrade --cask --greedy $outdated_casks
+            if gum spin --spinner dot --title "Aggiornamento applicazioni (incluso auto-update)..." -- brew upgrade --cask --greedy $outdated_casks 2>/dev/null; then
+                gum style --foreground 2 "✓ Aggiornamento applicazioni completato!"
+            else
+                gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento applicazioni. Continuo..."
+            fi
         else
-            brew upgrade --cask $outdated_casks
+            if gum spin --spinner dot --title "Aggiornamento applicazioni..." -- brew upgrade --cask $outdated_casks 2>/dev/null; then
+                gum style --foreground 2 "✓ Aggiornamento applicazioni completato!"
+            else
+                gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento applicazioni. Continuo..."
+            fi
         fi
-        echo "✅ Aggiornamento applicazioni completato!" && echo ""
+        echo ""
 
     else
 
-        echo "✅ Nessuna applicazione da aggiornare. Ottimo!" && echo ""
+        gum style --foreground 2 "✓ Nessuna applicazione da aggiornare"
+        echo ""
 
     fi
 
@@ -99,38 +117,71 @@ fi
 
 # Aggiorna l'indice dei pacchetti di Homebrew
 if [ "$do_update" = true ]; then
-    echo "👉 Avvio aggiornamento repository (update)..."
-    brew update
-    echo "✅ Aggiornamento repository completato!" && echo ""
+    if gum spin --spinner dot --title "Aggiornamento repository Homebrew..." -- brew update 2>/dev/null; then
+        gum style --foreground 2 "✓ Repository aggiornato"
+        echo ""
+    else
+        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento repository. Continuo..."
+        echo ""
+    fi
 fi
 
 # Aggiorna tutte le formule installate (pacchetti CLI)
 if [ "$do_upgrade" = true ]; then
-    echo "👉 Avvio aggiornamento formule (upgrade)..."
-    brew upgrade
-    echo "✅ Aggiornamento formule completato!" && echo ""
+    if gum spin --spinner dot --title "Aggiornamento formule (pacchetti CLI)..." -- brew upgrade 2>/dev/null; then
+        gum style --foreground 2 "✓ Formule aggiornate"
+        echo ""
+    else
+        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante aggiornamento formule. Continuo..."
+        echo ""
+    fi
 fi
 
 # Rimuove le dipendenze orfane (non più necessarie da altri pacchetti)
 if [ "$do_autoremove" = true ]; then
-    echo "👉 Avvio rimozione dipendenze non necessarie (autoremove)..."
-    brew autoremove
-    echo "✅ Rimozione dipendenze non necessarie completata!" && echo ""
+    if gum spin --spinner dot --title "Rimozione dipendenze non necessarie..." -- brew autoremove 2>/dev/null; then
+        gum style --foreground 2 "✓ Dipendenze orfane rimosse"
+        echo ""
+    else
+        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante rimozione dipendenze. Continuo..."
+        echo ""
+    fi
 fi
 
 # Rimuove le vecchie versioni dei pacchetti e svuota la cache
 if [ "$do_cleanup" = true ]; then
-    echo "👉 Avvio pulizia file obsoleti (cleanup)..."
-    brew cleanup --prune=all
-    echo "✅ Pulizia file obsoleti completata!" && echo ""
+    if gum spin --spinner dot --title "Pulizia cache e file obsoleti..." -- brew cleanup --prune=all 2>/dev/null; then
+        gum style --foreground 2 "✓ Pulizia completata"
+        echo ""
+    else
+        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante pulizia. Continuo..."
+        echo ""
+    fi
 fi
 
 # Esegue un controllo diagnostico per identificare potenziali problemi
 if [ "$do_doctor" = true ]; then
-    echo "👉 Avvio controllo stato di salute (doctor)..."
-    brew doctor
-    echo "✅ Controllo stato di salute completato!" && echo ""
+    gum style --foreground 6 "Esecuzione diagnostica sistema..."
+    echo ""
+    if brew doctor 2>&1 | gum style --foreground 240; then
+        echo ""
+        gum style --foreground 2 "✓ Diagnostica completata"
+        echo ""
+    else
+        echo ""
+        gum style --foreground 3 "⚠ Diagnostica completata con warning"
+        echo ""
+    fi
 fi
 
 # Messaggio di completamento
-echo "🎉 Aggiornamento e manutenzione Homebrew terminati con successo!"  && echo ""
+gum style \
+    --border double \
+    --padding "1 2" \
+    --margin "1 0" \
+    --foreground 2 \
+    --bold \
+    "Aggiornamento Completato con Successo!" \
+    "" \
+    "Tutte le operazioni selezionate sono state eseguite"
+echo ""

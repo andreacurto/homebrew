@@ -196,303 +196,65 @@ Puoi rieseguire `./brew-setup.sh` senza problemi. Lo script rileva cosa è già 
 
 ## Personalizzazione per Sviluppatori
 
-Questa sezione è per chi vuole modificare l'aspetto e il comportamento degli script.
+### File di Configurazione
 
-### File da modificare
+Le configurazioni UI si trovano all'inizio di ogni script:
+- `brew-setup.sh` - Script di installazione (linee 16-45)
+- `brew-update.sh` - Script di aggiornamento (linee 26-54)
+- `CLAUDE.md` - Documentazione tecnica dettagliata
 
-I file principali sono:
+### Variabili Principali
 
-- `brew-setup.sh` - Script di installazione iniziale
-- `brew-update.sh` - Script di aggiornamento
-
-Le configurazioni UI sono all'inizio di ogni file (linee 3-38).
-
-### Colori
-
-I colori usano la palette a 256 colori del terminale.
-
-**Variabili disponibili:**
-
+**Colori** (palette 256 colori - [chart](https://www.ditig.com/256-colors-cheat-sheet)):
 ```bash
-GUM_COLOR_SUCCESS="10"    # Verde - operazioni completate
-GUM_COLOR_ERROR="9"       # Rosso - errori
-GUM_COLOR_WARNING="11"    # Giallo - warning
-GUM_COLOR_INFO="14"       # Cyan - informazioni
-GUM_COLOR_PRIMARY="13"    # Magenta - titoli principali
-GUM_COLOR_MUTED="244"     # Grigio - testo secondario
+GUM_COLOR_SUCCESS="10"    # Operazioni completate
+GUM_COLOR_ERROR="9"       # Errori
+GUM_COLOR_WARNING="11"    # Warning e skip
+GUM_COLOR_INFO="14"       # Messaggi informativi
+GUM_COLOR_MUTED="244"     # Testo secondario
 ```
 
-**Reference colori:**
-
-- [256 Colors Cheat Sheet](https://www.ditig.com/256-colors-cheat-sheet) - Tutti i colori disponibili con codici
-
-**Come cambiare:**
-
-1. Scegli un numero dalla chart (0-255)
-2. Sostituisci il numero nella variabile
-3. Salva il file
-
-**Esempio:** Per usare un blu al posto del cyan per INFO:
-
+**Simboli**:
 ```bash
-GUM_COLOR_INFO="33"  # Blu medio
+GUM_SYMBOL_SUCCESS="✓"    # Completato
+GUM_SYMBOL_WARNING="!"    # Errore/Warning
+GUM_SYMBOL_SKIP="○"       # Saltato
 ```
 
-### Simboli
-
-I simboli sono caratteri Unicode usati per messaggi e checkbox.
-
-**Variabili disponibili:**
-
+**Spinner** (tipi: `dot`, `line`, `monkey`, `globe`, `moon`, etc.):
 ```bash
-GUM_SYMBOL_SUCCESS="✓"          # Check per successo
-GUM_SYMBOL_WARNING="!"          # Punto esclamativo per errori
-GUM_SYMBOL_BULLET="·"           # Punto per liste
-GUM_SYMBOL_SKIP="○"             # Cerchio vuoto per skip
-GUM_CHECKBOX_SELECTED="■"       # Checkbox piena (selezionata)
-GUM_CHECKBOX_UNSELECTED="□"     # Checkbox vuota (non selezionata)
-GUM_CHECKBOX_CURSOR="›"         # Cursore di selezione
+GUM_SPINNER_TYPE="monkey"
 ```
 
-**Come cambiare:**
+### Quick Tasks
 
-1. Cerca il carattere Unicode che preferisci
-2. Sostituisci nella variabile
-3. Salva il file
+**Aggiungere applicazione:**
+1. Trova il cask: `brew search nome-app`
+2. Aggiungi alla lista in `brew-setup.sh` (linee 55-72)
+3. Aggiorna tabella in README.md
 
-**Esempio:** Per usare emoji invece di simboli:
+**Cambiare tema:**
+Modifica `~/.zshrc` e sostituisci il nome del tema, poi riavvia il terminale.
 
+**Testare modifiche:**
 ```bash
-GUM_SYMBOL_SUCCESS="✅"
-GUM_SYMBOL_WARNING="❌"
+# brew-setup.sh
+./brew-setup.sh
+
+# brew-update.sh
+cp brew-update.sh ~/Shell/brew-update.sh && brew-update
 ```
 
-### Spinner
-
-Lo spinner è l'animazione che appare durante le operazioni lunghe.
-
-**Variabile:**
-
-```bash
-GUM_SPINNER_TYPE="line"
-```
-
-**Tipi disponibili in Gum:**
-
-- `dot` - Punto che si muove
-- `line` - Linea che ruota (attuale)
-- `minidot` - Punto minimo
-- `jump` - Punto che salta
-- `pulse` - Punto che pulsa
-- `points` - Punti che appaiono
-- `globe` - Globo che ruota
-- `moon` - Luna che cambia fase
-- `monkey` - Scimmia animata
-- `meter` - Barra di avanzamento
-- `hamburger` - Hamburger animato
-
-**Come cambiare:**
-
-1. Scegli uno spinner dalla lista
-2. Sostituisci il valore nella variabile
-3. Salva il file
-
-**Esempio:**
-
-```bash
-GUM_SPINNER_TYPE="dots"
-```
-
-### Bordi
-
-I bordi sono usati per i messaggi di inizio/fine e per gli errori.
-
-**Variabili disponibili:**
-
-```bash
-GUM_BORDER_ROUNDED="rounded"    # Bordo arrotondato
-GUM_BORDER_DOUBLE="double"      # Bordo doppio (usato per inizio/fine)
-GUM_BORDER_THICK="thick"        # Bordo spesso (usato per errori)
-```
-
-**Tipi disponibili in Gum:**
-
-- `none` - Nessun bordo
-- `hidden` - Nascosto
-- `normal` - Normale
-- `rounded` - Arrotondato
-- `thick` - Spesso
-- `double` - Doppio
-
-**Come usarli:** I bordi sono già configurati negli script. Per cambiare quale bordo viene usato dove, cerca nel codice:
-
-- `--border "$GUM_BORDER_DOUBLE"` per messaggi di inizio/fine
-- `--border "$GUM_BORDER_THICK"` per messaggi di errore
-
-### Layout e Spaziatura
-
-Controlla padding e margin dei messaggi.
-
-**Variabili disponibili:**
-
-```bash
-GUM_PADDING="0 1"           # Verticale Orizzontale
-GUM_MARGIN="0"              # Margin attorno ai box
-GUM_ERROR_PADDING="0 1"     # Padding specifico per errori
-```
-
-**Formato:** `"verticale orizzontale"`
-
-- Primo numero: padding/margin sopra e sotto
-- Secondo numero: padding/margin sinistra e destra
-
-**Esempio:** Per più spazio attorno ai messaggi:
-
-```bash
-GUM_PADDING="1 2"  # 1 riga sopra/sotto, 2 spazi sinistra/destra
-```
-
-### Testare le modifiche
-
-Dopo aver modificato le variabili:
-
-1. **Per brew-setup.sh:**
-
-    ```bash
-    ./brew-setup.sh
-    ```
-
-2. **Per brew-update.sh:**
-    - Copia in ~/Shell/:
-        ```bash
-        cp brew-update.sh ~/Shell/brew-update.sh
-        ```
-    - Esegui:
-        ```bash
-        brew-update
-        ```
-
-### Reference e Documentazione
-
-**Gum (tool per UI):**
-
-- [GitHub Gum](https://github.com/charmbracelet/gum) - Documentazione completa
-- [Gum Examples](https://github.com/charmbracelet/gum#examples) - Esempi pratici
-
-**Oh My Posh (temi terminale):**
-
-- [Oh My Posh Themes](https://ohmyposh.dev/docs/themes) - Galleria completa temi
-- [Oh My Posh Config](https://ohmyposh.dev/docs/installation/customize) - Customizzazione avanzata
-
-**Homebrew:**
-
-- [Homebrew Documentation](https://docs.brew.sh/) - Documentazione ufficiale
-- [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) - Lista applicazioni disponibili
-
-**Colori Terminale:**
-
-- [256 Colors Cheat Sheet](https://www.ditig.com/256-colors-cheat-sheet) - Reference completa
-- [Terminal Colors](https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html) - Guida tecnica
-
-**Shell Scripting:**
-
-- [Zsh Guide](https://zsh.sourceforge.io/Guide/) - Guida completa Zsh
-- [Bash Scripting](https://www.gnu.org/software/bash/manual/) - Reference Bash
-
-### Struttura Codice
-
-Entrambi gli script seguono questo pattern:
-
-```bash
-#!/bin/zsh
-
-# 1. Configurazione variabili UI (colori, simboli, spinner, bordi)
-GUM_COLOR_SUCCESS="10"
-...
-
-# 2. Messaggio iniziale con bordo
-echo ""
-gum style --border "$GUM_BORDER_DOUBLE" ... "Script - Inizio 🚀"
-echo ""
-
-# 3. Operazioni con pattern: spinner → check verde/rosso
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Descrizione..." -- sh -c "comando &>/dev/null"
-if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Operazione completata"
-else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore"
-fi
-
-# 4. Messaggio finale con bordo
-echo ""
-gum style --border "$GUM_BORDER_DOUBLE" ... "Script - Completato 🎉"
-echo ""
-```
-
-**Punti chiave:**
-
-- Tutti i comandi brew devono usare `sh -c "comando &>/dev/null"` per nascondere correttamente l'output
-- `$?` cattura l'exit code del comando precedente
-- `gum style` formatta e colora il testo
-- `gum spin` mostra lo spinner animato
-- `gum choose` crea menu interattivi con checkbox
-
-### Aggiungere Nuove Applicazioni
-
-Per aggiungere app alla lista in `brew-setup.sh`:
-
-1. Trova il nome del cask Homebrew:
-
-    ```bash
-    brew search nome-app
-    ```
-
-2. Aggiungi alla lista (linee 61-73):
-
-    ```bash
-    selected_apps=$(gum choose --no-limit --height 15 \
-        --header="Seleziona le applicazioni da installare:" \
-        ...
-        "nome-nuova-app" \
-        "whatsapp")
-    ```
-
-3. Aggiorna anche il README nella tabella applicazioni
-
-### Aggiungere Nuove Operazioni
-
-Per aggiungere operazioni a `brew-update.sh`:
-
-1. Aggiungi alla lista di selezione (linee 48-53)
-2. Aggiungi variabile booleana (dopo linea 61)
-3. Aggiungi case nel while loop (dopo linea 70)
-4. Aggiungi sezione con pattern spinner → check
-
-**Esempio:**
-
-```bash
-# Nella lista
-"Nuova operazione" \
-
-# Variabile
-do_nuova_operazione=false
-
-# Case
-"Nuova operazione") do_nuova_operazione=true ;;
-
-# Esecuzione
-if [ "$do_nuova_operazione" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Esecuzione nuova operazione..." -- sh -c "comando &>/dev/null"
-    if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Operazione completata"
-    else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore operazione"
-    fi
-fi
-```
+### Reference
+
+- [Gum Documentation](https://github.com/charmbracelet/gum) - UI terminale
+- [Oh My Posh Themes](https://ohmyposh.dev/docs/themes) - Temi shell
+- [Homebrew Docs](https://docs.brew.sh/) - Package manager
+- [256 Colors Chart](https://www.ditig.com/256-colors-cheat-sheet) - Colori terminale
+- [CLAUDE.md](CLAUDE.md) - Documentazione tecnica completa
 
 ---
 
 ## Contributi
 
-Se hai suggerimenti o trovi bug, apri una issue su GitHub.
+Suggerimenti e bug reports: apri una issue su GitHub.

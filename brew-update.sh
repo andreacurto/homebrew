@@ -24,34 +24,35 @@ fi
 # Definisce colori, simboli e stili per l'interfaccia Gum
 
 # Colori (256 terminal colors)
-GUM_COLOR_SUCCESS="10"    # Verde per operazioni completate
-GUM_COLOR_ERROR="9"       # Rosso per errori
-GUM_COLOR_WARNING="11"    # Giallo per warning
-GUM_COLOR_INFO="14"       # Cyan per informazioni
-GUM_COLOR_MUTED="244"     # Grigio per testo secondario
+GUM_COLOR_SUCCESS="10"    # Operazioni completate con successo
+GUM_COLOR_ERROR="9"       # Messaggi di errore
+GUM_COLOR_WARNING="11"    # Warning e operazioni saltate
+GUM_COLOR_INFO="14"       # Messaggi informativi durante operazioni
+GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✓"    # Check per successo
-GUM_SYMBOL_WARNING="!"    # Punto esclamativo per errori
-GUM_SYMBOL_BULLET="·"     # Punto per liste
+GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
+GUM_SYMBOL_WARNING="!"    # Errori e warning
+GUM_SYMBOL_BULLET="·"     # Elementi di lista
+GUM_SYMBOL_SKIP="○"       # Operazioni saltate
 
-# Checkbox (per menu di selezione)
-GUM_CHECKBOX_SELECTED="■"      # Checkbox selezionata
-GUM_CHECKBOX_UNSELECTED="□"    # Checkbox non selezionata
-GUM_CHECKBOX_CURSOR="›"        # Cursore di selezione
+# Checkbox
+GUM_CHECKBOX_SELECTED="■"      # Opzione selezionata nei menu
+GUM_CHECKBOX_UNSELECTED="□"    # Opzione non selezionata nei menu
+GUM_CHECKBOX_CURSOR="›"        # Indicatore posizione cursore
 
-# Spinner (animazione durante operazioni lunghe)
-GUM_SPINNER_TYPE="monkey"
+# Spinner
+GUM_SPINNER_TYPE="monkey"      # Tipo animazione durante operazioni
 
-# Bordi (per box messaggi)
-GUM_BORDER_ROUNDED="rounded"
-GUM_BORDER_DOUBLE="double"
-GUM_BORDER_THICK="thick"
+# Bordi
+GUM_BORDER_ROUNDED="rounded"   # Stile bordo per box principali
+GUM_BORDER_DOUBLE="double"     # Stile bordo alternativo
+GUM_BORDER_THICK="thick"       # Stile bordo spesso
 
-# Layout (spaziatura box)
-GUM_PADDING="0 1"
-GUM_MARGIN="0"
-GUM_ERROR_PADDING="0 1"
+# Layout
+GUM_PADDING="0 1"              # Spaziatura interna box (verticale orizzontale)
+GUM_MARGIN="0"                 # Margine esterno box
+GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
@@ -149,7 +150,7 @@ if [ "$do_cask_upgrade" = true ]; then
             fi
         fi
     else
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Nessuna applicazione da aggiornare"
+        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione da aggiornare"
     fi
 fi
 

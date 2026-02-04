@@ -1,92 +1,63 @@
 #!/bin/zsh
 
-# =====================================================
-# Configurazione UI (Gum)
-# =====================================================
+# Colori (256 terminal colors)
+GUM_COLOR_SUCCESS="10"
+GUM_COLOR_ERROR="9"
+GUM_COLOR_WARNING="11"
+GUM_COLOR_INFO="14"
+GUM_COLOR_PRIMARY="13"
+GUM_COLOR_MUTED="244"
 
-# Colori (256 terminal colors - Reference: https://www.ditig.com/256-colors-cheat-sheet)
-# Palette ispirata a Claude Code - colori soft e moderni
-GUM_COLOR_SUCCESS="10"       # Verde chiaro (più soft)
-GUM_COLOR_ERROR="9"          # Rosso soft
-GUM_COLOR_WARNING="11"       # Giallo soft
-GUM_COLOR_INFO="14"          # Cyan chiaro
-GUM_COLOR_PRIMARY="13"       # Magenta chiaro
-GUM_COLOR_MUTED="244"        # Grigio medio
+# Simboli
+GUM_SYMBOL_SUCCESS="✓"
+GUM_SYMBOL_WARNING="!"
+GUM_SYMBOL_SKIP="○"
 
-# Simboli (minimalisti, stile Claude Code)
-GUM_SYMBOL_SUCCESS="✓"       # Check leggero
-GUM_SYMBOL_WARNING="!"       # Punto esclamativo
-GUM_SYMBOL_BULLET="·"        # Punto medio
-GUM_SYMBOL_SKIP="○"          # Cerchio vuoto
-GUM_SYMBOL_INFO="›"          # Freccia destra
+# Checkbox
+GUM_CHECKBOX_SELECTED="■"
+GUM_CHECKBOX_UNSELECTED="□"
+GUM_CHECKBOX_CURSOR="›"
 
 # Spinner
-GUM_SPINNER_TYPE="line"      # Spinner lineare più minimal
+GUM_SPINNER_TYPE="line"
 
-# Bordi (più leggeri)
-GUM_BORDER_NORMAL="normal"   # Bordo standard
-GUM_BORDER_ROUNDED="rounded" # Bordo arrotondato
-GUM_BORDER_DOUBLE="double"   # Bordo doppio
-GUM_BORDER_THICK="thick"     # Bordo spesso
-GUM_BORDER_NONE="none"       # Nessun bordo
+# Bordi
+GUM_BORDER_ROUNDED="rounded"
+GUM_BORDER_DOUBLE="double"
+GUM_BORDER_THICK="thick"
 
-# Layout (più compatto)
-GUM_PADDING="0 1"            # Padding minimo
-GUM_MARGIN="0"               # Margin zero
-GUM_ERROR_PADDING="0 1"      # Padding errori
+# Layout
+GUM_PADDING="0 1"
+GUM_MARGIN="0"
+GUM_ERROR_PADDING="0 1"
 
-echo ""
 gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_PRIMARY" --bold "Setup Homebrew - Inizializzazione"
-echo ""
-
-# =====================================================
-# 1. Installazione Homebrew
-# =====================================================
 
 if ! command -v brew &> /dev/null; then
-
-    gum style --foreground "$GUM_COLOR_INFO" "Homebrew non trovato. Avvio installazione..."
-    # Installa Homebrew
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Aggiunge Homebrew al PATH per la sessione corrente
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Homebrew..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato correttamente"
-    echo ""
-
+    if command -v brew &> /dev/null; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
+    else
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione Homebrew"
+        exit 1
+    fi
 else
-
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew già installato"
-    echo ""
-
 fi
 
-# =====================================================
-# 2. Installazione pacchetti
-# =====================================================
-
-gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Installazione Pacchetti Essenziali"
-echo ""
-
-# Strumenti CLI
 gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- brew install node gh oh-my-posh gum &>/dev/null
 if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Installazione strumenti CLI completata!"
-    echo ""
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante l'installazione CLI tools. Continuo..."
-    echo ""
+    gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
 fi
 
-# =====================================================
-# 3. Raccolta Preferenze Utente
-# =====================================================
-
-gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Raccolta Preferenze Utente"
-
-# Selezione applicazioni con checkbox interattive
-echo ""
-gum style --foreground "$GUM_COLOR_INFO" "Seleziona le applicazioni da installare (usa Spazio per selezionare, Invio per confermare):"
 selected_apps=$(gum choose --no-limit --height 15 \
+    --header="Seleziona le applicazioni da installare:" \
+    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
     "1password" \
     "appcleaner" \
     "claude-code" \
@@ -101,100 +72,50 @@ selected_apps=$(gum choose --no-limit --height 15 \
     "wailbrew" \
     "whatsapp")
 
-# Converte l'output in array (metodo compatibile bash/zsh)
 selected_apps_array=()
 while IFS= read -r line; do
     [[ -n "$line" ]] && selected_apps_array+=("$line")
 done <<< "$selected_apps"
 
-# Selezione tema Oh My Posh
-echo ""
-gum style --foreground "$GUM_COLOR_INFO" "Seleziona il tema Oh My Posh:"
-selected_theme=$(gum choose --selected="zash" \
+selected_theme=$(gum choose \
+    --header="Seleziona il tema Oh My Posh:" \
+    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+    --selected="zash" \
     "zash" \
     "material" \
     "robbyrussell" \
     "pararussel")
 
-echo ""
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Preferenze raccolte con successo!"
-
-# =====================================================
-# 4. Installazione Font e Applicazioni
-# =====================================================
-
-gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Installazione Font e Applicazioni"
-echo ""
-
-# Font
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Meslo LG Nerd Font..." -- brew install --cask font-meslo-lg-nerd-font &>/dev/null
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font Nerd Font..." -- bash -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
 if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Meslo LG Nerd Font installato"
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Meslo LG"
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
 fi
 
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Roboto Mono Nerd Font..." -- brew install --cask font-roboto-mono-nerd-font &>/dev/null
-if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Roboto Mono Nerd Font installato"
-    echo ""
-else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Roboto Mono"
-    echo ""
-fi
-
-# Applicazioni
-# Installa le app selezionate dall'utente
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
-
-    echo ""
     gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- brew install --cask "${selected_apps_array[@]}" &>/dev/null
     if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Installazione applicazioni completata!"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante l'installazione di alcune applicazioni. Continuo..."
+        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
     fi
-    echo ""
-
 else
-
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione selezionata per l'installazione"
-    echo ""
-
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione selezionata"
 fi
 
-# =====================================================
-# 4. Setup Script di aggiornamento
-# =====================================================
-
-gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Setup Script di Aggiornamento"
-echo ""
-
-# Crea directory Scripts se non esiste
-mkdir -p ~/Shell
-
-# Copia lo script di aggiornamento
 SCRIPT_DIR=$(dirname "$0")
-cp "$SCRIPT_DIR/brew-update.sh" ~/Shell/brew-update.sh
-chmod +x ~/Shell/brew-update.sh
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script di aggiornamento..." -- bash -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
+if [ $? -eq 0 ]; then
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script di aggiornamento configurato"
+else
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore configurazione script"
+fi
 
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script di aggiornamento configurato in ~/Shell/"
-echo ""
-
-# =====================================================
-# 5. Configurazione Shell
-# =====================================================
-
-gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_INFO" "Configurazione Shell"
-echo ""
-
-# Backup del file .zshrc esistente
 if [ -f ~/.zshrc ]; then
     cp ~/.zshrc ~/.zshrc.bak
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_INFO Backup di ~/.zshrc creato in ~/.zshrc.bak"
 fi
 
-# Crea il file .zshrc con il tema selezionato
 cat > ~/.zshrc << EOF
 # Oh My Posh
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
@@ -204,20 +125,5 @@ alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
 
 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configurata con tema: $selected_theme"
-echo ""
 
-# =====================================================
-# Completamento
-# =====================================================
-
-# Messaggio di completamento
-gum style \
-    --border "$GUM_BORDER_DOUBLE" \
-    --padding "$GUM_PADDING" \
-    --margin "$GUM_MARGIN" \
-    --foreground "$GUM_COLOR_SUCCESS" \
-    --bold \
-    "Setup Completato con Successo!" \
-    "" \
-    "Riavvia il terminale per applicare le modifiche"
-echo ""
+gum style --border "$GUM_BORDER_DOUBLE" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --foreground "$GUM_COLOR_SUCCESS" --bold "Setup Completato!" "" "Riavvia il terminale per applicare le modifiche"

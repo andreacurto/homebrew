@@ -4,16 +4,17 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 
 ## Caratteristiche
 
-✨ **Interfaccia Interattiva**
+✨ **Interfaccia Interattiva Moderna**
 
-- Checkbox e menu di selezione con navigazione da tastiera
-- Spinner animati durante le operazioni
-- Messaggi colorati e formattati per migliore leggibilità
-- Gestione errori non-blocking (continua anche in caso di problemi)
+- Checkbox realistiche (□/■) con navigazione da tastiera
+- Domande integrate direttamente nei menu di selezione
+- Spinner animati che mostrano lo stato in tempo reale
+- Messaggi compatti e colorati per una visualizzazione pulita
+- Lista finale con check verdi che mostrano tutte le operazioni completate
 
 🎯 **Selezione Personalizzata**
 
-- Scegli quali applicazioni installare
+- Scegli quali applicazioni installare con checkbox visive
 - Scegli il tema della shell durante il setup
 - Seleziona quali operazioni di manutenzione eseguire
 
@@ -21,6 +22,7 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
 
 - Setup iniziale con un solo comando
 - Aggiornamenti selettivi e veloci
+- Gestione errori non-blocking (continua anche in caso di problemi)
 - Pulizia automatica del sistema
 
 ---
@@ -52,22 +54,25 @@ Tool per automatizzare l'installazione e l'aggiornamento di pacchetti tramite Ho
     ./brew-setup.sh
     ```
 
-Lo script ti guiderà attraverso un'**installazione interattiva**:
+Lo script ti guiderà attraverso un'**installazione interattiva compatta**:
 
 1. **Installazione automatica** di Homebrew (se non presente)
 2. **Installazione pacchetti essenziali** (Node.js, GitHub CLI, Oh My Posh, Gum)
-3. **Selezione applicazioni**: Scegli quali app installare tramite checkbox interattive
-4. **Selezione tema shell**: Scegli il tema Oh My Posh che preferisci
-5. **Installazione font** e applicazioni selezionate
-6. **Configurazione automatica** degli script di aggiornamento
+3. **Selezione applicazioni**: Checkbox realistiche (□/■) con domanda integrata
+4. **Selezione tema shell**: Menu di selezione per il tema Oh My Posh
+5. **Installazione font** Nerd Font con messaggio di completamento
+6. **Installazione applicazioni** selezionate con messaggio di completamento
+7. **Configurazione automatica** degli script di aggiornamento
 
-Durante il processo vedrai:
+L'interfaccia è **compatta e pulita**:
 
-- ✔ Messaggi di successo in verde
-- ⚠ Warning in giallo (l'installazione continua)
-- Spinner animati durante le operazioni lunghe
+- ✓ Check verdi per ogni operazione completata con successo
+- ! Warning rossi per errori (l'installazione continua)
+- Spinner durante le operazioni che si trasformano in messaggi di stato
+- Nessuna riga vuota ridondante, colori e simboli separano le sezioni
+- Al termine vedrai una lista di check verdi con tutte le operazioni completate
 
-Al termine, **riavvia il terminale** per applicare le modifiche.
+**Riavvia il terminale** per applicare le modifiche.
 
 ## Aggiornamento del Sistema
 
@@ -77,22 +82,24 @@ Una volta completato il setup, puoi aggiornare il sistema usando l'alias da term
 brew-update
 ```
 
-Lo script ti permetterà di **selezionare le operazioni** da eseguire tramite checkbox interattive:
+Lo script ti mostra **checkbox realistiche (□/■)** per selezionare le operazioni:
 
-- ✅ Aggiorna applicazioni (con opzione --greedy per app con auto-update)
-- ✅ Aggiorna repository Homebrew
-- ✅ Aggiorna formule (pacchetti CLI)
-- ✅ Rimuovi dipendenze orfane
-- ✅ Pulizia cache e file obsoleti
-- ✅ Diagnostica sistema (brew doctor)
+- ■ Aggiorna applicazioni (con opzione --greedy per app con auto-update)
+- ■ Aggiorna repository Homebrew
+- ■ Aggiorna formule (pacchetti CLI)
+- ■ Rimuovi dipendenze orfane
+- ■ Pulizia cache e file obsoleti
+- ■ Diagnostica sistema (brew doctor)
 
-Tutte le operazioni sono **pre-selezionate di default**. Puoi deselezionare quelle che non vuoi eseguire usando la barra spaziatrice.
+Tutte le operazioni sono **pre-selezionate di default** (■). Usa la barra spaziatrice per deselezionare (□) quelle che non vuoi eseguire.
 
-Durante l'esecuzione vedrai:
+**Durante l'esecuzione**:
 
-- Spinner animati per ogni operazione
-- Messaggi di completamento o errori
-- Output nascosto per una visualizzazione pulita
+- Ogni operazione mostra uno spinner con descrizione in tempo reale
+- Lo spinner si trasforma in ✓ verde (successo) o ! rosso (errore)
+- Per l'aggiornamento applicazioni vedi il progresso di download
+- Interfaccia compatta senza righe vuote ridondanti
+- Al termine, una lista pulita di check verdi mostra tutte le operazioni completate
 
 ## Personalizzazione
 

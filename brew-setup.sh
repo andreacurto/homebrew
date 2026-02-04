@@ -1,23 +1,27 @@
 #!/bin/zsh
 
-echo "" && echo "🚀 Inizializzazione setup Homebrew..."  && echo ""
+echo ""
+gum style --border double --padding "1 2" --margin "1 0" --foreground 5 --bold "Setup Homebrew - Inizializzazione"
+echo ""
 
 # =====================================================
 # 1. Installazione Homebrew
 # =====================================================
 
 if ! command -v brew &> /dev/null; then
-    
-    echo "👉 Homebrew non trovato. Avvio installazione..."
+
+    gum style --foreground 6 "Homebrew non trovato. Avvio installazione..."
     # Installa Homebrew
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     # Aggiunge Homebrew al PATH per la sessione corrente
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    echo "✅ Homebrew installato correttamente" && echo ""
+    gum style --foreground 2 "✓ Homebrew installato correttamente"
+    echo ""
 
 else
-    
-    echo "✅ Homebrew già installato" && echo ""
+
+    gum style --foreground 2 "✓ Homebrew già installato"
+    echo ""
 
 fi
 
@@ -25,85 +29,95 @@ fi
 # 2. Installazione pacchetti
 # =====================================================
 
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Installazione Pacchetti Essenziali"
+echo ""
+
 # Strumenti CLI
-echo "👉 Installazione strumenti CLI..."
-brew install node gh oh-my-posh gum
-echo "✅ Installazione strumenti CLI completata!" && echo ""
+if gum spin --spinner dot --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- brew install node gh oh-my-posh gum 2>/dev/null; then
+    gum style --foreground 2 "✓ Installazione strumenti CLI completata!"
+    echo ""
+else
+    gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante l'installazione CLI tools. Continuo..."
+    echo ""
+fi
 
 # =====================================================
 # 3. Raccolta Preferenze Utente
 # =====================================================
 
-echo "👉 Raccolta preferenze utente..."
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Raccolta Preferenze Utente"
 
-# Array delle applicazioni disponibili
-declare -a apps=(
-    "1password"
-    "appcleaner"
-    "claude-code"
-    "dropbox"
-    "figma"
-    "google-chrome"
-    "imageoptim"
-    "numi"
-    "rectangle"
-    "spotify"
-    "visual-studio-code"
-    "wailbrew"
-    "whatsapp"
-)
+# Selezione applicazioni con checkbox interattive
+echo ""
+gum style --foreground 6 "Seleziona le applicazioni da installare (usa Spazio per selezionare, Invio per confermare):"
+selected_apps=$(gum choose --no-limit --height 15 \
+    "1password" \
+    "appcleaner" \
+    "claude-code" \
+    "dropbox" \
+    "figma" \
+    "google-chrome" \
+    "imageoptim" \
+    "numi" \
+    "rectangle" \
+    "spotify" \
+    "visual-studio-code" \
+    "wailbrew" \
+    "whatsapp")
 
-# Array per memorizzare le app selezionate
-declare -a selected_apps=()
-
-# Chiede all'utente per ogni applicazione
-for app in "${apps[@]}"; do
-    read -r "REPLY?Installare $app? (y/n): "
-    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-        selected_apps+=("$app")
-    fi
-done
+# Converte l'output in array
+IFS=$'\n' read -r -d '' -a selected_apps_array <<< "$selected_apps"
 
 # Selezione tema Oh My Posh
 echo ""
-echo "Scegli il tema Oh My Posh:"
-echo "1) zash (default)"
-echo "2) material"
-echo "3) robbyrussell"
-echo "4) pararussel"
-read -r "REPLY?Seleziona tema (1-4) [1]: "
+gum style --foreground 6 "Seleziona il tema Oh My Posh:"
+selected_theme=$(gum choose --selected="zash" \
+    "zash" \
+    "material" \
+    "robbyrussell" \
+    "pararussel")
 
-case "${REPLY:-1}" in
-    1) selected_theme="zash" ;;
-    2) selected_theme="material" ;;
-    3) selected_theme="robbyrussell" ;;
-    4) selected_theme="pararussel" ;;
-    *) selected_theme="zash" ;;
-esac
-
-echo "✅ Preferenze raccolte!" && echo ""
+echo ""
+gum style --foreground 2 "✓ Preferenze raccolte con successo!"
 
 # =====================================================
 # 4. Installazione Font e Applicazioni
 # =====================================================
 
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Installazione Font e Applicazioni"
+echo ""
+
 # Font
-echo "👉 Installazione font..."
-brew install --cask font-meslo-lg-nerd-font
-brew install --cask font-roboto-mono-nerd-font
-echo "✅ Installazione font completata!" && echo ""
+if gum spin --spinner dot --title "Installazione Meslo LG Nerd Font..." -- brew install --cask font-meslo-lg-nerd-font 2>/dev/null; then
+    gum style --foreground 2 "✓ Meslo LG Nerd Font installato"
+else
+    gum style --foreground 196 "⚠ Errore installazione Meslo LG"
+fi
+
+if gum spin --spinner dot --title "Installazione Roboto Mono Nerd Font..." -- brew install --cask font-roboto-mono-nerd-font 2>/dev/null; then
+    gum style --foreground 2 "✓ Roboto Mono Nerd Font installato"
+    echo ""
+else
+    gum style --foreground 196 "⚠ Errore installazione Roboto Mono"
+    echo ""
+fi
 
 # Applicazioni
 # Installa le app selezionate dall'utente
-if [ ${#selected_apps[@]} -gt 0 ]; then
+if [ ${#selected_apps_array[@]} -gt 0 ]; then
 
-    echo "" && echo "👉 Installazione applicazioni..."
-    brew install --cask "${selected_apps[@]}"
-    echo "✅ Installazione applicazioni completata!" && echo ""
+    echo ""
+    if gum spin --spinner dot --title "Installazione applicazioni selezionate..." -- brew install --cask "${selected_apps_array[@]}" 2>/dev/null; then
+        gum style --foreground 2 "✓ Installazione applicazioni completata!"
+    else
+        gum style --foreground 196 --border thick --padding "0 1" "⚠ Errore durante l'installazione di alcune applicazioni. Continuo..."
+    fi
+    echo ""
 
 else
 
-    echo "✅ Nessuna applicazione selezionata per l'installazione!" && echo ""
+    gum style --foreground 3 "⊘ Nessuna applicazione selezionata per l'installazione"
+    echo ""
 
 fi
 
@@ -111,7 +125,8 @@ fi
 # 4. Setup Script di aggiornamento
 # =====================================================
 
-echo "👉 Configurazione script di aggiornamento..."
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Setup Script di Aggiornamento"
+echo ""
 
 # Crea directory Scripts se non esiste
 mkdir -p ~/Shell
@@ -121,18 +136,20 @@ SCRIPT_DIR=$(dirname "$0")
 cp "$SCRIPT_DIR/brew-update.sh" ~/Shell/brew-update.sh
 chmod +x ~/Shell/brew-update.sh
 
-echo "✅ Configurazione script di aggiornamento completato!" && echo ""
+gum style --foreground 2 "✓ Script di aggiornamento configurato in ~/Shell/"
+echo ""
 
 # =====================================================
 # 5. Configurazione Shell
 # =====================================================
 
-echo "👉 Configurazione Shell..."
+gum style --border rounded --padding "1 2" --margin "1 0" --foreground 6 "Configurazione Shell"
+echo ""
 
 # Backup del file .zshrc esistente
 if [ -f ~/.zshrc ]; then
     cp ~/.zshrc ~/.zshrc.bak
-    echo "💾 Backup del file ~/.zshrc creato in ~/.zshrc.bak"
+    gum style --foreground 3 "⚑ Backup di ~/.zshrc creato in ~/.zshrc.bak"
 fi
 
 # Crea il file .zshrc con il tema selezionato
@@ -144,11 +161,21 @@ eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${sele
 alias brew-update='sh ~/Shell/brew-update.sh'
 EOF
 
-echo "✅ Configurazione Shell completata con tema: $selected_theme!" && echo ""
+gum style --foreground 2 "✓ Shell configurata con tema: $selected_theme"
+echo ""
 
 # =====================================================
 # Completamento
 # =====================================================
 
 # Messaggio di completamento
-echo "🎉 Setup Homebrew completato con successo! Per applicare le modifiche, riavvia il terminale." && echo ""
+gum style \
+    --border double \
+    --padding "1 2" \
+    --margin "1 0" \
+    --foreground 2 \
+    --bold \
+    "Setup Completato con Successo!" \
+    "" \
+    "Riavvia il terminale per applicare le modifiche"
+echo ""

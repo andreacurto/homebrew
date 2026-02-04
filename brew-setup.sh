@@ -25,6 +25,9 @@ GUM_SPINNER_TYPE="line"      # Spinner lineare più minimal
 
 # Bordi (più leggeri)
 GUM_BORDER_NORMAL="normal"   # Bordo standard
+GUM_BORDER_ROUNDED="rounded" # Bordo arrotondato
+GUM_BORDER_DOUBLE="double"   # Bordo doppio
+GUM_BORDER_THICK="thick"     # Bordo spesso
 GUM_BORDER_NONE="none"       # Nessun bordo
 
 # Layout (più compatto)

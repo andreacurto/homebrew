@@ -33,7 +33,7 @@ GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 # Simboli
 GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
 GUM_SYMBOL_WARNING="!"    # Errori e warning
-GUM_SYMBOL_BULLET="·"     # Elementi di lista
+GUM_SYMBOL_BULLET="→"     # Elementi di lista
 GUM_SYMBOL_SKIP="○"       # Operazioni saltate
 
 # Checkbox
@@ -100,7 +100,7 @@ done <<< "$selected_operations"
 # Se selezionato aggiornamento app, chiede se includere app con auto-update
 # L'opzione --greedy forza l'aggiornamento anche di app che si aggiornano da sole
 if [ "$do_cask_upgrade" = true ]; then
-    if gum confirm "Includere anche applicazioni con auto-update (opzione --greedy)?"; then
+    if gum confirm "Includere anche applicazioni con auto-update (opzione --greedy)?" --default=false; then
         use_greedy=true
     fi
 fi

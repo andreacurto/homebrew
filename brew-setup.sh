@@ -68,7 +68,8 @@ gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM
 echo ""
 
 # Strumenti CLI
-if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- brew install node gh oh-my-posh gum 2>/dev/null; then
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- brew install node gh oh-my-posh gum &>/dev/null
+if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Installazione strumenti CLI completata!"
     echo ""
 else
@@ -100,8 +101,11 @@ selected_apps=$(gum choose --no-limit --height 15 \
     "wailbrew" \
     "whatsapp")
 
-# Converte l'output in array
-IFS=$'\n' read -r -d '' -a selected_apps_array <<< "$selected_apps"
+# Converte l'output in array (metodo compatibile bash/zsh)
+selected_apps_array=()
+while IFS= read -r line; do
+    [[ -n "$line" ]] && selected_apps_array+=("$line")
+done <<< "$selected_apps"
 
 # Selezione tema Oh My Posh
 echo ""
@@ -123,13 +127,15 @@ gum style --border "$GUM_BORDER_ROUNDED" --padding "$GUM_PADDING" --margin "$GUM
 echo ""
 
 # Font
-if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Meslo LG Nerd Font..." -- brew install --cask font-meslo-lg-nerd-font 2>/dev/null; then
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Meslo LG Nerd Font..." -- brew install --cask font-meslo-lg-nerd-font &>/dev/null
+if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Meslo LG Nerd Font installato"
 else
     gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione Meslo LG"
 fi
 
-if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Roboto Mono Nerd Font..." -- brew install --cask font-roboto-mono-nerd-font 2>/dev/null; then
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione Roboto Mono Nerd Font..." -- brew install --cask font-roboto-mono-nerd-font &>/dev/null
+if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Roboto Mono Nerd Font installato"
     echo ""
 else
@@ -142,7 +148,8 @@ fi
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
 
     echo ""
-    if gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- brew install --cask "${selected_apps_array[@]}" 2>/dev/null; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- brew install --cask "${selected_apps_array[@]}" &>/dev/null
+    if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Installazione applicazioni completata!"
     else
         gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_WARNING Errore durante l'installazione di alcune applicazioni. Continuo..."

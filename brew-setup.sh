@@ -13,19 +13,20 @@
 # ===== COLORI ANSI =====
 # Usati prima che gum sia disponibile
 MUTED="\033[38;5;244m"
+RED="\033[38;5;9m"
 RESET="\033[0m"
 
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
 # Mostra cosa farà lo script e chiede conferma all'utente
 echo ""
-echo -e "${MUTED}╭───────────────────────────────────╮${RESET}"
-echo -e "${MUTED}│${RESET}  Homebrew Setup - Inizio 🚀       ${MUTED}│${RESET}"
-echo -e "${MUTED}╰───────────────────────────────────╯${RESET}"
+echo -e "${MUTED}╭──────────────────────────────╮${RESET}"
+echo -e "${MUTED}│${RESET}  Homebrew Setup - Inizio 🚀  ${MUTED}│${RESET}"
+echo -e "${MUTED}╰──────────────────────────────╯${RESET}"
 echo ""
 echo "Questo script installerà:"
 echo -e "${MUTED}→ Homebrew (package manager per macOS)${RESET}"
 echo -e "${MUTED}→ Strumenti CLI (node, gh, oh-my-posh, gum)${RESET}"
-echo -e "${MUTED}→ Font Nerd Font per il terminale${RESET}"
+echo -e "${MUTED}→ Font 'Nerd Font' per il terminale${RESET}"
 echo -e "${MUTED}→ Applicazioni a tua scelta${RESET}"
 echo -e "${MUTED}→ Tema personalizzato per il terminale${RESET}"
 echo ""
@@ -38,7 +39,7 @@ if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
     if ! command -v brew &> /dev/null; then
-        echo "! Errore installazione Homebrew"
+        echo -e "${RED}! Errore installazione Homebrew${RESET}"
         exit 1
     fi
 fi
@@ -48,7 +49,7 @@ fi
 if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
     if ! command -v gum &> /dev/null; then
-        echo "! Errore installazione gum"
+        echo -e "${RED}! Errore installazione gum${RESET}"
         exit 1
     fi
 fi
@@ -86,9 +87,6 @@ GUM_BORDER_THICK="thick"       # Stile bordo spesso
 GUM_PADDING="0 1"              # Spaziatura interna box (verticale orizzontale)
 GUM_MARGIN="0"                 # Margine esterno box
 GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
-
-# ===== MESSAGGIO DIPENDENZE INSTALLATE =====
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew e gum pronti"
 
 # ===== SELEZIONE APPLICAZIONI =====
 # Menu interattivo con checkbox per scegliere quali applicazioni installare
@@ -129,6 +127,10 @@ selected_theme=$(gum choose \
     "material" \
     "robbyrussell" \
     "pararussel")
+
+# ===== INSTALLAZIONI =====
+# Messaggio di conferma dipendenze base
+gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew e gum pronti"
 
 # ===== INSTALLAZIONE STRUMENTI CLI =====
 # Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente

@@ -34,8 +34,12 @@ echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
 
+# ===== VERIFICA PRELIMINARE =====
+echo -e "${MUTED}⌛ Verifica preliminare in corso, non chiudere il terminale...${RESET}"
+
 # ===== INSTALLAZIONE SILENZIOSA HOMEBREW =====
 # Verifica se Homebrew è installato, altrimenti lo installa
+HOMEBREW_ALREADY_INSTALLED=false
 if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -43,17 +47,25 @@ if ! command -v brew &> /dev/null; then
         echo -e "${RED}! Errore installazione Homebrew${RESET}"
         exit 1
     fi
+else
+    HOMEBREW_ALREADY_INSTALLED=true
 fi
 
 # ===== INSTALLAZIONE SILENZIOSA GUM =====
 # Verifica se gum è installato, altrimenti lo installa
+GUM_ALREADY_INSTALLED=false
 if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
     if ! command -v gum &> /dev/null; then
         echo -e "${RED}! Errore installazione gum${RESET}"
         exit 1
     fi
+else
+    GUM_ALREADY_INSTALLED=true
 fi
+
+# Cancella il messaggio di verifica preliminare
+echo -e "\033[1A\033[2K\r"
 
 # ===== CONFIGURAZIONE UI =====
 # Definisce colori, simboli e stili per l'interfaccia Gum
@@ -131,40 +143,87 @@ selected_theme=$(gum choose \
 
 # ===== INSTALLAZIONI =====
 # Messaggio di conferma dipendenze base
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
+if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Homebrew già installato"
+else
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
+fi
 
 # ===== INSTALLAZIONE STRUMENTI CLI =====
 # Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
 # - node: Runtime JavaScript
 # - gh: GitHub CLI
-# - oh-my-posh: Personalizzazione prompt shell
+# - oh-my-posh: Personalizzazione prompt shell (cask)
 # (gum già installato nella fase iniziale)
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- sh -c "brew install node gh oh-my-posh &>/dev/null"
-if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
+
+# Controlla se tutti gli strumenti CLI sono già installati
+CLI_ALREADY_INSTALLED=false
+if command -v node &> /dev/null && command -v gh &> /dev/null && command -v oh-my-posh &> /dev/null; then
+    CLI_ALREADY_INSTALLED=true
+fi
+
+if [ "$CLI_ALREADY_INSTALLED" = true ]; then
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Strumenti CLI già installati"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione strumenti CLI"
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh)..." -- sh -c "brew install node gh &>/dev/null && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh &>/dev/null"
+    if [ $? -eq 0 ]; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
+    else
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione strumenti CLI"
+    fi
 fi
 
 # ===== INSTALLAZIONE FONT =====
 # Installa font Nerd Font necessari per i temi Oh My Posh
 # I Nerd Font includono icone e simboli speciali per il terminale
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font 'Nerd Font'..." -- sh -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
-if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
+
+# Lista font da verificare
+fonts_list=("font-meslo-lg-nerd-font" "font-roboto-mono-nerd-font")
+
+# Separa i font già installati da quelli da installare
+fonts_to_install=()
+for font in "${fonts_list[@]}"; do
+    if ! brew list --cask "$font" &> /dev/null; then
+        fonts_to_install+=("$font")
+    fi
+done
+
+# Installa solo i font non ancora presenti
+if [ ${#fonts_to_install[@]} -gt 0 ]; then
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font 'Nerd Font'..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
+    if [ $? -eq 0 ]; then
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
+    else
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
+    fi
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
+    # Tutti i font erano già installati
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Font già installati"
 fi
 
 # ===== INSTALLAZIONE APPLICAZIONI =====
 # Installa le applicazioni selezionate dall'utente tramite Homebrew Cask
 # Se nessuna app selezionata, salta questa fase
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- sh -c "brew install --cask ${selected_apps_array[*]} &>/dev/null"
-    if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
+    # Separa le app già installate da quelle da installare
+    apps_to_install=()
+    for app in "${selected_apps_array[@]}"; do
+        if ! brew list --cask "$app" &> /dev/null; then
+            apps_to_install+=("$app")
+        fi
+    done
+
+    # Installa solo le app non ancora presenti
+    if [ ${#apps_to_install[@]} -gt 0 ]; then
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- sh -c "brew install --cask ${apps_to_install[*]} &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
+        fi
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
+        # Tutte le app selezionate erano già installate
+        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Applicazioni già installate"
     fi
 else
     gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione selezionata"

@@ -34,12 +34,12 @@ GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
 GUM_SYMBOL_WARNING="!"    # Errori e warning
 GUM_SYMBOL_BULLET="→"     # Elementi di lista
-GUM_SYMBOL_SKIP="○"       # Operazioni saltate
+GUM_SYMBOL_SKIP="❋"       # Operazioni saltate
 
 # Checkbox
 GUM_CHECKBOX_SELECTED="■"      # Opzione selezionata nei menu
 GUM_CHECKBOX_UNSELECTED="□"    # Opzione non selezionata nei menu
-GUM_CHECKBOX_CURSOR="›"        # Indicatore posizione cursore
+GUM_CHECKBOX_CURSOR="□"        # Indicatore posizione cursore
 
 # Spinner
 GUM_SPINNER_TYPE="monkey"      # Tipo animazione durante operazioni

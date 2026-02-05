@@ -24,6 +24,7 @@ echo -e "${MUTED}│${RESET}  Homebrew Setup - Inizio 🚀  ${MUTED}│${RESET}"
 echo -e "${MUTED}╰──────────────────────────────╯${RESET}"
 echo ""
 echo "Questo script installerà:"
+echo ""
 echo -e "${MUTED}→ Homebrew (package manager per macOS)${RESET}"
 echo -e "${MUTED}→ Strumenti CLI (node, gh, oh-my-posh, gum)${RESET}"
 echo -e "${MUTED}→ Font 'Nerd Font' per il terminale${RESET}"
@@ -68,12 +69,12 @@ GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 # Simboli
 GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
 GUM_SYMBOL_WARNING="!"    # Errori e warning
-GUM_SYMBOL_SKIP="○"       # Operazioni saltate
+GUM_SYMBOL_SKIP="❋"       # Operazioni saltate
 
 # Checkbox
 GUM_CHECKBOX_SELECTED="■"      # Opzione selezionata nei menu
 GUM_CHECKBOX_UNSELECTED="□"    # Opzione non selezionata nei menu
-GUM_CHECKBOX_CURSOR="›"        # Indicatore posizione cursore
+GUM_CHECKBOX_CURSOR="□"        # Indicatore posizione cursore
 
 # Spinner
 GUM_SPINNER_TYPE="monkey"      # Tipo animazione durante operazioni
@@ -130,7 +131,7 @@ selected_theme=$(gum choose \
 
 # ===== INSTALLAZIONI =====
 # Messaggio di conferma dipendenze base
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew e gum pronti"
+gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
 
 # ===== INSTALLAZIONE STRUMENTI CLI =====
 # Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
@@ -138,17 +139,17 @@ gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew e gum 
 # - gh: GitHub CLI
 # - oh-my-posh: Personalizzazione prompt shell
 # (gum già installato nella fase iniziale)
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh)..." -- sh -c "brew install node gh oh-my-posh &>/dev/null"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh, gum)..." -- sh -c "brew install node gh oh-my-posh &>/dev/null"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione CLI tools"
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione strumenti CLI"
 fi
 
 # ===== INSTALLAZIONE FONT =====
 # Installa font Nerd Font necessari per i temi Oh My Posh
 # I Nerd Font includono icone e simboli speciali per il terminale
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font Nerd Font..." -- sh -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font 'Nerd Font'..." -- sh -c "brew install --cask font-meslo-lg-nerd-font font-roboto-mono-nerd-font &>/dev/null"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
 else
@@ -177,7 +178,7 @@ gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script di aggiorn
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script di aggiornamento configurato"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore configurazione script"
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore configurazione script di aggiornamento"
 fi
 
 # ===== CONFIGURAZIONE SHELL =====
@@ -195,7 +196,7 @@ eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${sele
 alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
 
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Shell configurata con tema '$selected_theme'"
+gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Terminale configurato con tema '$selected_theme'"
 
 # ===== MESSAGGIO FINALE =====
 echo ""

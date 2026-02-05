@@ -109,7 +109,7 @@ Configurati tramite variabili per facile personalizzazione:
 GUM_SYMBOL_SUCCESS="✓"   # Operazioni completate
 GUM_SYMBOL_WARNING="!"   # Errori e warning
 GUM_SYMBOL_BULLET="→"    # Bullet point liste
-GUM_SYMBOL_SKIP="○"      # Operazione saltata
+GUM_SYMBOL_SKIP="❋"      # Operazione saltata
 ```
 
 ### Pattern UI Comuni
@@ -224,10 +224,10 @@ fi
 3. Attesa conferma utente (Invio per continuare)
 4. Installazione silenziosa Homebrew (se non presente)
 5. Installazione silenziosa gum (se non presente)
-6. Messaggio dipendenze pronte (con gum)
-7. **Selezione applicazioni**: Multi-select con checkbox
-8. **Selezione tema**: Oh My Posh (default: zash)
-9. **Installazione CLI tools**: node, gh, oh-my-posh
+6. **Selezione applicazioni**: Multi-select con checkbox
+7. **Selezione tema**: Oh My Posh (default: zash)
+8. Messaggio "Homebrew installato" (con gum)
+9. **Installazione CLI tools**: node, gh, oh-my-posh, gum
 10. **Installazione font**: Meslo LG, Roboto Mono Nerd Font
 11. **Installazione applicazioni** selezionate
 12. **Setup script aggiornamento**: Copia in ~/Shell/
@@ -329,7 +329,7 @@ Modificare per adattare a font/preferenze:
 GUM_SYMBOL_SUCCESS="✓"     # Completato
 GUM_SYMBOL_WARNING="!"     # Errore/Warning
 GUM_SYMBOL_BULLET="→"      # Bullet liste
-GUM_SYMBOL_SKIP="○"        # Saltato
+GUM_SYMBOL_SKIP="❋"        # Saltato
 ```
 
 #### Spinner

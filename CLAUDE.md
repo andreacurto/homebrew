@@ -20,7 +20,7 @@ Documentazione tecnica per sviluppatori e AI assistants per modifiche future al 
 homebrew/
 ├── brew-setup.sh      # Script setup iniziale sistema
 ├── brew-update.sh     # Script aggiornamento e manutenzione
-├── .zshrc             # Template configurazione shell (copiato in ~/)
+├── .zshrc-example     # Template configurazione shell (riferimento)
 ├── README.md          # Documentazione utente
 └── CLAUDE.md          # Documentazione tecnica (questo file)
 ```
@@ -88,12 +88,17 @@ homebrew/
 Configurato tramite variabili (256 terminal colors - [Reference](https://www.ditig.com/256-colors-cheat-sheet)):
 
 ```bash
-GUM_COLOR_SUCCESS="2"    # Verde - operazioni completate
-GUM_COLOR_ERROR="196"    # Rosso - errori
-GUM_COLOR_WARNING="3"    # Giallo - warning
-GUM_COLOR_INFO="6"       # Cyan - informazioni
-GUM_COLOR_PRIMARY="5"    # Magenta - header principali
-GUM_COLOR_MUTED="240"    # Grigio - output secondario
+GUM_COLOR_SUCCESS="10"   # Verde brillante - operazioni completate
+GUM_COLOR_ERROR="9"      # Rosso brillante - errori
+GUM_COLOR_WARNING="11"   # Giallo brillante - warning
+GUM_COLOR_INFO="14"      # Cyan brillante - informazioni
+GUM_COLOR_MUTED="244"    # Grigio - output secondario
+```
+
+**ANSI Colors (pre-gum):** Per messaggi prima che gum sia disponibile:
+```bash
+MUTED="\033[38;5;244m"   # Grigio 244
+RESET="\033[0m"          # Reset colore
 ```
 
 ### Simboli UI
@@ -101,11 +106,10 @@ GUM_COLOR_MUTED="240"    # Grigio - output secondario
 Configurati tramite variabili per facile personalizzazione:
 
 ```bash
-GUM_SYMBOL_SUCCESS="✔"   # Operazioni completate
-GUM_SYMBOL_WARNING="⚠"   # Errori e warning
-GUM_SYMBOL_BULLET="❖"    # Bullet point liste
-GUM_SYMBOL_SKIP="⊘"      # Operazione saltata
-GUM_SYMBOL_INFO="⚑"      # Informazioni
+GUM_SYMBOL_SUCCESS="✓"   # Operazioni completate
+GUM_SYMBOL_WARNING="!"   # Errori e warning
+GUM_SYMBOL_BULLET="→"    # Bullet point liste
+GUM_SYMBOL_SKIP="○"      # Operazione saltata
 ```
 
 ### Pattern UI Comuni
@@ -215,26 +219,24 @@ fi
 
 **Flusso Completo:**
 
-1. Configurazione UI (variabili)
-2. Messaggio iniziale
-3. **Sezione 1**: Controlla/installa Homebrew
-4. **Sezione 2**: Installa CLI tools essenziali (node, gh, oh-my-posh, gum)
-5. **Sezione 3**: Raccolta preferenze utente
-    - Multi-select applicazioni (checkbox)
-    - Select tema Oh My Posh (singola scelta, default: zash)
-6. **Sezione 4**: Installazione
-    - Font (Meslo LG, Roboto Mono)
-    - Applicazioni selezionate
-7. **Sezione 5**: Setup script aggiornamento
-    - Crea `~/Shell/`
-    - Copia `brew-update.sh`
-8. **Sezione 6**: Configurazione shell
-    - Backup `.zshrc` esistente
-    - Genera nuovo `.zshrc` con tema selezionato
-9. Messaggio completamento
+1. Definizione colori ANSI (per messaggi pre-gum)
+2. Messaggio iniziale con lista operazioni (ANSI styled)
+3. Attesa conferma utente (Invio per continuare)
+4. Installazione silenziosa Homebrew (se non presente)
+5. Installazione silenziosa gum (se non presente)
+6. Messaggio dipendenze pronte (con gum)
+7. **Selezione applicazioni**: Multi-select con checkbox
+8. **Selezione tema**: Oh My Posh (default: zash)
+9. **Installazione CLI tools**: node, gh, oh-my-posh
+10. **Installazione font**: Meslo LG, Roboto Mono Nerd Font
+11. **Installazione applicazioni** selezionate
+12. **Setup script aggiornamento**: Copia in ~/Shell/
+13. **Configurazione shell**: Genera ~/.zshrc con tema
+14. Messaggio completamento
 
 **Variabili Chiave:**
 
+- `MUTED`, `RESET`: Colori ANSI per messaggi pre-gum
 - `selected_apps_array[]`: Applicazioni da installare
 - `selected_theme`: Tema Oh My Posh scelto
 
@@ -312,12 +314,11 @@ fi
 Modificare per cambiare schema colori (valori 0-255):
 
 ```bash
-GUM_COLOR_SUCCESS="2"      # Verde
-GUM_COLOR_ERROR="196"      # Rosso
-GUM_COLOR_WARNING="3"      # Giallo
-GUM_COLOR_INFO="6"         # Cyan
-GUM_COLOR_PRIMARY="5"      # Magenta
-GUM_COLOR_MUTED="240"      # Grigio
+GUM_COLOR_SUCCESS="10"     # Verde brillante
+GUM_COLOR_ERROR="9"        # Rosso brillante
+GUM_COLOR_WARNING="11"     # Giallo brillante
+GUM_COLOR_INFO="14"        # Cyan brillante
+GUM_COLOR_MUTED="244"      # Grigio
 ```
 
 #### Simboli
@@ -325,11 +326,10 @@ GUM_COLOR_MUTED="240"      # Grigio
 Modificare per adattare a font/preferenze:
 
 ```bash
-GUM_SYMBOL_SUCCESS="✔"
-GUM_SYMBOL_WARNING="⚠"
-GUM_SYMBOL_BULLET="❖"
-GUM_SYMBOL_SKIP="⊘"
-GUM_SYMBOL_INFO="⚑"
+GUM_SYMBOL_SUCCESS="✓"     # Completato
+GUM_SYMBOL_WARNING="!"     # Errore/Warning
+GUM_SYMBOL_BULLET="→"      # Bullet liste
+GUM_SYMBOL_SKIP="○"        # Saltato
 ```
 
 #### Spinner
@@ -337,7 +337,7 @@ GUM_SYMBOL_INFO="⚑"
 Tipi disponibili: dot, line, minidot, jump, pulse, points, globe, moon, monkey, meter, hamburger
 
 ```bash
-GUM_SPINNER_TYPE="dot"
+GUM_SPINNER_TYPE="monkey"
 ```
 
 #### Bordi
@@ -360,7 +360,7 @@ GUM_ERROR_PADDING="0 1"    # Padding errori
 
 ## Applicazioni Installabili
 
-Lista mantenuta in `brew-setup.sh` array `apps` (linee 86-98):
+Lista mantenuta in `brew-setup.sh` nel blocco `gum choose` (sezione SELEZIONE APPLICAZIONI):
 
 - 1password
 - appcleaner
@@ -378,12 +378,13 @@ Lista mantenuta in `brew-setup.sh` array `apps` (linee 86-98):
 
 **Aggiungere nuove app**:
 
-1. Inserire nome cask nell'array (ordine alfabetico preferito)
-2. Aggiornare README.md sezione Applicazioni
+1. Trovare nome cask: `brew search nome-app`
+2. Aggiungere opzione nel `gum choose` applicazioni
+3. Aggiornare README.md sezione Applicazioni
 
 ## Temi Oh My Posh
 
-Lista temi in `brew-setup.sh` gum choose (linee 106-110):
+Lista temi in `brew-setup.sh` nel blocco `gum choose` tema:
 
 - `zash` (default)
 - `material`
@@ -392,7 +393,7 @@ Lista temi in `brew-setup.sh` gum choose (linee 106-110):
 
 **Aggiungere nuovi temi**:
 
-1. Verificare esistenza tema in Oh My Posh: `ls $(brew --prefix oh-my-posh)/themes/`
+1. Verificare esistenza tema: `ls $(brew --prefix oh-my-posh)/themes/`
 2. Aggiungere opzione in `gum choose` tema
 3. Aggiornare README.md lista temi
 
@@ -400,25 +401,26 @@ Lista temi in `brew-setup.sh` gum choose (linee 106-110):
 
 ### Aggiunta Nuova Dipendenza CLI
 
-1. Aggiungere a `brew install` in sezione CLI tools (brew-setup.sh:68)
+1. Aggiungere a `brew install` in sezione INSTALLAZIONE STRUMENTI CLI
 2. Aggiornare README.md lista strumenti
 
 ### Modifica Schema Colori
 
-1. Editare variabili `GUM_COLOR_*` all'inizio script (brew-setup.sh:7-13, brew-update.sh:15-21)
-2. Usare [256 colors chart](https://www.ditig.com/256-colors-cheat-sheet) per scegliere
+1. Editare variabili `GUM_COLOR_*` nella sezione CONFIGURAZIONE UI
+2. Per colori pre-gum, editare variabili ANSI nella sezione COLORI ANSI
+3. Usare [256 colors chart](https://www.ditig.com/256-colors-cheat-sheet) per scegliere
 
 ### Aggiunta Nuova Operazione in brew-update
 
-1. Aggiungere opzione in `gum choose` operazioni (brew-update.sh:53-60)
-2. Aggiungere variabile booleana `do_*` (brew-update.sh:62-69)
-3. Aggiungere case in conversione (brew-update.sh:72-80)
+1. Aggiungere opzione in `gum choose` nella sezione SELEZIONE OPERAZIONI
+2. Aggiungere variabile booleana `do_*`
+3. Aggiungere case nel blocco di conversione selezioni
 4. Aggiungere sezione condizionale con pattern spinner + errori
 5. Aggiornare README.md
 
 ### Personalizzazione Simboli
 
-1. Editare variabili `GUM_SYMBOL_*` (brew-setup.sh:15-20, brew-update.sh:23-26)
+1. Editare variabili `GUM_SYMBOL_*` nella sezione CONFIGURAZIONE UI
 2. Usare emoji o caratteri Unicode
 3. Testare con font terminale in uso
 
@@ -460,6 +462,15 @@ Per vedere output Homebrew completo, rimuovere `2>/dev/null` dai comandi:
 
 ## Changelog
 
+### v2.1 - Ottimizzazioni (2026-02-05)
+
+- Fix bug: gum usato prima di essere installato
+- Aggiunto messaggio iniziale con ANSI colors (pre-gum)
+- Installazione silenziosa Homebrew e gum
+- Selezioni utente spostate prima delle installazioni
+- Commenti migliorati in tutti gli script
+- README.md snellito (sezione sviluppatori)
+
 ### v2.0 - UI Interattiva (2026-02-04)
 
 - Aggiunta interfaccia interattiva con Gum
@@ -478,4 +489,4 @@ Per vedere output Homebrew completo, rimuovere `2>/dev/null` dai comandi:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-04_ _Versione: 2.0 (UI Interattiva)_
+_Ultimo aggiornamento: 2026-02-05_ _Versione: 2.1 (Ottimizzazioni)_

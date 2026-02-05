@@ -194,64 +194,21 @@ Puoi rieseguire `./brew-setup.sh` senza problemi. Lo script rileva cosa è già 
 
 ---
 
-## Personalizzazione per Sviluppatori
+## Per Sviluppatori
 
-### File di Configurazione
+Per documentazione tecnica dettagliata (architettura, convenzioni, configurazione UI, flussi operativi), consulta [CLAUDE.md](CLAUDE.md).
 
-Le configurazioni UI si trovano all'inizio di ogni script:
-- `brew-setup.sh` - Script di installazione (linee 16-45)
-- `brew-update.sh` - Script di aggiornamento (linee 26-54)
-- `CLAUDE.md` - Documentazione tecnica dettagliata
+### Quick Reference
 
-### Variabili Principali
-
-**Colori** (palette 256 colori - [chart](https://www.ditig.com/256-colors-cheat-sheet)):
-```bash
-GUM_COLOR_SUCCESS="10"    # Operazioni completate
-GUM_COLOR_ERROR="9"       # Errori
-GUM_COLOR_WARNING="11"    # Warning e skip
-GUM_COLOR_INFO="14"       # Messaggi informativi
-GUM_COLOR_MUTED="244"     # Testo secondario
-```
-
-**Simboli**:
-```bash
-GUM_SYMBOL_SUCCESS="✓"    # Completato
-GUM_SYMBOL_WARNING="!"    # Errore/Warning
-GUM_SYMBOL_SKIP="○"       # Saltato
-```
-
-**Spinner** (tipi: `dot`, `line`, `monkey`, `globe`, `moon`, etc.):
-```bash
-GUM_SPINNER_TYPE="monkey"
-```
-
-### Quick Tasks
-
-**Aggiungere applicazione:**
-1. Trova il cask: `brew search nome-app`
-2. Aggiungi alla lista in `brew-setup.sh` (linee 55-72)
-3. Aggiorna tabella in README.md
-
-**Cambiare tema:**
-Modifica `~/.zshrc` e sostituisci il nome del tema, poi riavvia il terminale.
+**Aggiungere applicazione:** `brew search nome-app`, poi aggiungi alla lista in `brew-setup.sh`
 
 **Testare modifiche:**
 ```bash
-# brew-setup.sh
-./brew-setup.sh
-
-# brew-update.sh
-cp brew-update.sh ~/Shell/brew-update.sh && brew-update
+./brew-setup.sh                                           # Setup
+cp brew-update.sh ~/Shell/brew-update.sh && brew-update   # Update
 ```
 
-### Reference
-
-- [Gum Documentation](https://github.com/charmbracelet/gum) - UI terminale
-- [Oh My Posh Themes](https://ohmyposh.dev/docs/themes) - Temi shell
-- [Homebrew Docs](https://docs.brew.sh/) - Package manager
-- [256 Colors Chart](https://www.ditig.com/256-colors-cheat-sheet) - Colori terminale
-- [CLAUDE.md](CLAUDE.md) - Documentazione tecnica completa
+**Link utili:** [Gum](https://github.com/charmbracelet/gum) · [Oh My Posh](https://ohmyposh.dev/docs/themes) · [Homebrew](https://docs.brew.sh/)
 
 ---
 

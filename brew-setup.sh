@@ -141,6 +141,9 @@ selected_theme=$(gum choose \
     "robbyrussell" \
     "pararussel")
 
+# Fallback al tema default se la selezione è vuota
+[[ -z "$selected_theme" ]] && selected_theme="zash"
+
 # ===== INSTALLAZIONI =====
 # Messaggio di conferma dipendenze base
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then

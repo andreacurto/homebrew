@@ -20,6 +20,13 @@ if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
 fi
 
+# File temporanei con PID per evitare conflitti tra istanze concorrenti
+TMP_OUTDATED="/tmp/outdated_casks_$$.txt"
+TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
+
+# Pulizia file temporanei all'uscita (normale, Ctrl+C, errori)
+trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR"' EXIT
+
 # ===== CONFIGURAZIONE UI =====
 # Definisce colori, simboli e stili per l'interfaccia Gum
 
@@ -110,9 +117,8 @@ fi
 # Mostra il progresso di download per ogni app
 if [ "$do_cask_upgrade" = true ]; then
     # Controlla quali app hanno aggiornamenti disponibili
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo applicazioni obsolete..." -- bash -c "if [ \"$use_greedy\" = true ]; then brew outdated --cask --greedy --quiet; else brew outdated --cask --quiet; fi" > /tmp/outdated_casks.txt
-    outdated_casks=$(cat /tmp/outdated_casks.txt)
-    rm -f /tmp/outdated_casks.txt
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo applicazioni obsolete..." -- sh -c "if [ \"$use_greedy\" = true ]; then brew outdated --cask --greedy --quiet; else brew outdated --cask --quiet; fi > \"$TMP_OUTDATED\""
+    outdated_casks=$(<"$TMP_OUTDATED")
 
     if [[ -n "$outdated_casks" ]]; then
         # Mostra lista app da aggiornare
@@ -133,7 +139,7 @@ if [ "$do_cask_upgrade" = true ]; then
             brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
             done
-            # PIPESTATUS[0] cattura exit code del primo comando della pipeline (brew upgrade)
+            # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
             if [ ${pipestatus[1]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
@@ -208,7 +214,7 @@ fi
 # Esegue brew doctor per identificare potenziali problemi
 # Mostra l'output completo della diagnostica
 if [ "$do_doctor" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Esecuzione diagnostica sistema..." -- sh -c "brew doctor > /tmp/brew_doctor_output.txt 2>&1"
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Esecuzione diagnostica sistema..." -- sh -c "brew doctor > \"$TMP_DOCTOR\" 2>&1"
     doctor_exit=$?
     if [ $doctor_exit -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Diagnostica completata"
@@ -217,8 +223,7 @@ if [ "$do_doctor" = true ]; then
     fi
     # Mostra output diagnostica in grigio
     echo ""
-    cat /tmp/brew_doctor_output.txt | gum style --foreground "$GUM_COLOR_MUTED"
-    rm -f /tmp/brew_doctor_output.txt
+    gum style --foreground "$GUM_COLOR_MUTED" < "$TMP_DOCTOR"
 fi
 
 # ===== MESSAGGIO FINALE =====

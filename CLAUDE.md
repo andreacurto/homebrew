@@ -483,6 +483,17 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v2.2 - Bug fix e robustezza (2026-02-06)
+
+- Fix PIPESTATUS → pipestatus (zsh usa array 1-indexed)
+- Fallback tema default "zash" se selezione vuota
+- File temporanei con PID (`$$`) per evitare conflitti concorrenti
+- Trap EXIT per pulizia automatica file temporanei
+- Redirect stdout dentro `sh -c` per robustezza
+- Sostituito `bash -c` con `sh -c` per consistenza POSIX
+- Eliminato uso superfluo di `cat` (UUOC)
+- Liste app indentate e colorate muted
+
 ### v2.1 - Ottimizzazioni (2026-02-05)
 
 - Fix bug: gum usato prima di essere installato
@@ -510,4 +521,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-05_ _Versione: 2.1 (Ottimizzazioni)_
+_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.2 (Bug fix e robustezza)_

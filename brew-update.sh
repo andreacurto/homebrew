@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.3.0"
+SCRIPT_VERSION="1.3.2"
 
 # URL sorgente per auto-aggiornamento script
 SCRIPT_SOURCE="https://raw.githubusercontent.com/andreacurto/homebrew/master/brew-update.sh"
@@ -144,10 +144,10 @@ fi
 # ===== MESSAGGIO VERSIONE SCRIPT =====
 # Mostra lo stato di aggiornamento dello script all'utente
 if [ "$script_was_updated" = true ] && [ -n "$script_remote_version" ]; then
-    gum style --foreground "$GUM_COLOR_INFO" "Hai già l'ultima versione dello script (v$script_remote_version)"
+    gum style --foreground "$GUM_COLOR_INFO" "Script aggiornato alla versione v$script_remote_version"
     echo ""
 elif [ "$script_update_checked" = true ]; then
-    gum style --foreground "$GUM_COLOR_INFO" "Script aggiornato all'ultima versione (v$SCRIPT_VERSION)"
+    gum style --foreground "$GUM_COLOR_INFO" "Hai già l'ultima versione dello script (v$SCRIPT_VERSION)"
     echo ""
 fi
 

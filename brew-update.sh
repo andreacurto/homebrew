@@ -16,6 +16,9 @@
 # Assicura che Homebrew sia nel PATH
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+# Versione script (usata per messaggio di stato)
+SCRIPT_VERSION="1.3.0"
+
 # URL sorgente per auto-aggiornamento script
 SCRIPT_SOURCE="https://raw.githubusercontent.com/andreacurto/homebrew/master/brew-update.sh"
 
@@ -36,14 +39,20 @@ trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
 # Scarica l'ultima versione dalla repo GitHub e aggiorna silenziosamente
 # In caso di errore (no internet, timeout, etc.) lo script prosegue normalmente
 SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
+script_was_updated=false
+script_update_checked=false
+script_remote_version=""
 if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" -o "$TMP_UPDATE" 2>/dev/null; then
     if [ -f "$SCRIPT_LOCAL" ] && [ -f "$TMP_UPDATE" ]; then
         local_hash=$(shasum "$SCRIPT_LOCAL" 2>/dev/null | cut -d' ' -f1)
         remote_hash=$(shasum "$TMP_UPDATE" 2>/dev/null | cut -d' ' -f1)
+        script_remote_version=$(grep '^SCRIPT_VERSION=' "$TMP_UPDATE" 2>/dev/null | cut -d'"' -f2)
         if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ]; then
             cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
             chmod +x "$SCRIPT_LOCAL" 2>/dev/null
+            script_was_updated=true
         fi
+        script_update_checked=true
     fi
 fi
 
@@ -130,6 +139,18 @@ if [ "$do_cask_upgrade" = true ]; then
     if gum confirm "Includere anche applicazioni con auto-update (opzione --greedy)?" --default=false; then
         use_greedy=true
     fi
+fi
+
+# ===== MESSAGGIO VERSIONE SCRIPT =====
+# Mostra lo stato di aggiornamento dello script all'utente
+if [ "$script_was_updated" = true ] && [ -n "$script_remote_version" ]; then
+    echo ""
+    gum style --foreground "$GUM_COLOR_INFO" "Script aggiornato alla versione v$script_remote_version"
+    echo ""
+elif [ "$script_update_checked" = true ]; then
+    echo ""
+    gum style --foreground "$GUM_COLOR_INFO" "Script aggiornato (v$SCRIPT_VERSION)"
+    echo ""
 fi
 
 # ===== AGGIORNAMENTO APPLICAZIONI =====

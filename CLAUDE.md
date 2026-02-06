@@ -510,6 +510,12 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v2.5 - Messaggio versione script (2026-02-06)
+
+- Aggiunta variabile `SCRIPT_VERSION` per tracciamento versione
+- Messaggio info con stato versione prima delle operazioni
+- Mostra versione corrente se aggiornato, o versione nuova se appena aggiornato
+
 ### v2.4 - Auto-aggiornamento script (2026-02-06)
 
 - Auto-update silenzioso di `brew-update.sh` dalla repo GitHub pubblica
@@ -565,4 +571,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.4 (Auto-aggiornamento script)_
+_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.5 (Messaggio versione script)_

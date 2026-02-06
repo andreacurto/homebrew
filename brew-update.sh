@@ -56,7 +56,7 @@ GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Inizio 🚀"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update → Inizio 🚀"
 echo ""
 
 # ===== SELEZIONE OPERAZIONI =====
@@ -117,7 +117,9 @@ if [ "$do_cask_upgrade" = true ]; then
     if [[ -n "$outdated_casks" ]]; then
         # Mostra lista app da aggiornare
         gum style --foreground "$GUM_COLOR_WARNING" "Trovate applicazioni da aggiornare:"
-        echo "$outdated_casks" | sed "s/^/  $GUM_SYMBOL_BULLET /"
+        echo "$outdated_casks" | while IFS= read -r line; do
+            gum style --foreground "$GUM_COLOR_MUTED" "  $GUM_SYMBOL_BULLET $line"
+        done
 
         # Converte lista in array bash/zsh compatible
         outdated_casks_array=()
@@ -132,7 +134,7 @@ if [ "$do_cask_upgrade" = true ]; then
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
             done
             # PIPESTATUS[0] cattura exit code del primo comando della pipeline (brew upgrade)
-            if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            if [ ${pipestatus[1]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
@@ -143,7 +145,7 @@ if [ "$do_cask_upgrade" = true ]; then
             brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
             done
-            if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            if [ ${pipestatus[1]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore aggiornamento applicazioni"
@@ -214,11 +216,12 @@ if [ "$do_doctor" = true ]; then
         gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Diagnostica completata con warning"
     fi
     # Mostra output diagnostica in grigio
+    echo ""
     cat /tmp/brew_doctor_output.txt | gum style --foreground "$GUM_COLOR_MUTED"
     rm -f /tmp/brew_doctor_output.txt
 fi
 
 # ===== MESSAGGIO FINALE =====
 echo ""
-gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update - Completato 🎉"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update → Completato 🎉"
 echo ""

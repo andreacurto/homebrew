@@ -65,7 +65,7 @@ else
 fi
 
 # Cancella il messaggio di verifica preliminare
-echo -e "\033[1A\033[2K\r"
+echo -e "\033[1A\033[2K\033[1A\033[2K"
 
 # ===== CONFIGURAZIONE UI =====
 # Definisce colori, simboli e stili per l'interfaccia Gum

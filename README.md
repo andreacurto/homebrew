@@ -7,7 +7,7 @@ Script per installare e mantenere aggiornato il tuo Mac con Homebrew in modo sem
 Questo progetto ti permette di:
 
 1. **Installare Homebrew** (se non ce l'hai già)
-2. **Scegliere quali applicazioni installare** tramite un menu interattivo con checkbox
+2. **Scegliere quali applicazioni e font installare** tramite menu interattivi con checkbox
 3. **Mantenere tutto aggiornato** con un singolo comando da terminale
 4. **Personalizzare il tema del terminale** scegliendo tra 4 temi disponibili
 
@@ -63,16 +63,20 @@ Lo script ti mostrerà:
     - Premi **Spazio** per selezionare/deselezionare
     - Premi **Invio** quando hai finito
 
-4. **Scelta tema terminale**
+4. **Scelta font**
+    - Stessa logica delle applicazioni
+    - I Nerd Font servono per i temi del terminale
+
+5. **Scelta tema terminale**
     - 4 temi tra cui scegliere (consigliato: zash)
     - Usa le **frecce** e premi **Invio**
 
-5. **Installazione automatica**
-    - Font necessari
+6. **Installazione automatica**
+    - Font che hai selezionato
     - Applicazioni che hai selezionato
-    - Vedrai gli spinner e poi i check verdi ✓
+    - Vedrai gli spinner e poi i check verdi ✔︎
 
-6. **Messaggio finale**
+7. **Messaggio finale**
     - "Homebrew Setup - Completato 🎉"
     - **Chiudi e riapri il terminale** per vedere le modifiche
 
@@ -139,6 +143,19 @@ Durante il setup puoi scegliere quali installare:
 
 ---
 
+## Font Disponibili
+
+Durante il setup puoi scegliere quali font installare:
+
+| Font                      | Descrizione                              |
+| ------------------------- | ---------------------------------------- |
+| Meslo LG Nerd Font        | Font monospaced con icone e simboli      |
+| Roboto Mono Nerd Font     | Font monospaced ispirato a Roboto        |
+
+**Nota**: I Nerd Font includono icone speciali necessarie per i temi del terminale (Oh My Posh).
+
+---
+
 ## Temi Terminale
 
 Durante il setup scegli uno di questi temi per il terminale:
@@ -200,7 +217,7 @@ Per documentazione tecnica dettagliata (architettura, convenzioni, configurazion
 
 ### Quick Reference
 
-**Aggiungere applicazione:** `brew search nome-app`, poi aggiungi alla lista in `brew-setup.sh`
+**Aggiungere app/font:** `brew search nome`, poi aggiungi all'array `APP_LIST` o `FONT_LIST` in testata di `brew-setup.sh`
 
 **Testare modifiche:**
 ```bash

@@ -166,9 +166,10 @@ fi
 
 ### Naming Variabili
 
-- **MAIUSCOLO**: Variabili configurazione globale UI (`GUM_COLOR_SUCCESS`, `GUM_SPINNER_TYPE`)
+- **MAIUSCOLO**: Variabili configurazione globale (`GUM_COLOR_SUCCESS`, `APP_LIST`, `FONT_LIST`)
 - **snake_case**: Variabili locali/temporanee (`selected_apps`, `outdated_casks`)
 - **Prefisso GUM\_**: Tutte le variabili di configurazione Gum
+- **Suffisso \_LIST**: Array configurabili per liste installazione
 
 ### Commenti
 
@@ -220,25 +221,29 @@ fi
 
 **Flusso Completo:**
 
-1. Definizione colori ANSI (per messaggi pre-gum)
-2. Messaggio iniziale con lista operazioni (ANSI styled)
-3. Attesa conferma utente (Invio per continuare)
-4. Installazione silenziosa Homebrew (se non presente)
-5. Installazione silenziosa gum (se non presente)
-6. **Selezione applicazioni**: Multi-select con checkbox
-7. **Selezione tema**: Oh My Posh (default: zash)
-8. Messaggio "Homebrew installato" (con gum)
-9. **Installazione CLI tools**: node, gh, oh-my-posh, gum
-10. **Installazione font**: Meslo LG, Roboto Mono Nerd Font
-11. **Installazione applicazioni** selezionate
-12. **Setup script aggiornamento**: Copia in ~/Shell/
-13. **Configurazione shell**: Genera ~/.zshrc con tema
-14. Messaggio completamento
+1. Definizione liste installazione (`APP_LIST`, `FONT_LIST`)
+2. Definizione colori ANSI (per messaggi pre-gum)
+3. Messaggio iniziale con lista operazioni (ANSI styled)
+4. Attesa conferma utente (Invio per continuare)
+5. Installazione silenziosa Homebrew (se non presente)
+6. Installazione silenziosa gum (se non presente)
+7. **Selezione applicazioni**: Multi-select con checkbox (da `APP_LIST`)
+8. **Selezione font**: Multi-select con checkbox (da `FONT_LIST`)
+9. **Selezione tema**: Oh My Posh (default: zash)
+10. Messaggio "Homebrew installato" (con gum)
+11. **Installazione CLI tools**: node, gh, oh-my-posh, gum
+12. **Installazione font** selezionati
+13. **Installazione applicazioni** selezionate
+14. **Setup script aggiornamento**: Copia in ~/Shell/
+15. **Configurazione shell**: Genera ~/.zshrc con tema
+16. Messaggio completamento
 
 **Variabili Chiave:**
 
+- `APP_LIST[]`, `FONT_LIST[]`: Liste configurabili in testata
 - `MUTED`, `RESET`: Colori ANSI per messaggi pre-gum
-- `selected_apps_array[]`: Applicazioni da installare
+- `selected_apps_array[]`: Applicazioni selezionate dall'utente
+- `selected_fonts_array[]`: Font selezionati dall'utente
 - `selected_theme`: Tema Oh My Posh scelto
 
 ### brew-update.sh
@@ -359,29 +364,51 @@ GUM_MARGIN="1 0"           # Verticale Orizzontale
 GUM_ERROR_PADDING="0 1"    # Padding errori
 ```
 
-## Applicazioni Installabili
+## Liste Installazione
 
-Lista mantenuta in `brew-setup.sh` nel blocco `gum choose` (sezione SELEZIONE APPLICAZIONI):
+App e font sono configurati tramite array in testata di `brew-setup.sh` (sezione LISTE INSTALLAZIONE).
+Separare i dati dalla logica permette di aggiungere/rimuovere elementi senza toccare il codice.
 
-- 1password
-- appcleaner
-- claude-code
-- dropbox
-- figma
-- google-chrome
-- imageoptim
-- numi
-- rectangle
-- spotify
-- visual-studio-code
-- wailbrew
-- whatsapp
+### Applicazioni (`APP_LIST`)
+
+```bash
+APP_LIST=(
+    "1password"
+    "appcleaner"
+    "claude-code"
+    "dropbox"
+    "figma"
+    "google-chrome"
+    "imageoptim"
+    "numi"
+    "rectangle"
+    "spotify"
+    "visual-studio-code"
+    "wailbrew"
+    "whatsapp"
+)
+```
 
 **Aggiungere nuove app**:
 
 1. Trovare nome cask: `brew search nome-app`
-2. Aggiungere opzione nel `gum choose` applicazioni
+2. Aggiungere elemento all'array `APP_LIST` in testata
 3. Aggiornare README.md sezione Applicazioni
+
+### Font (`FONT_LIST`)
+
+```bash
+FONT_LIST=(
+    "font-meslo-lg-nerd-font"
+    "font-roboto-mono-nerd-font"
+)
+```
+
+**Aggiungere nuovi font**:
+
+1. Trovare nome cask: `brew search font-nome`
+2. Aggiungere elemento all'array `FONT_LIST` in testata
+3. Aggiornare README.md sezione Font
 
 ## Temi Oh My Posh
 
@@ -483,6 +510,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v2.3 - Liste configurabili e selezione font (2026-02-06)
+
+- Liste app e font separate dalla logica in variabili `APP_LIST` e `FONT_LIST`
+- Selezione interattiva font con menu checkbox (come le app)
+- Gestione casistiche font: nessuno selezionato, già installati, errori
+- Guard per array vuoti (menu non mostrato se lista vuota)
+
 ### v2.2 - Bug fix e robustezza (2026-02-06)
 
 - Fix PIPESTATUS → pipestatus (zsh usa array 1-indexed)
@@ -521,4 +555,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.2 (Bug fix e robustezza)_
+_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.3 (Liste configurabili e selezione font)_

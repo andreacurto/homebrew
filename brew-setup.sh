@@ -6,7 +6,7 @@
 # Funzionalità:
 # - Installa Homebrew se non presente
 # - Installa strumenti CLI essenziali (node, gh, oh-my-posh, gum)
-# - Permette selezione interattiva applicazioni da installare
+# - Permette selezione interattiva applicazioni e font da installare
 # - Configura tema Oh My Posh per il terminale
 # - Setup script di aggiornamento automatico
 
@@ -15,6 +15,31 @@
 MUTED="\033[38;5;244m"
 RED="\033[38;5;9m"
 RESET="\033[0m"
+
+# ===== LISTE INSTALLAZIONE =====
+# Modificare questi array per aggiungere/rimuovere elementi
+# I nomi devono corrispondere ai nomi Homebrew Cask
+
+APP_LIST=(
+    "1password"
+    "appcleaner"
+    "claude-code"
+    "dropbox"
+    "figma"
+    "google-chrome"
+    "imageoptim"
+    "numi"
+    "rectangle"
+    "spotify"
+    "visual-studio-code"
+    "wailbrew"
+    "whatsapp"
+)
+
+FONT_LIST=(
+    "font-meslo-lg-nerd-font"
+    "font-roboto-mono-nerd-font"
+)
 
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
 # Mostra cosa farà lo script e chiede conferma all'utente
@@ -104,30 +129,40 @@ GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
 # ===== SELEZIONE APPLICAZIONI =====
 # Menu interattivo con checkbox per scegliere quali applicazioni installare
 # Usa frecce per navigare, Spazio per selezionare, Invio per confermare
-selected_apps=$(gum choose --no-limit --height 15 \
-    --header="Seleziona le applicazioni da installare:" \
-    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
-    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
-    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-    "1password" \
-    "appcleaner" \
-    "claude-code" \
-    "dropbox" \
-    "figma" \
-    "google-chrome" \
-    "imageoptim" \
-    "numi" \
-    "rectangle" \
-    "spotify" \
-    "visual-studio-code" \
-    "wailbrew" \
-    "whatsapp")
+selected_apps=""
+if [ ${#APP_LIST[@]} -gt 0 ]; then
+    selected_apps=$(gum choose --no-limit --height 15 \
+        --header="Seleziona le applicazioni da installare:" \
+        --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+        --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+        --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+        "${APP_LIST[@]}")
+fi
 
 # Converte l'output multi-linea in array bash/zsh compatible
 selected_apps_array=()
 while IFS= read -r line; do
     [[ -n "$line" ]] && selected_apps_array+=("$line")
 done <<< "$selected_apps"
+
+# ===== SELEZIONE FONT =====
+# Menu interattivo con checkbox per scegliere quali font installare
+# I Nerd Font includono icone e simboli speciali per il terminale
+selected_fonts=""
+if [ ${#FONT_LIST[@]} -gt 0 ]; then
+    selected_fonts=$(gum choose --no-limit \
+        --header="Seleziona i font da installare:" \
+        --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+        --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+        --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+        "${FONT_LIST[@]}")
+fi
+
+# Converte l'output multi-linea in array bash/zsh compatible
+selected_fonts_array=()
+while IFS= read -r line; do
+    [[ -n "$line" ]] && selected_fonts_array+=("$line")
+done <<< "$selected_fonts"
 
 # ===== SELEZIONE TEMA OH MY POSH =====
 # Menu per scegliere il tema del prompt del terminale
@@ -177,31 +212,31 @@ else
 fi
 
 # ===== INSTALLAZIONE FONT =====
-# Installa font Nerd Font necessari per i temi Oh My Posh
-# I Nerd Font includono icone e simboli speciali per il terminale
+# Installa i font selezionati dall'utente tramite Homebrew Cask
+# Se nessun font selezionato, salta questa fase
+if [ ${#selected_fonts_array[@]} -gt 0 ]; then
+    # Separa i font già installati da quelli da installare
+    fonts_to_install=()
+    for font in "${selected_fonts_array[@]}"; do
+        if ! brew list --cask "$font" &> /dev/null; then
+            fonts_to_install+=("$font")
+        fi
+    done
 
-# Lista font da verificare
-fonts_list=("font-meslo-lg-nerd-font" "font-roboto-mono-nerd-font")
-
-# Separa i font già installati da quelli da installare
-fonts_to_install=()
-for font in "${fonts_list[@]}"; do
-    if ! brew list --cask "$font" &> /dev/null; then
-        fonts_to_install+=("$font")
-    fi
-done
-
-# Installa solo i font non ancora presenti
-if [ ${#fonts_to_install[@]} -gt 0 ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font 'Nerd Font'..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
-    if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
+    # Installa solo i font non ancora presenti
+    if [ ${#fonts_to_install[@]} -gt 0 ]; then
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font selezionati..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
+        fi
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
+        # Tutti i font selezionati erano già installati
+        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Font già installati"
     fi
 else
-    # Tutti i font erano già installati
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Font già installati"
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessun font selezionato"
 fi
 
 # ===== INSTALLAZIONE APPLICAZIONI =====

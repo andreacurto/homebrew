@@ -107,8 +107,8 @@ RESET="\033[0m"          # Reset colore
 Configurati tramite variabili per facile personalizzazione:
 
 ```bash
-GUM_SYMBOL_SUCCESS="✓"   # Operazioni completate
-GUM_SYMBOL_WARNING="!"   # Errori e warning
+GUM_SYMBOL_SUCCESS="✔︎"   # Operazioni completate
+GUM_SYMBOL_WARNING="✘"   # Errori e warning
 GUM_SYMBOL_BULLET="→"    # Bullet point liste
 GUM_SYMBOL_SKIP="❋"      # Operazione saltata
 ```
@@ -327,8 +327,8 @@ GUM_COLOR_MUTED="244"      # Grigio
 Modificare per adattare a font/preferenze:
 
 ```bash
-GUM_SYMBOL_SUCCESS="✓"     # Completato
-GUM_SYMBOL_WARNING="!"     # Errore/Warning
+GUM_SYMBOL_SUCCESS="✔︎"     # Completato
+GUM_SYMBOL_WARNING="✘"     # Errore/Warning
 GUM_SYMBOL_BULLET="→"      # Bullet liste
 GUM_SYMBOL_SKIP="❋"        # Saltato
 ```

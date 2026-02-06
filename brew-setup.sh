@@ -79,8 +79,8 @@ GUM_COLOR_PRIMARY="13"    # Titoli e header principali
 GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
-GUM_SYMBOL_WARNING="!"    # Errori e warning
+GUM_SYMBOL_SUCCESS="✔︎"    # Operazioni completate
+GUM_SYMBOL_WARNING="✘"    # Errori e warning
 GUM_SYMBOL_SKIP="❋"       # Operazioni saltate
 
 # Checkbox

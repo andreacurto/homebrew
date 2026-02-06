@@ -38,8 +38,8 @@ GUM_COLOR_INFO="14"       # Messaggi informativi durante operazioni
 GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✓"    # Operazioni completate
-GUM_SYMBOL_WARNING="!"    # Errori e warning
+GUM_SYMBOL_SUCCESS="✔︎"    # Operazioni completate
+GUM_SYMBOL_WARNING="✘"    # Errori e warning
 GUM_SYMBOL_BULLET="→"     # Elementi di lista
 GUM_SYMBOL_SKIP="❋"       # Operazioni saltate
 

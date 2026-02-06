@@ -55,7 +55,7 @@ Lo script ti mostrerà:
 
 2. **Installazione strumenti base**
     - Node.js, GitHub CLI, Oh My Posh, Gum
-    - Vedrai uno spinner e poi un check verde ✓
+    - Vedrai uno spinner e poi un check verde ✔︎
 
 3. **Scelta applicazioni**
     - Ti appare una lista con checkbox (□ vuoto, ■ pieno)
@@ -103,8 +103,8 @@ brew-update
 
 3. **Esecuzione operazioni**
     - Vedrai uno spinner per ogni operazione
-    - Quando finisce, lo spinner diventa un check verde ✓
-    - Se c'è un errore, vedi un punto esclamativo rosso !
+    - Quando finisce, lo spinner diventa un check verde ✔︎
+    - Se c'è un errore, vedi un croce rossa ✘
 
 4. **Output diagnostica**
     - Se hai selezionato "Diagnostica sistema"

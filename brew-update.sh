@@ -17,10 +17,10 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.3.8"
+SCRIPT_VERSION="1.4.0"
 
-# URL sorgente per auto-aggiornamento script
-SCRIPT_SOURCE="https://raw.githubusercontent.com/andreacurto/homebrew/master/brew-update.sh"
+# URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
+SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
 
 # Verifica/installa gum se non presente (necessario per l'interfaccia)
 if ! command -v gum &> /dev/null; then
@@ -42,7 +42,7 @@ SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
 script_was_updated=false
 script_update_checked=false
 script_remote_version=""
-if curl -fsSL --max-time 5 -H 'Cache-Control: no-cache' "$SCRIPT_SOURCE" -o "$TMP_UPDATE" 2>/dev/null; then
+if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys,json,base64; sys.stdout.buffer.write(base64.b64decode(json.load(sys.stdin)['content']))" > "$TMP_UPDATE" 2>/dev/null; then
     if [ -f "$SCRIPT_LOCAL" ] && [ -f "$TMP_UPDATE" ]; then
         local_hash=$(shasum "$SCRIPT_LOCAL" 2>/dev/null | cut -d' ' -f1)
         remote_hash=$(shasum "$TMP_UPDATE" 2>/dev/null | cut -d' ' -f1)

@@ -123,9 +123,11 @@ if [ "$do_cask_upgrade" = true ]; then
     if [[ -n "$outdated_casks" ]]; then
         # Mostra lista app da aggiornare
         gum style --foreground "$GUM_COLOR_WARNING" "Trovate applicazioni da aggiornare:"
+        echo ""
         echo "$outdated_casks" | while IFS= read -r line; do
             gum style --foreground "$GUM_COLOR_MUTED" "  $GUM_SYMBOL_BULLET $line"
         done
+        echo ""
 
         # Converte lista in array bash/zsh compatible
         outdated_casks_array=()
@@ -136,9 +138,11 @@ if [ "$do_cask_upgrade" = true ]; then
         if [ "$use_greedy" = true ]; then
             # Aggiorna includendo app con auto-update
             gum style --foreground "$GUM_COLOR_INFO" "Aggiornamento applicazioni (incluso auto-update)..."
+            echo ""
             brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
             done
+            echo ""
             # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
             if [ ${pipestatus[1]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
@@ -148,9 +152,11 @@ if [ "$do_cask_upgrade" = true ]; then
         else
             # Aggiorna solo app senza auto-update
             gum style --foreground "$GUM_COLOR_INFO" "Aggiornamento applicazioni..."
+            echo ""
             brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
             done
+            echo ""
             if [ ${pipestatus[1]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else

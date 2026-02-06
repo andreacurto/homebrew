@@ -11,6 +11,7 @@ Documentazione tecnica per sviluppatori e AI assistants per modifiche future al 
 5. [Flussi Operativi](#flussi-operativi)
 6. [Gestione Errori](#gestione-errori)
 7. [Configurazione UI](#configurazione-ui)
+8. [Workflow Git](#workflow-git)
 
 ## Architettura Progetto
 
@@ -459,6 +460,26 @@ Per vedere output Homebrew completo, rimuovere `2>/dev/null` dai comandi:
 - [Oh My Posh Themes](https://ohmyposh.dev/docs/themes)
 - [Terminal 256 Colors Chart](https://www.ditig.com/256-colors-cheat-sheet)
 - [Zsh Scripting Guide](https://zsh.sourceforge.io/Guide/)
+
+## Workflow Git
+
+### Commit e Push
+
+- Dopo ogni commit, eseguire sempre il push automaticamente senza attendere conferma
+- Non aspettare che l'utente chieda di pushare
+
+### Versionamento Semantico (Semver)
+
+Dopo ogni commit+push, valutare automaticamente il bump di versione seguendo [Semantic Versioning](https://semver.org/lang/it/) e aggiornare il tag git:
+
+- **PATCH** (x.y.Z): bug fix, UI tweaks, modifiche minori
+- **MINOR** (x.Y.0): nuove funzionalità backward-compatible
+- **MAJOR** (X.0.0): breaking changes
+
+Esempio:
+```bash
+git tag v1.0.1 && git push origin v1.0.1
+```
 
 ## Changelog
 

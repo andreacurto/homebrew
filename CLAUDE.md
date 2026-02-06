@@ -510,6 +510,16 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v2.4 - Auto-aggiornamento script (2026-02-06)
+
+- Auto-update silenzioso di `brew-update.sh` dalla repo GitHub pubblica
+- Scarica l'ultima versione all'avvio e aggiorna `~/Shell/brew-update.sh` se diversa
+- Nessun output per l'utente: completamente trasparente
+- Timeout 5s per non bloccare in caso di assenza di rete
+- Nuova variabile `SCRIPT_SOURCE` per URL sorgente
+- Aggiunto hint `brew-update` nel messaggio finale di `brew-setup.sh`
+- Migliorate spaziature output aggiornamento applicazioni
+
 ### v2.3 - Liste configurabili e selezione font (2026-02-06)
 
 - Liste app e font separate dalla logica in variabili `APP_LIST` e `FONT_LIST`
@@ -555,4 +565,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.3 (Liste configurabili e selezione font)_
+_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.4 (Auto-aggiornamento script)_

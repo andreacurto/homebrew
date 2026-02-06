@@ -10,10 +10,14 @@
 # - Rimuove dipendenze orfane
 # - Pulizia cache e vecchie versioni
 # - Diagnostica sistema (brew doctor)
+# - Auto-aggiornamento script dalla repo GitHub
 
 # ===== SETUP AMBIENTE =====
 # Assicura che Homebrew sia nel PATH
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# URL sorgente per auto-aggiornamento script
+SCRIPT_SOURCE="https://raw.githubusercontent.com/andreacurto/homebrew/master/brew-update.sh"
 
 # Verifica/installa gum se non presente (necessario per l'interfaccia)
 if ! command -v gum &> /dev/null; then
@@ -23,9 +27,25 @@ fi
 # File temporanei con PID per evitare conflitti tra istanze concorrenti
 TMP_OUTDATED="/tmp/outdated_casks_$$.txt"
 TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
+TMP_UPDATE="/tmp/brew_update_$$.sh"
 
 # Pulizia file temporanei all'uscita (normale, Ctrl+C, errori)
-trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR"' EXIT
+trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
+
+# ===== AUTO-AGGIORNAMENTO SCRIPT =====
+# Scarica l'ultima versione dalla repo GitHub e aggiorna silenziosamente
+# In caso di errore (no internet, timeout, etc.) lo script prosegue normalmente
+SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
+if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" -o "$TMP_UPDATE" 2>/dev/null; then
+    if [ -f "$SCRIPT_LOCAL" ] && [ -f "$TMP_UPDATE" ]; then
+        local_hash=$(shasum "$SCRIPT_LOCAL" 2>/dev/null | cut -d' ' -f1)
+        remote_hash=$(shasum "$TMP_UPDATE" 2>/dev/null | cut -d' ' -f1)
+        if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ]; then
+            cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
+            chmod +x "$SCRIPT_LOCAL" 2>/dev/null
+        fi
+    fi
+fi
 
 # ===== CONFIGURAZIONE UI =====
 # Definisce colori, simboli e stili per l'interfaccia Gum

@@ -52,9 +52,9 @@ echo "Questo script installerà:"
 echo ""
 echo -e "${MUTED}  → Homebrew (package manager per macOS)${RESET}"
 echo -e "${MUTED}  → Strumenti CLI (node, gh, oh-my-posh, gum)${RESET}"
-echo -e "${MUTED}  → Font 'Nerd Font' a tua scelta${RESET}"
+echo -e "${MUTED}  → Font 'Nerd Font' per il terminale a tua scelta${RESET}"
+echo -e "${MUTED}  → Tema per il terminale a tua scelta${RESET}"
 echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
-echo -e "${MUTED}  → Tema personalizzato per il terminale${RESET}"
 echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
@@ -168,7 +168,7 @@ done <<< "$selected_fonts"
 # Menu per scegliere il tema del prompt del terminale
 # Default: zash (minimalista)
 selected_theme=$(gum choose \
-    --header="Seleziona il tema Oh My Posh:" \
+    --header="Seleziona il tema per terminale da installare (Oh My Posh):" \
     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
     --selected="zash" \
     "zash" \

@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.3.4"
+SCRIPT_VERSION="1.3.5"
 
 # URL sorgente per auto-aggiornamento script
 SCRIPT_SOURCE="https://raw.githubusercontent.com/andreacurto/homebrew/master/brew-update.sh"

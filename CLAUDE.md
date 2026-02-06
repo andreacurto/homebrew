@@ -503,12 +503,23 @@ Dopo ogni commit+push, valutare automaticamente il bump di versione seguendo [Se
 - **MINOR** (x.Y.0): nuove funzionalità backward-compatible
 - **MAJOR** (X.0.0): breaking changes
 
+**IMPORTANTE**: Ad ogni nuovo tag, aggiornare SEMPRE la variabile `SCRIPT_VERSION` in `brew-update.sh` per farla corrispondere al tag. Se non viene aggiornata, il messaggio di versione mostrerà un valore sbagliato.
+
 Esempio:
 ```bash
+# 1. Aggiornare SCRIPT_VERSION in brew-update.sh
+# 2. Commit e push
+# 3. Creare tag
 git tag v1.0.1 && git push origin v1.0.1
 ```
 
 ## Changelog
+
+### v2.6 - Fix versione e documentazione SCRIPT_VERSION (2026-02-06)
+
+- Fix messaggi versione invertiti in brew-update
+- Documentata regola: SCRIPT_VERSION deve SEMPRE corrispondere al git tag
+- Aggiornata documentazione workflow git con nota su SCRIPT_VERSION
 
 ### v2.5 - Messaggio versione script (2026-02-06)
 
@@ -571,4 +582,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.5 (Messaggio versione script)_
+_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.6 (Fix versione e documentazione SCRIPT_VERSION)_

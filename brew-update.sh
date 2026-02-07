@@ -15,7 +15,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.8.3"
+SCRIPT_VERSION="1.8.4"
 TEST_MODE=false
 [[ "$1" == "--test" ]] && TEST_MODE=true
 

@@ -515,6 +515,24 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.8.0 - Test connessione e auto-aggiornamento interattivo (2026-02-07)
+
+- **Test connessione internet** obbligatorio all'avvio di entrambi gli script
+  - brew-update.sh: test dopo installazione gum, messaggio errore con gum style
+  - brew-setup.sh: test prima di installare Homebrew/gum, messaggio errore con ANSI colors
+  - Se connessione assente: mostra warning e termina script (exit 1)
+  - Skip automatico in modalità TEST (--test)
+- **Auto-aggiornamento interattivo** in brew-update.sh
+  - Non più silenzioso: chiede conferma all'utente prima di aggiornare
+  - Usa gum confirm con messaggio: "È disponibile una nuova versione di brew-update (vX.X.X). Vuoi aggiornarla ora?"
+  - Default: true (consiglia aggiornamento)
+  - Messaggio di stato aggiornato per gestire 3 casi:
+    - Aggiornato con successo (verde)
+    - Nuova versione disponibile ma rifiutata (warning giallo)
+    - Nessun aggiornamento disponibile (info grigio)
+- Migliora UX: utente sempre informato e in controllo degli aggiornamenti
+- Previene esecuzione in assenza di connessione con messaggio chiaro
+
 ### v1.7.1 - Simulazione richiesta password in TEST mode (2026-02-07)
 
 - Aggiunto fake password prompt visivo in modalità TEST
@@ -668,4 +686,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.7.1 (Simulazione password TEST mode)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.8.0 (Test connessione e auto-aggiornamento interattivo)_

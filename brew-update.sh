@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.7.1"
+SCRIPT_VERSION="1.8.0"
 
 # Modalità test (attiva con --test)
 TEST_MODE=false
@@ -31,6 +31,17 @@ if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
 fi
 
+# ===== TEST CONNESSIONE INTERNET =====
+# Verifica connessione internet prima di procedere (skip in TEST mode)
+if [ "$TEST_MODE" = false ]; then
+    if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
+        echo ""
+        gum style --foreground "9" --border "thick" --padding "0 1" "✘ Connessione internet assente. Lo script richiede una connessione internet attiva per funzionare."
+        echo ""
+        exit 1
+    fi
+fi
+
 # File temporanei con PID per evitare conflitti tra istanze concorrenti
 TMP_OUTDATED="/tmp/outdated_casks_$$.txt"
 TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
@@ -40,21 +51,29 @@ TMP_UPDATE="/tmp/brew_update_$$.sh"
 trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
 
 # ===== AUTO-AGGIORNAMENTO SCRIPT =====
-# Scarica l'ultima versione dalla repo GitHub e aggiorna silenziosamente
+# Scarica l'ultima versione dalla repo GitHub e chiede conferma prima di aggiornare
 # In caso di errore (no internet, timeout, etc.) lo script prosegue normalmente
 SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
 script_was_updated=false
 script_update_checked=false
 script_remote_version=""
+script_update_declined=false
 if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys,json,base64; sys.stdout.buffer.write(base64.b64decode(json.load(sys.stdin)['content']))" > "$TMP_UPDATE" 2>/dev/null; then
     if [ -f "$SCRIPT_LOCAL" ] && [ -f "$TMP_UPDATE" ]; then
         local_hash=$(shasum "$SCRIPT_LOCAL" 2>/dev/null | cut -d' ' -f1)
         remote_hash=$(shasum "$TMP_UPDATE" 2>/dev/null | cut -d' ' -f1)
         script_remote_version=$(grep '^SCRIPT_VERSION=' "$TMP_UPDATE" 2>/dev/null | cut -d'"' -f2)
-        if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ]; then
-            cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
-            chmod +x "$SCRIPT_LOCAL" 2>/dev/null
-            script_was_updated=true
+
+        # Se versione remota diversa, chiedi conferma all'utente
+        if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ] && [ -n "$script_remote_version" ]; then
+            echo ""
+            if gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true; then
+                cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
+                chmod +x "$SCRIPT_LOCAL" 2>/dev/null
+                script_was_updated=true
+            else
+                script_update_declined=true
+            fi
         fi
         script_update_checked=true
     fi
@@ -102,7 +121,7 @@ echo ""
 
 # Banner modalità test
 if [ "$TEST_MODE" = true ]; then
-    gum style --border "$GUM_BORDER_THICK" --border-foreground "$GUM_COLOR_WARNING" --padding "$GUM_PADDING" --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
+    gum style --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
     echo ""
 fi
 
@@ -155,13 +174,15 @@ fi
 # ===== MESSAGGIO VERSIONE SCRIPT =====
 # Mostra lo stato di aggiornamento dello script all'utente
 if [ "$script_was_updated" = true ] && [ -n "$script_remote_version" ]; then
-    if [ "$SCRIPT_VERSION" != "$script_remote_version" ]; then
-        gum style --foreground "$GUM_COLOR_MUTED" "$GUM_SYMBOL_SUCCESS brew-update aggiornato: v$SCRIPT_VERSION → v$script_remote_version"
-    else
-        gum style --foreground "$GUM_COLOR_MUTED" "$GUM_SYMBOL_SUCCESS brew-update aggiornato alla versione v$script_remote_version"
-    fi
+    # Script aggiornato con successo
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update aggiornato alla versione v$script_remote_version"
+    echo ""
+elif [ "$script_update_declined" = true ] && [ -n "$script_remote_version" ]; then
+    # Nuova versione disponibile ma utente ha rifiutato
+    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Nuova versione v$script_remote_version disponibile (corrente: v$SCRIPT_VERSION)"
     echo ""
 elif [ "$script_update_checked" = true ]; then
+    # Nessun aggiornamento disponibile o già aggiornato
     gum style --foreground "$GUM_COLOR_MUTED" "$GUM_SYMBOL_INFO brew-update: v$SCRIPT_VERSION"
     echo ""
 fi

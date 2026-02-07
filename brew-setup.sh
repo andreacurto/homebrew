@@ -64,6 +64,17 @@ echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
 
+# ===== TEST CONNESSIONE INTERNET =====
+# Verifica connessione internet prima di procedere (skip in TEST mode)
+if [ "$TEST_MODE" = false ]; then
+    if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
+        echo ""
+        echo -e "${RED}✘ Connessione internet assente. Lo script richiede una connessione internet attiva per funzionare.${RESET}"
+        echo ""
+        exit 1
+    fi
+fi
+
 # ===== VERIFICA PRELIMINARE =====
 echo -e "${MUTED}⌛ Verifica preliminare in corso, non chiudere il terminale...${RESET}"
 
@@ -135,7 +146,7 @@ GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
 # Banner modalità test
 if [ "$TEST_MODE" = true ]; then
     echo ""
-    gum style --border "$GUM_BORDER_THICK" --border-foreground "$GUM_COLOR_WARNING" --padding "$GUM_PADDING" --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
+    gum style --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
     echo ""
 fi
 

@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.5.0"
+SCRIPT_VERSION="1.5.1"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -202,19 +202,8 @@ if [ "$do_cask_upgrade" = true ]; then
                 gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
             else
                 # Aggiorna app selezionate con greedy
-                echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
-                echo ""
-                brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                    if [[ "$line" == "Password:"* ]]; then
-                        echo "$line"
-                        echo ""
-                    else
-                        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                    fi
-                done
-                echo ""
-                # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
-                if [ ${pipestatus[1]} -eq 0 ]; then
+                gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..." -- brew upgrade --cask --greedy "${selected_casks_array[@]}" &>/dev/null
+                if [ $? -eq 0 ]; then
                     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
                 else
                     gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
@@ -222,18 +211,8 @@ if [ "$do_cask_upgrade" = true ]; then
             fi
         else
             # Aggiorna solo app senza auto-update
-            echo "Aggiornamento applicazioni in corso..."
-            echo ""
-            brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                if [[ "$line" == "Password:"* ]]; then
-                    echo "$line"
-                    echo ""
-                else
-                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                fi
-            done
-            echo ""
-            if [ ${pipestatus[1]} -eq 0 ]; then
+            gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}" &>/dev/null
+            if [ $? -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"

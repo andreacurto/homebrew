@@ -515,6 +515,15 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.0 - Selezione interattiva app con auto-update (2026-02-07)
+
+- Aggiunta selezione interattiva delle app quando use_greedy=true
+- L'utente può scegliere quali app aggiornare tramite checkbox multi-select
+- Menu gum choose con stile identico a brew-setup.sh
+- Gestione caso "nessuna selezione" con messaggio INFO
+- Flusso non-greedy invariato (aggiorna tutte le app automaticamente)
+- Nuova variabile `selected_casks_array[]` per app selezionate dall'utente
+
 ### v2.6 - Fix versione e documentazione SCRIPT_VERSION (2026-02-06)
 
 - Fix messaggi versione invertiti in brew-update
@@ -582,4 +591,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-06_ _Versione: 2.6 (Fix versione e documentazione SCRIPT_VERSION)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.0 (Selezione interattiva app con auto-update)_

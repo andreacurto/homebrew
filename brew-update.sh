@@ -89,7 +89,7 @@ if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys
                 chmod +x "$SCRIPT_LOCAL" 2>/dev/null
 
                 echo ""
-                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
+                gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
                 gum style --foreground "$GUM_COLOR_MUTED" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
                 echo ""
                 exit 0

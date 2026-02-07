@@ -206,8 +206,13 @@ if [ "$CLI_ALREADY_INSTALLED" = true ]; then
 else
     echo "Installazione strumenti e librerie in corso..."
     echo ""
-    (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+    (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+        if [[ "$line" == "Password:"* ]]; then
+            echo "$line"
+            echo ""
+        else
+            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        fi
     done
     echo ""
     if [ ${pipestatus[1]} -eq 0 ]; then
@@ -233,8 +238,13 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
     if [ ${#fonts_to_install[@]} -gt 0 ]; then
         echo "Installazione font per terminale in corso..."
         echo ""
-        brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+            if [[ "$line" == "Password:"* ]]; then
+                echo "$line"
+                echo ""
+            else
+                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            fi
         done
         echo ""
         if [ ${pipestatus[1]} -eq 0 ]; then
@@ -266,8 +276,13 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
     if [ ${#apps_to_install[@]} -gt 0 ]; then
         echo "Installazione applicazioni in corso..."
         echo ""
-        brew install --cask ${apps_to_install[*]} 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        brew install --cask ${apps_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+            if [[ "$line" == "Password:"* ]]; then
+                echo "$line"
+                echo ""
+            else
+                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            fi
         done
         echo ""
         if [ ${pipestatus[1]} -eq 0 ]; then

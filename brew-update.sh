@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.4.3"
+SCRIPT_VERSION="1.4.4"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -183,8 +183,13 @@ if [ "$do_cask_upgrade" = true ]; then
             # Aggiorna includendo app con auto-update
             echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
             echo ""
-            brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                if [[ "$line" == "Password:"* ]]; then
+                    echo "$line"
+                    echo ""
+                else
+                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                fi
             done
             echo ""
             # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
@@ -197,8 +202,13 @@ if [ "$do_cask_upgrade" = true ]; then
             # Aggiorna solo app senza auto-update
             echo "Aggiornamento applicazioni in corso..."
             echo ""
-            brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                if [[ "$line" == "Password:"* ]]; then
+                    echo "$line"
+                    echo ""
+                else
+                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                fi
             done
             echo ""
             if [ ${pipestatus[1]} -eq 0 ]; then

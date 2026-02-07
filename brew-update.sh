@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.5.2"
+SCRIPT_VERSION="1.5.3"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -201,6 +201,11 @@ if [ "$do_cask_upgrade" = true ]; then
             if [ ${#selected_casks_array[@]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
             else
+                # Richiedi password sudo prima di avviare lo spinner
+                gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Alcune app potrebbero richiedere la password di amministratore"
+                sudo -v
+                echo ""
+
                 # Aggiorna app selezionate con greedy
                 gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..." -- brew upgrade --cask --greedy "${selected_casks_array[@]}"
                 if [ $? -eq 0 ]; then
@@ -210,6 +215,11 @@ if [ "$do_cask_upgrade" = true ]; then
                 fi
             fi
         else
+            # Richiedi password sudo prima di avviare lo spinner
+            gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Alcune app potrebbero richiedere la password di amministratore"
+            sudo -v
+            echo ""
+
             # Aggiorna solo app senza auto-update
             gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
             if [ $? -eq 0 ]; then

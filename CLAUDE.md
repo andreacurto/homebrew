@@ -515,6 +515,22 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.7.0 - Modalità TEST per entrambi gli script (2026-02-07)
+
+- Aggiunta modalità test completa con flag `--test` per brew-update.sh e brew-setup.sh
+- Banner warning visibile: "⚠️ MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
+- **brew-update.sh --test**: Simula tutte le operazioni con dati fake e delay realistici
+  - App obsolete fake (chrome, vscode, 1password, spotify, dropbox)
+  - Output brew progressivo simulato per installazioni (Downloading, Installing, Summary)
+  - Delay variabili per realismo (0.3s-1.2s a seconda dell'operazione)
+  - Diagnostica fake "Your system is ready to brew"
+- **brew-setup.sh --test**: Simula installazioni senza modifiche filesystem
+  - CLI tools, font, applicazioni con output simulato
+  - Skip configurazione .zshrc e copia script in modalità test
+- Uso: `brew-update --test` o `brew-setup --test`
+- Permette testing completo senza impatto sul sistema
+- Utile per demo, sviluppo, e verifica UI/UX
+
 ### v1.6.1 - Fix riga Password orfana (2026-02-07)
 
 - Cancellazione automatica riga "Password:" dopo inserimento
@@ -643,4 +659,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.6.1 (Fix riga Password orfana)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.7.0 (Modalità TEST completa)_

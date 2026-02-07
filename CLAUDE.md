@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.2 - Fix spinner invisibile (2026-02-07)
+
+- Fix bug: rimosso &>/dev/null che nascondeva output di gum spin
+- gum spin nasconde già automaticamente l'output del comando
+- Spinner ora visibile e funzionante durante aggiornamento app
+- Permette a brew di richiedere password se necessario
+
 ### v1.5.1 - Spinner per aggiornamento applicazioni (2026-02-07)
 
 - Sostituito output filtrato con spinner animato durante aggiornamento app
@@ -598,4 +605,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.1 (Spinner per aggiornamento applicazioni)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.2 (Fix spinner invisibile)_

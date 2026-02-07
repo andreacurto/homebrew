@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.3 - Fix richiesta password nascosta (2026-02-07)
+
+- Aggiunto messaggio warning prima della richiesta password
+- Richiesta password upfront con `sudo -v` prima dello spinner
+- Previene che lo script sembri bloccato mentre brew attende la password
+- Applicato a entrambi i rami (greedy e non-greedy)
+
 ### v1.5.2 - Fix spinner invisibile (2026-02-07)
 
 - Fix bug: rimosso &>/dev/null che nascondeva output di gum spin
@@ -605,4 +612,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.2 (Fix spinner invisibile)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.3 (Fix richiesta password nascosta)_

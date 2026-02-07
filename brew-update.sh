@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.8.1"
+SCRIPT_VERSION="1.8.2"
 
 # Modalità test (attiva con --test)
 TEST_MODE=false
@@ -71,11 +71,10 @@ if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys
                 cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
                 chmod +x "$SCRIPT_LOCAL" 2>/dev/null
 
-                # Mostra messaggio di successo e termina
+                # Mostra messaggio di info e termina
                 echo ""
-                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
-                echo ""
-                gum style --foreground "$GUM_COLOR_INFO" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
+                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
+                gum style --foreground "$GUM_COLOR_MUTED" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
                 echo ""
                 exit 0
             else

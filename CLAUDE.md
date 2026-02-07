@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.4 - Fix gestione password errata (2026-02-07)
+
+- Aggiunto controllo exit code di `sudo -v`
+- Se password errata: mostra messaggio errore e salta installazione
+- Se password corretta: procede con spinner
+- Previene che lo script si blocchi se password inserita erroneamente
+
 ### v1.5.3 - Fix richiesta password nascosta (2026-02-07)
 
 - Aggiunto messaggio warning prima della richiesta password
@@ -612,4 +619,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.3 (Fix richiesta password nascosta)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.4 (Fix gestione password errata)_

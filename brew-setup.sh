@@ -62,7 +62,8 @@ read -r
 if [ "$TEST_MODE" = false ]; then
     if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
         echo ""
-        echo -e "${RED}✘ Connessione internet assente. Lo script richiede una connessione internet attiva per funzionare.${RESET}"
+        echo -e "${RED}✘ Connessione internet assente.${RESET}"
+        echo -e "${MUTED}Lo script richiede una connessione internet attiva per funzionare.${RESET}"
         echo ""
         exit 1
     fi

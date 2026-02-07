@@ -58,7 +58,8 @@ GUM_ERROR_PADDING="0 1"
 if [ "$TEST_MODE" = false ]; then
     if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
         echo ""
-        gum style --foreground "$GUM_COLOR_ERROR" --border "$GUM_BORDER_THICK" --padding "$GUM_ERROR_PADDING" "$GUM_SYMBOL_ERROR Connessione internet assente. Lo script richiede una connessione internet attiva per funzionare."
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Connessione internet assente."
+        gum style --foreground "$GUM_COLOR_MUTED" "Lo script richiede una connessione internet attiva per funzionare."
         echo ""
         exit 1
     fi

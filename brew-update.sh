@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.6.0"
+SCRIPT_VERSION="1.6.1"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -204,11 +204,18 @@ if [ "$do_cask_upgrade" = true ]; then
                 # Aggiorna app selezionate con greedy (output filtrato per vedere password/progresso)
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
+                password_shown=false
                 brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Summary)" | while IFS= read -r line; do
                     if [[ "$line" == "Password:"* ]]; then
                         echo "$line"
                         echo ""
+                        password_shown=true
                     else
+                        # Cancella "Password:" dopo che l'utente l'ha inserita
+                        if [ "$password_shown" = true ]; then
+                            echo -ne "\033[1A\033[2K\033[1A\033[2K"
+                            password_shown=false
+                        fi
                         gum style --foreground "$GUM_COLOR_MUTED" "  $line"
                     fi
                 done

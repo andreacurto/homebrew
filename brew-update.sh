@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.4.4"
+SCRIPT_VERSION="1.5.0"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -180,23 +180,45 @@ if [ "$do_cask_upgrade" = true ]; then
         done <<< "$outdated_casks"
 
         if [ "$use_greedy" = true ]; then
-            # Aggiorna includendo app con auto-update
-            echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
-            echo ""
-            brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                if [[ "$line" == "Password:"* ]]; then
-                    echo "$line"
-                    echo ""
-                else
-                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                fi
-            done
-            echo ""
-            # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
-            if [ ${pipestatus[1]} -eq 0 ]; then
-                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
+            # Selezione interattiva app da aggiornare
+            selected_casks=""
+            if [ ${#outdated_casks_array[@]} -gt 0 ]; then
+                selected_casks=$(gum choose --no-limit \
+                    --header="Seleziona le applicazioni da aggiornare:" \
+                    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+                    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+                    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+                    "${outdated_casks_array[@]}")
+            fi
+
+            # Converte selezione in array
+            selected_casks_array=()
+            while IFS= read -r line; do
+                [[ -n "$line" ]] && selected_casks_array+=("$line")
+            done <<< "$selected_casks"
+
+            # Se nessuna app selezionata, salta
+            if [ ${#selected_casks_array[@]} -eq 0 ]; then
+                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
             else
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                # Aggiorna app selezionate con greedy
+                echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
+                echo ""
+                brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                    if [[ "$line" == "Password:"* ]]; then
+                        echo "$line"
+                        echo ""
+                    else
+                        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                    fi
+                done
+                echo ""
+                # pipestatus[1] cattura exit code del primo comando della pipeline (brew upgrade)
+                if [ ${pipestatus[1]} -eq 0 ]; then
+                    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
+                else
+                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                fi
             fi
         else
             # Aggiorna solo app senza auto-update

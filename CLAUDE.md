@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.1 - Spinner per aggiornamento applicazioni (2026-02-07)
+
+- Sostituito output filtrato con spinner animato durante aggiornamento app
+- UI più pulita: nasconde output brew e mostra solo spinner con messaggio
+- Applicato a entrambi i rami (greedy e non-greedy)
+- Riduce verbosità e migliora percezione di responsività
+
 ### v1.5.0 - Selezione interattiva app con auto-update (2026-02-07)
 
 - Aggiunta selezione interattiva delle app quando use_greedy=true
@@ -591,4 +598,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.0 (Selezione interattiva app con auto-update)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.1 (Spinner per aggiornamento applicazioni)_

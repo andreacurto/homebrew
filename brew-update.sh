@@ -49,10 +49,8 @@ GUM_CHECKBOX_CURSOR="□"
 # Spinner e layout
 GUM_SPINNER_TYPE="monkey"
 GUM_BORDER_ROUNDED="rounded"
-GUM_BORDER_THICK="thick"
 GUM_PADDING="0 1"
 GUM_MARGIN="0"
-GUM_ERROR_PADDING="0 1"
 
 # ===== TEST CONNESSIONE INTERNET =====
 if [ "$TEST_MODE" = false ]; then

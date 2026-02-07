@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.6.1 - Fix riga Password orfana (2026-02-07)
+
+- Cancellazione automatica riga "Password:" dopo inserimento
+- Usa ANSI escape codes (`\033[1A\033[2K`) per rimuovere righe
+- Output pulito senza "Password:" residua a schermo
+- Migliora percezione di pulizia UI durante installazione
+
 ### v1.6.0 - Fix blocco app greedy con output filtrato (2026-02-07)
 
 - Risolto blocco apparente durante aggiornamento app con --greedy
@@ -636,4 +643,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.6.0 (Fix blocco app greedy)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.6.1 (Fix riga Password orfana)_

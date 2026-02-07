@@ -17,7 +17,11 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.6.1"
+SCRIPT_VERSION="1.7.0"
+
+# Modalità test (attiva con --test)
+TEST_MODE=false
+[[ "$1" == "--test" ]] && TEST_MODE=true
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -96,6 +100,12 @@ echo ""
 gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update → Inizio 🚀"
 echo ""
 
+# Banner modalità test
+if [ "$TEST_MODE" = true ]; then
+    gum style --border "$GUM_BORDER_THICK" --border-foreground "$GUM_COLOR_WARNING" --padding "$GUM_PADDING" --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
+    echo ""
+fi
+
 # ===== SELEZIONE OPERAZIONI =====
 # Menu interattivo per scegliere quali operazioni eseguire
 # Tutte le operazioni sono pre-selezionate di default
@@ -161,7 +171,14 @@ fi
 # Mostra il progresso di download per ogni app
 if [ "$do_cask_upgrade" = true ]; then
     # Controlla quali app hanno aggiornamenti disponibili
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni..." -- sh -c "if [ \"$use_greedy\" = true ]; then brew outdated --cask --greedy --quiet; else brew outdated --cask --quiet; fi > \"$TMP_OUTDATED\""
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: inietta dati fake
+        sleep 0.5
+        echo -e "google-chrome\nvisual-studio-code\n1password\nspotify\ndropbox" > "$TMP_OUTDATED"
+    else
+        # Modalità normale: esegue brew outdated
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni..." -- sh -c "if [ \"$use_greedy\" = true ]; then brew outdated --cask --greedy --quiet; else brew outdated --cask --quiet; fi > \"$TMP_OUTDATED\""
+    fi
     outdated_casks=$(<"$TMP_OUTDATED")
 
     if [[ -n "$outdated_casks" ]]; then
@@ -204,35 +221,58 @@ if [ "$do_cask_upgrade" = true ]; then
                 # Aggiorna app selezionate con greedy (output filtrato per vedere password/progresso)
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
-                password_shown=false
-                brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Summary)" | while IFS= read -r line; do
-                    if [[ "$line" == "Password:"* ]]; then
-                        echo "$line"
-                        echo ""
-                        password_shown=true
-                    else
-                        # Cancella "Password:" dopo che l'utente l'ha inserita
-                        if [ "$password_shown" = true ]; then
-                            echo -ne "\033[1A\033[2K\033[1A\033[2K"
-                            password_shown=false
-                        fi
-                        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                    fi
-                done
-                echo ""
-                if [ ${pipestatus[1]} -eq 0 ]; then
+
+                if [ "$TEST_MODE" = true ]; then
+                    # Modalità test: simula output brew realistico
+                    for app in "${selected_casks_array[@]}"; do
+                        gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $app"
+                        sleep 0.4
+                        gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $app"
+                        sleep 0.6
+                        gum style --foreground "$GUM_COLOR_MUTED" "  ==> Summary"
+                        sleep 0.2
+                    done
+                    echo ""
                     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
                 else
-                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                    # Modalità normale: esegue brew upgrade
+                    password_shown=false
+                    brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Summary)" | while IFS= read -r line; do
+                        if [[ "$line" == "Password:"* ]]; then
+                            echo "$line"
+                            echo ""
+                            password_shown=true
+                        else
+                            # Cancella "Password:" dopo che l'utente l'ha inserita
+                            if [ "$password_shown" = true ]; then
+                                echo -ne "\033[1A\033[2K\033[1A\033[2K"
+                                password_shown=false
+                            fi
+                            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                        fi
+                    done
+                    echo ""
+                    if [ ${pipestatus[1]} -eq 0 ]; then
+                        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
+                    else
+                        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                    fi
                 fi
             fi
         else
             # Aggiorna solo app senza auto-update (non richiede password di solito)
-            gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
-            if [ $? -eq 0 ]; then
+            if [ "$TEST_MODE" = true ]; then
+                # Modalità test: simula con spinner e delay
+                sleep 1.5
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                # Modalità normale: esegue brew upgrade
+                gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
+                if [ $? -eq 0 ]; then
+                    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
+                else
+                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                fi
             fi
         fi
     else
@@ -244,11 +284,18 @@ fi
 # Aggiorna l'indice dei pacchetti disponibili su Homebrew
 # Necessario per avere le ultime versioni disponibili
 if [ "$do_update" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento Homebrew..." -- sh -c "brew update &>/dev/null"
-    if [ $? -eq 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula con delay
+        sleep 1
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew aggiornato"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile aggiornare Homebrew"
+        # Modalità normale: esegue brew update
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento Homebrew..." -- sh -c "brew update &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew aggiornato"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile aggiornare Homebrew"
+        fi
     fi
 fi
 
@@ -256,11 +303,18 @@ fi
 # Aggiorna tutti i pacchetti CLI installati (non le applicazioni)
 # Es: node, gh, oh-my-posh, gum, etc.
 if [ "$do_upgrade" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento strumenti e librerie..." -- sh -c "brew upgrade &>/dev/null"
-    if [ $? -eq 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula con delay
+        sleep 1.2
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie aggiornati"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile aggiornare strumenti e librerie"
+        # Modalità normale: esegue brew upgrade
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento strumenti e librerie..." -- sh -c "brew upgrade &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie aggiornati"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile aggiornare strumenti e librerie"
+        fi
     fi
 fi
 
@@ -268,11 +322,18 @@ fi
 # Rimuove pacchetti installati come dipendenze ma non più necessari
 # Libera spazio rimuovendo pacchetti inutilizzati
 if [ "$do_autoremove" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione pacchetti non utilizzati..." -- sh -c "brew autoremove &>/dev/null"
-    if [ $? -eq 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula con delay
+        sleep 0.8
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pacchetti non utilizzati rimossi"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile rimuovere pacchetti non utilizzati"
+        # Modalità normale: esegue brew autoremove
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Rimozione pacchetti non utilizzati..." -- sh -c "brew autoremove &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pacchetti non utilizzati rimossi"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile rimuovere pacchetti non utilizzati"
+        fi
     fi
 fi
 
@@ -280,11 +341,18 @@ fi
 # Rimuove vecchie versioni di pacchetti e svuota la cache di download
 # --prune=all rimuove tutti i file di cache, anche quelli recenti
 if [ "$do_cleanup" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache..." -- sh -c "brew cleanup --prune=all &>/dev/null"
-    if [ $? -eq 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula con delay
+        sleep 1
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia cache completata"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare la pulizia cache"
+        # Modalità normale: esegue brew cleanup
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Pulizia cache..." -- sh -c "brew cleanup --prune=all &>/dev/null"
+        if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Pulizia cache completata"
+        else
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare la pulizia cache"
+        fi
     fi
 fi
 
@@ -292,16 +360,25 @@ fi
 # Esegue brew doctor per identificare potenziali problemi
 # Mostra l'output completo della diagnostica
 if [ "$do_doctor" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Diagnostica sistema..." -- sh -c "brew doctor > \"$TMP_DOCTOR\" 2>&1"
-    doctor_exit=$?
-    if [ $doctor_exit -eq 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula output diagnostica
+        sleep 0.8
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Diagnostica sistema completata"
+        echo ""
+        echo "Your system is ready to brew." | gum style --foreground "$GUM_COLOR_MUTED"
     else
-        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Diagnostica sistema completata con avvisi"
+        # Modalità normale: esegue brew doctor
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Diagnostica sistema..." -- sh -c "brew doctor > \"$TMP_DOCTOR\" 2>&1"
+        doctor_exit=$?
+        if [ $doctor_exit -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Diagnostica sistema completata"
+        else
+            gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Diagnostica sistema completata con avvisi"
+        fi
+        # Mostra output diagnostica in grigio
+        echo ""
+        gum style --foreground "$GUM_COLOR_MUTED" < "$TMP_DOCTOR"
     fi
-    # Mostra output diagnostica in grigio
-    echo ""
-    gum style --foreground "$GUM_COLOR_MUTED" < "$TMP_DOCTOR"
 fi
 
 # ===== MESSAGGIO FINALE =====

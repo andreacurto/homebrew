@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.4.2"
+SCRIPT_VERSION="1.4.3"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -166,7 +166,7 @@ if [ "$do_cask_upgrade" = true ]; then
 
     if [[ -n "$outdated_casks" ]]; then
         # Mostra lista app da aggiornare
-        echo "Aggiornamenti disponibili:"
+        echo "Aggiornamenti app disponibili:"
         echo ""
         echo "$outdated_casks" | while IFS= read -r line; do
             gum style --foreground "$GUM_COLOR_MUTED" "  $GUM_SYMBOL_BULLET $line"
@@ -181,7 +181,7 @@ if [ "$do_cask_upgrade" = true ]; then
 
         if [ "$use_greedy" = true ]; then
             # Aggiorna includendo app con auto-update
-            echo "Aggiornamento in corso (incluse app con auto-aggiornamento)..."
+            echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
             echo ""
             brew upgrade --cask --greedy "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"
@@ -195,7 +195,7 @@ if [ "$do_cask_upgrade" = true ]; then
             fi
         else
             # Aggiorna solo app senza auto-update
-            echo "Aggiornamento in corso..."
+            echo "Aggiornamento applicazioni in corso..."
             echo ""
             brew upgrade --cask "${outdated_casks_array[@]}" 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
                 gum style --foreground "$GUM_COLOR_MUTED" "  $line"

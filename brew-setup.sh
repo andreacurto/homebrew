@@ -51,9 +51,9 @@ echo ""
 echo "Questo script installerà:"
 echo ""
 echo -e "${MUTED}  → Homebrew (package manager per macOS)${RESET}"
-echo -e "${MUTED}  → Strumenti CLI (node, gh, oh-my-posh, gum)${RESET}"
-echo -e "${MUTED}  → Font 'Nerd Font' per il terminale a tua scelta${RESET}"
-echo -e "${MUTED}  → Tema per il terminale a tua scelta${RESET}"
+echo -e "${MUTED}  → Strumenti e librerie (node, gh, oh-my-posh, gum)${RESET}"
+echo -e "${MUTED}  → Font per terminale a tua scelta${RESET}"
+echo -e "${MUTED}  → Tema terminale a tua scelta${RESET}"
 echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
 echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
@@ -105,8 +105,9 @@ GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
 
 # Simboli
 GUM_SYMBOL_SUCCESS="✔︎"    # Operazioni completate
-GUM_SYMBOL_WARNING="✘"    # Errori e warning
-GUM_SYMBOL_SKIP="❋"       # Operazioni saltate
+GUM_SYMBOL_ERROR="✘"      # Errori
+GUM_SYMBOL_WARNING="❖"    # Situazioni che richiedono attenzione
+GUM_SYMBOL_INFO="❋"       # Informazioni neutre
 
 # Checkbox
 GUM_CHECKBOX_SELECTED="■"      # Opzione selezionata nei menu
@@ -182,36 +183,36 @@ selected_theme=$(gum choose \
 # ===== INSTALLAZIONI =====
 # Messaggio di conferma dipendenze base
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Homebrew già installato"
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Homebrew già installato"
 else
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Homebrew installato"
 fi
 
-# ===== INSTALLAZIONE STRUMENTI CLI =====
+# ===== INSTALLAZIONE STRUMENTI E LIBRERIE =====
 # Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
 # - node: Runtime JavaScript
 # - gh: GitHub CLI
 # - oh-my-posh: Personalizzazione prompt shell (cask)
 # (gum già installato nella fase iniziale)
 
-# Controlla se tutti gli strumenti CLI sono già installati
+# Controlla se tutti gli strumenti e librerie sono già installati
 CLI_ALREADY_INSTALLED=false
 if command -v node &> /dev/null && command -v gh &> /dev/null && command -v oh-my-posh &> /dev/null; then
     CLI_ALREADY_INSTALLED=true
 fi
 
 if [ "$CLI_ALREADY_INSTALLED" = true ]; then
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Strumenti CLI già installati"
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Strumenti e librerie già installati"
 else
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti CLI (node, gh, oh-my-posh)..." -- sh -c "brew install node gh &>/dev/null && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh &>/dev/null"
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti e librerie..." -- sh -c "brew install node gh &>/dev/null && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh &>/dev/null"
     if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti CLI installati"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie installati"
     else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione strumenti CLI"
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare strumenti e librerie"
     fi
 fi
 
-# ===== INSTALLAZIONE FONT =====
+# ===== INSTALLAZIONE FONT PER TERMINALE =====
 # Installa i font selezionati dall'utente tramite Homebrew Cask
 # Se nessun font selezionato, salta questa fase
 if [ ${#selected_fonts_array[@]} -gt 0 ]; then
@@ -225,18 +226,18 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
 
     # Installa solo i font non ancora presenti
     if [ ${#fonts_to_install[@]} -gt 0 ]; then
-        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font selezionati..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font per terminale..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
         if [ $? -eq 0 ]; then
-            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font installati"
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
         else
-            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione font"
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
         fi
     else
         # Tutti i font selezionati erano già installati
-        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Font già installati"
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
     fi
 else
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessun font selezionato"
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun font selezionato"
 fi
 
 # ===== INSTALLAZIONE APPLICAZIONI =====
@@ -253,29 +254,29 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
 
     # Installa solo le app non ancora presenti
     if [ ${#apps_to_install[@]} -gt 0 ]; then
-        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni selezionate..." -- sh -c "brew install --cask ${apps_to_install[*]} &>/dev/null"
+        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni..." -- sh -c "brew install --cask ${apps_to_install[*]} &>/dev/null"
         if [ $? -eq 0 ]; then
             gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
         else
-            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore installazione applicazioni"
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare applicazioni"
         fi
     else
         # Tutte le app selezionate erano già installate
-        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Applicazioni già installate"
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Applicazioni già installate"
     fi
 else
-    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_SKIP Nessuna applicazione selezionata"
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
 fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====
 # Copia brew-update.sh in ~/Shell/ per poterlo eseguire con alias brew-update
 # Crea la directory ~/Shell/ se non esiste
-SCRIPT_DIR=$(dirname "$0")
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script di aggiornamento..." -- sh -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
 if [ $? -eq 0 ]; then
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script di aggiornamento configurato"
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
-    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_WARNING Errore configurazione script di aggiornamento"
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile configurare script aggiornamento"
 fi
 
 # ===== CONFIGURAZIONE SHELL =====
@@ -293,12 +294,12 @@ eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${sele
 alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
 
-gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Terminale configurato con tema '$selected_theme'"
+gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato"
 
 # ===== MESSAGGIO FINALE =====
 echo ""
 gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup → Completato 🎉"
 echo ""
-gum style --foreground "$GUM_COLOR_INFO" "Riavvia il terminale per applicare le modifiche"
+gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Riavvia il terminale per applicare le modifiche"
 gum style --foreground "$GUM_COLOR_MUTED" "Usa da terminale il comando 'brew-update' per aggiornare Homebrew in futuro"
 echo ""

@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 
 # URL sorgente per auto-aggiornamento script (API GitHub, no cache CDN)
 SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
@@ -220,22 +220,12 @@ if [ "$do_cask_upgrade" = true ]; then
                 fi
             fi
         else
-            # Richiedi password sudo prima di avviare lo spinner
-            gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Alcune app potrebbero richiedere la password di amministratore"
-            sudo -v
-
-            if [ $? -ne 0 ]; then
-                # Password errata o autenticazione fallita
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Password errata. Impossibile aggiornare le applicazioni"
+            # Aggiorna solo app senza auto-update (non richiede password di solito)
+            gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
+            if [ $? -eq 0 ]; then
+                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
-                echo ""
-                # Aggiorna solo app senza auto-update
-                gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
-                if [ $? -eq 0 ]; then
-                    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
-                else
-                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
-                fi
+                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
             fi
         fi
     else

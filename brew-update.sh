@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.7.0"
+SCRIPT_VERSION="1.7.1"
 
 # Modalità test (attiva con --test)
 TEST_MODE=false
@@ -223,6 +223,11 @@ if [ "$do_cask_upgrade" = true ]; then
                 echo ""
 
                 if [ "$TEST_MODE" = true ]; then
+                    # Modalità test: simula richiesta password visiva
+                    gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
+                    echo ""
+                    sleep 0.8
+
                     # Modalità test: simula output brew realistico
                     for app in "${selected_casks_array[@]}"; do
                         gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $app"

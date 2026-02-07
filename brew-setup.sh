@@ -220,6 +220,11 @@ else
     echo ""
 
     if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula richiesta password visiva
+        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
+        echo ""
+        sleep 0.8
+
         # Modalità test: simula installazione CLI tools
         for tool in "node" "gh" "oh-my-posh"; do
             gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $tool"
@@ -253,6 +258,11 @@ fi
 # Se nessun font selezionato, salta questa fase
 if [ ${#selected_fonts_array[@]} -gt 0 ]; then
     if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula richiesta password visiva
+        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
+        echo ""
+        sleep 0.8
+
         # Modalità test: simula installazione font
         echo "Installazione font per terminale in corso..."
         echo ""
@@ -305,6 +315,11 @@ fi
 # Se nessuna app selezionata, salta questa fase
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
     if [ "$TEST_MODE" = true ]; then
+        # Modalità test: simula richiesta password visiva
+        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
+        echo ""
+        sleep 0.8
+
         # Modalità test: simula installazione applicazioni
         echo "Installazione applicazioni in corso..."
         echo ""

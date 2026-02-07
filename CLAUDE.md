@@ -515,6 +515,15 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.7.1 - Simulazione richiesta password in TEST mode (2026-02-07)
+
+- Aggiunto fake password prompt visivo in modalità TEST
+- Simula "🔒 Password amministratore richiesta" prima delle installazioni
+- Applicato a brew-update.sh (sezione greedy app update)
+- Applicato a brew-setup.sh (sezioni CLI tools, font, app)
+- Permette di testare anche la casistica password senza dover autenticarsi
+- UX TEST completa: replica tutti gli scenari reali inclusa richiesta admin
+
 ### v1.7.0 - Modalità TEST per entrambi gli script (2026-02-07)
 
 - Aggiunta modalità test completa con flag `--test` per brew-update.sh e brew-setup.sh
@@ -659,4 +668,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.7.0 (Modalità TEST completa)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.7.1 (Simulazione password TEST mode)_

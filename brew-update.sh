@@ -17,7 +17,7 @@
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Versione script (usata per messaggio di stato)
-SCRIPT_VERSION="1.8.0"
+SCRIPT_VERSION="1.8.1"
 
 # Modalità test (attiva con --test)
 TEST_MODE=false
@@ -70,7 +70,14 @@ if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys
             if gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true; then
                 cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
                 chmod +x "$SCRIPT_LOCAL" 2>/dev/null
-                script_was_updated=true
+
+                # Mostra messaggio di successo e termina
+                echo ""
+                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
+                echo ""
+                gum style --foreground "$GUM_COLOR_INFO" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
+                echo ""
+                exit 0
             else
                 script_update_declined=true
             fi
@@ -116,7 +123,7 @@ GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
 
 # ===== MESSAGGIO INIZIALE =====
 echo ""
-gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update → Inizio 🚀"
+gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Update → v$SCRIPT_VERSION 🚀"
 echo ""
 
 # Banner modalità test
@@ -172,18 +179,10 @@ if [ "$do_cask_upgrade" = true ]; then
 fi
 
 # ===== MESSAGGIO VERSIONE SCRIPT =====
-# Mostra lo stato di aggiornamento dello script all'utente
-if [ "$script_was_updated" = true ] && [ -n "$script_remote_version" ]; then
-    # Script aggiornato con successo
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update aggiornato alla versione v$script_remote_version"
-    echo ""
-elif [ "$script_update_declined" = true ] && [ -n "$script_remote_version" ]; then
+# Mostra warning solo se utente ha rifiutato l'aggiornamento
+if [ "$script_update_declined" = true ] && [ -n "$script_remote_version" ]; then
     # Nuova versione disponibile ma utente ha rifiutato
     gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Nuova versione v$script_remote_version disponibile (corrente: v$SCRIPT_VERSION)"
-    echo ""
-elif [ "$script_update_checked" = true ]; then
-    # Nessun aggiornamento disponibile o già aggiornato
-    gum style --foreground "$GUM_COLOR_MUTED" "$GUM_SYMBOL_INFO brew-update: v$SCRIPT_VERSION"
     echo ""
 fi
 

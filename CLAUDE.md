@@ -515,6 +515,17 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.8.1 - Miglioramenti UI auto-aggiornamento (2026-02-07)
+
+- **Versione nel titolo**: mostra "Homebrew Update → v1.8.1 🚀" invece di "Inizio"
+- **Terminazione dopo aggiornamento**: se utente accetta aggiornamento, script si aggiorna e termina
+  - Messaggio: "brew-update aggiornato da vX.X.X a vY.Y.Y"
+  - Invito: "Riavvia il comando 'brew-update' per utilizzare la nuova versione"
+  - Exit pulito senza proseguire con altre operazioni
+- **Pulizia output**: rimosso messaggio "❋ brew-update: v1.8.0" quando script già aggiornato
+- **Messaggio warning**: mostrato solo se utente rifiuta aggiornamento disponibile
+- Migliora chiarezza UX e flusso di aggiornamento
+
 ### v1.8.0 - Test connessione e auto-aggiornamento interattivo (2026-02-07)
 
 - **Test connessione internet** obbligatorio all'avvio di entrambi gli script
@@ -686,4 +697,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.8.0 (Test connessione e auto-aggiornamento interattivo)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.8.1 (Miglioramenti UI auto-aggiornamento)_

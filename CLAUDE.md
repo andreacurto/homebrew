@@ -515,6 +515,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.5.5 - Ottimizzazione richiesta password (2026-02-07)
+
+- Password richiesta solo per app con auto-aggiornamento (greedy)
+- Rimossa richiesta password per app normali (non necessaria)
+- Migliora UX: non disturba l'utente quando non serve
+- Apps normali raramente richiedono privilegi amministratore
+
 ### v1.5.4 - Fix gestione password errata (2026-02-07)
 
 - Aggiunto controllo exit code di `sudo -v`
@@ -619,4 +626,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.4 (Fix gestione password errata)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.5 (Ottimizzazione richiesta password)_

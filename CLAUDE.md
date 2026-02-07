@@ -515,6 +515,16 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ## Changelog
 
+### v1.6.0 - Fix blocco app greedy con output filtrato (2026-02-07)
+
+- Risolto blocco apparente durante aggiornamento app con --greedy
+- Sostituito spinner con output filtrato (pattern identico a brew-setup.sh)
+- Rimosso `sudo -v` e `gum spin` che nascondevano richiesta password di brew
+- Output filtrato permette di vedere password prompt e progresso installazione
+- Output pulito mostrando solo righe rilevanti (Password, Downloading, Installing, etc.)
+- Spinner mantenuto per app non-greedy dove funziona correttamente
+- Soluzione stabile testata e coerente con resto del progetto
+
 ### v1.5.5 - Ottimizzazione richiesta password (2026-02-07)
 
 - Password richiesta solo per app con auto-aggiornamento (greedy)
@@ -626,4 +636,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.5.5 (Ottimizzazione richiesta password)_
+_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.6.0 (Fix blocco app greedy)_

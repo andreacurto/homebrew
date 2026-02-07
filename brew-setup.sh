@@ -204,8 +204,13 @@ fi
 if [ "$CLI_ALREADY_INSTALLED" = true ]; then
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Strumenti e librerie già installati"
 else
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione strumenti e librerie..." -- sh -c "brew install node gh &>/dev/null && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh &>/dev/null"
-    if [ $? -eq 0 ]; then
+    echo "Installazione strumenti e librerie in corso..."
+    echo ""
+    (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+    done
+    echo ""
+    if [ ${pipestatus[1]} -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie installati"
     else
         gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare strumenti e librerie"
@@ -226,8 +231,13 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
 
     # Installa solo i font non ancora presenti
     if [ ${#fonts_to_install[@]} -gt 0 ]; then
-        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione font per terminale..." -- sh -c "brew install --cask --force ${fonts_to_install[*]} &>/dev/null"
-        if [ $? -eq 0 ]; then
+        echo "Installazione font per terminale in corso..."
+        echo ""
+        brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        done
+        echo ""
+        if [ ${pipestatus[1]} -eq 0 ]; then
             gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
         else
             gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
@@ -254,8 +264,13 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
 
     # Installa solo le app non ancora presenti
     if [ ${#apps_to_install[@]} -gt 0 ]; then
-        gum spin --spinner "$GUM_SPINNER_TYPE" --title "Installazione applicazioni..." -- sh -c "brew install --cask ${apps_to_install[*]} &>/dev/null"
-        if [ $? -eq 0 ]; then
+        echo "Installazione applicazioni in corso..."
+        echo ""
+        brew install --cask ${apps_to_install[*]} 2>&1 | grep -E "(==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        done
+        echo ""
+        if [ ${pipestatus[1]} -eq 0 ]; then
             gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
         else
             gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare applicazioni"

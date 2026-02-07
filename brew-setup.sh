@@ -11,20 +11,15 @@
 # - Setup script di aggiornamento automatico
 
 # ===== COLORI ANSI =====
-# Usati prima che gum sia disponibile
 MUTED="\033[38;5;244m"
 RED="\033[38;5;9m"
 RESET="\033[0m"
 
 # ===== MODALITÀ TEST =====
-# Attiva con --test per simulare installazioni senza modifiche reali
 TEST_MODE=false
 [[ "$1" == "--test" ]] && TEST_MODE=true
 
 # ===== LISTE INSTALLAZIONE =====
-# Modificare questi array per aggiungere/rimuovere elementi
-# I nomi devono corrispondere ai nomi Homebrew Cask
-
 APP_LIST=(
     "1password"
     "appcleaner"
@@ -47,7 +42,6 @@ FONT_LIST=(
 )
 
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
-# Mostra cosa farà lo script e chiede conferma all'utente
 echo ""
 echo -e "${MUTED}╭──────────────────────────────╮${RESET}"
 echo -e "${MUTED}│${RESET}  Homebrew Setup → Inizio 🚀  ${MUTED}│${RESET}"
@@ -65,7 +59,6 @@ echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
 
 # ===== TEST CONNESSIONE INTERNET =====
-# Verifica connessione internet prima di procedere (skip in TEST mode)
 if [ "$TEST_MODE" = false ]; then
     if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
         echo ""
@@ -79,7 +72,6 @@ fi
 echo -e "${MUTED}⌛ Verifica preliminare in corso, non chiudere il terminale...${RESET}"
 
 # ===== INSTALLAZIONE SILENZIOSA HOMEBREW =====
-# Verifica se Homebrew è installato, altrimenti lo installa
 HOMEBREW_ALREADY_INSTALLED=false
 if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -93,57 +85,44 @@ else
 fi
 
 # ===== INSTALLAZIONE SILENZIOSA GUM =====
-# Verifica se gum è installato, altrimenti lo installa
-GUM_ALREADY_INSTALLED=false
 if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
     if ! command -v gum &> /dev/null; then
         echo -e "${RED}! Errore installazione gum${RESET}"
         exit 1
     fi
-else
-    GUM_ALREADY_INSTALLED=true
 fi
 
 # Cancella il messaggio di verifica preliminare
 echo -e "\033[1A\033[2K\033[1A\033[2K"
 
 # ===== CONFIGURAZIONE UI =====
-# Definisce colori, simboli e stili per l'interfaccia Gum
-
 # Colori (256 terminal colors)
-GUM_COLOR_SUCCESS="10"    # Operazioni completate con successo
-GUM_COLOR_ERROR="9"       # Messaggi di errore
-GUM_COLOR_WARNING="11"    # Warning e operazioni saltate
-GUM_COLOR_INFO="14"       # Messaggi informativi durante operazioni
-GUM_COLOR_PRIMARY="13"    # Titoli e header principali
-GUM_COLOR_MUTED="244"     # Output secondario e testo attenuato
+GUM_COLOR_SUCCESS="10"
+GUM_COLOR_ERROR="9"
+GUM_COLOR_WARNING="11"
+GUM_COLOR_INFO="14"
+GUM_COLOR_MUTED="244"
 
 # Simboli
-GUM_SYMBOL_SUCCESS="✔︎"    # Operazioni completate
-GUM_SYMBOL_ERROR="✘"      # Errori
-GUM_SYMBOL_WARNING="❖"    # Situazioni che richiedono attenzione
-GUM_SYMBOL_INFO="❋"       # Informazioni neutre
+GUM_SYMBOL_SUCCESS="✔︎"
+GUM_SYMBOL_ERROR="✘"
+GUM_SYMBOL_WARNING="❖"
+GUM_SYMBOL_INFO="❋"
 
 # Checkbox
-GUM_CHECKBOX_SELECTED="■"      # Opzione selezionata nei menu
-GUM_CHECKBOX_UNSELECTED="□"    # Opzione non selezionata nei menu
-GUM_CHECKBOX_CURSOR="□"        # Indicatore posizione cursore
+GUM_CHECKBOX_SELECTED="■"
+GUM_CHECKBOX_UNSELECTED="□"
+GUM_CHECKBOX_CURSOR="□"
 
-# Spinner
-GUM_SPINNER_TYPE="monkey"      # Tipo animazione durante operazioni
+# Spinner e layout
+GUM_SPINNER_TYPE="monkey"
+GUM_BORDER_ROUNDED="rounded"
+GUM_BORDER_THICK="thick"
+GUM_PADDING="0 1"
+GUM_MARGIN="0"
+GUM_ERROR_PADDING="0 1"
 
-# Bordi
-GUM_BORDER_ROUNDED="rounded"   # Stile bordo per box principali
-GUM_BORDER_DOUBLE="double"     # Stile bordo alternativo
-GUM_BORDER_THICK="thick"       # Stile bordo spesso
-
-# Layout
-GUM_PADDING="0 1"              # Spaziatura interna box (verticale orizzontale)
-GUM_MARGIN="0"                 # Margine esterno box
-GUM_ERROR_PADDING="0 1"        # Spaziatura messaggi di errore
-
-# Banner modalità test
 if [ "$TEST_MODE" = true ]; then
     echo ""
     gum style --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
@@ -151,8 +130,6 @@ if [ "$TEST_MODE" = true ]; then
 fi
 
 # ===== SELEZIONE APPLICAZIONI =====
-# Menu interattivo con checkbox per scegliere quali applicazioni installare
-# Usa frecce per navigare, Spazio per selezionare, Invio per confermare
 selected_apps=""
 if [ ${#APP_LIST[@]} -gt 0 ]; then
     selected_apps=$(gum choose --no-limit --height 15 \
@@ -163,15 +140,12 @@ if [ ${#APP_LIST[@]} -gt 0 ]; then
         "${APP_LIST[@]}")
 fi
 
-# Converte l'output multi-linea in array bash/zsh compatible
 selected_apps_array=()
 while IFS= read -r line; do
     [[ -n "$line" ]] && selected_apps_array+=("$line")
 done <<< "$selected_apps"
 
 # ===== SELEZIONE FONT =====
-# Menu interattivo con checkbox per scegliere quali font installare
-# I Nerd Font includono icone e simboli speciali per il terminale
 selected_fonts=""
 if [ ${#FONT_LIST[@]} -gt 0 ]; then
     selected_fonts=$(gum choose --no-limit \
@@ -182,15 +156,12 @@ if [ ${#FONT_LIST[@]} -gt 0 ]; then
         "${FONT_LIST[@]}")
 fi
 
-# Converte l'output multi-linea in array bash/zsh compatible
 selected_fonts_array=()
 while IFS= read -r line; do
     [[ -n "$line" ]] && selected_fonts_array+=("$line")
 done <<< "$selected_fonts"
 
 # ===== SELEZIONE TEMA OH MY POSH =====
-# Menu per scegliere il tema del prompt del terminale
-# Default: zash (minimalista)
 selected_theme=$(gum choose \
     --header="Seleziona il tema per terminale da installare (Oh My Posh):" \
     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
@@ -200,11 +171,9 @@ selected_theme=$(gum choose \
     "robbyrussell" \
     "pararussel")
 
-# Fallback al tema default se la selezione è vuota
 [[ -z "$selected_theme" ]] && selected_theme="zash"
 
 # ===== INSTALLAZIONI =====
-# Messaggio di conferma dipendenze base
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Homebrew già installato"
 else
@@ -212,13 +181,6 @@ else
 fi
 
 # ===== INSTALLAZIONE STRUMENTI E LIBRERIE =====
-# Installa pacchetti essenziali per il funzionamento degli script e dell'ambiente
-# - node: Runtime JavaScript
-# - gh: GitHub CLI
-# - oh-my-posh: Personalizzazione prompt shell (cask)
-# (gum già installato nella fase iniziale)
-
-# Controlla se tutti gli strumenti e librerie sono già installati
 CLI_ALREADY_INSTALLED=false
 if command -v node &> /dev/null && command -v gh &> /dev/null && command -v oh-my-posh &> /dev/null; then
     CLI_ALREADY_INSTALLED=true
@@ -231,12 +193,10 @@ else
     echo ""
 
     if [ "$TEST_MODE" = true ]; then
-        # Modalità test: simula richiesta password visiva
         gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
         echo ""
         sleep 0.8
 
-        # Modalità test: simula installazione CLI tools
         for tool in "node" "gh" "oh-my-posh"; do
             gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $tool"
             sleep 0.3
@@ -246,7 +206,6 @@ else
         echo ""
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie installati"
     else
-        # Modalità normale: esegue brew install
         (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
             if [[ "$line" == "Password:"* ]]; then
                 echo "$line"
@@ -265,16 +224,12 @@ else
 fi
 
 # ===== INSTALLAZIONE FONT PER TERMINALE =====
-# Installa i font selezionati dall'utente tramite Homebrew Cask
-# Se nessun font selezionato, salta questa fase
 if [ ${#selected_fonts_array[@]} -gt 0 ]; then
     if [ "$TEST_MODE" = true ]; then
-        # Modalità test: simula richiesta password visiva
         gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
         echo ""
         sleep 0.8
 
-        # Modalità test: simula installazione font
         echo "Installazione font per terminale in corso..."
         echo ""
         for font in "${selected_fonts_array[@]}"; do
@@ -286,7 +241,6 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
         echo ""
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
     else
-        # Modalità normale: separa font già installati da quelli da installare
         fonts_to_install=()
         for font in "${selected_fonts_array[@]}"; do
             if ! brew list --cask "$font" &> /dev/null; then
@@ -294,7 +248,6 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
             fi
         done
 
-        # Installa solo i font non ancora presenti
         if [ ${#fonts_to_install[@]} -gt 0 ]; then
             echo "Installazione font per terminale in corso..."
             echo ""
@@ -313,7 +266,6 @@ if [ ${#selected_fonts_array[@]} -gt 0 ]; then
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
             fi
         else
-            # Tutti i font selezionati erano già installati
             gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
         fi
     fi
@@ -322,16 +274,12 @@ else
 fi
 
 # ===== INSTALLAZIONE APPLICAZIONI =====
-# Installa le applicazioni selezionate dall'utente tramite Homebrew Cask
-# Se nessuna app selezionata, salta questa fase
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
     if [ "$TEST_MODE" = true ]; then
-        # Modalità test: simula richiesta password visiva
         gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
         echo ""
         sleep 0.8
 
-        # Modalità test: simula installazione applicazioni
         echo "Installazione applicazioni in corso..."
         echo ""
         for app in "${selected_apps_array[@]}"; do
@@ -343,7 +291,6 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
         echo ""
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
     else
-        # Modalità normale: separa app già installate da quelle da installare
         apps_to_install=()
         for app in "${selected_apps_array[@]}"; do
             if ! brew list --cask "$app" &> /dev/null; then
@@ -351,7 +298,6 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
             fi
         done
 
-        # Installa solo le app non ancora presenti
         if [ ${#apps_to_install[@]} -gt 0 ]; then
             echo "Installazione applicazioni in corso..."
             echo ""
@@ -370,7 +316,6 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare applicazioni"
             fi
         else
-            # Tutte le app selezionate erano già installate
             gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Applicazioni già installate"
         fi
     fi
@@ -379,14 +324,10 @@ else
 fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====
-# Copia brew-update.sh in ~/Shell/ per poterlo eseguire con alias brew-update
-# Crea la directory ~/Shell/ se non esiste
 if [ "$TEST_MODE" = true ]; then
-    # Modalità test: simula con delay
     sleep 0.5
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
-    # Modalità normale: esegue copia script
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
     gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
     if [ $? -eq 0 ]; then
@@ -397,14 +338,10 @@ else
 fi
 
 # ===== CONFIGURAZIONE SHELL =====
-# Crea/sovrascrive ~/.zshrc con configurazione Oh My Posh e alias
-# Backup automatico del file esistente in ~/.zshrc.bak
 if [ "$TEST_MODE" = true ]; then
-    # Modalità test: simula con delay
     sleep 0.3
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato"
 else
-    # Modalità normale: modifica .zshrc
     if [ -f ~/.zshrc ]; then
         cp ~/.zshrc ~/.zshrc.bak
     fi

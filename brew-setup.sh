@@ -51,9 +51,10 @@ echo "Questo script installerà:"
 echo ""
 echo -e "${MUTED}  → Homebrew (package manager per macOS)${RESET}"
 echo -e "${MUTED}  → Strumenti e librerie (node, gh, oh-my-posh, gum)${RESET}"
+echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
 echo -e "${MUTED}  → Font per terminale a tua scelta${RESET}"
 echo -e "${MUTED}  → Tema terminale a tua scelta${RESET}"
-echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
+echo -e "${MUTED}  → Script di aggiornamento (percorso a tua scelta)${RESET}"
 echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
@@ -228,56 +229,6 @@ else
     fi
 fi
 
-# ===== INSTALLAZIONE FONT PER TERMINALE =====
-if [ ${#selected_fonts_array[@]} -gt 0 ]; then
-    if [ "$TEST_MODE" = true ]; then
-        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
-        echo ""
-        sleep 0.8
-
-        echo "Installazione font per terminale in corso..."
-        echo ""
-        for font in "${selected_fonts_array[@]}"; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $font"
-            sleep 0.3
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $font"
-            sleep 0.4
-        done
-        echo ""
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
-    else
-        fonts_to_install=()
-        for font in "${selected_fonts_array[@]}"; do
-            if ! brew list --cask "$font" &> /dev/null; then
-                fonts_to_install+=("$font")
-            fi
-        done
-
-        if [ ${#fonts_to_install[@]} -gt 0 ]; then
-            echo "Installazione font per terminale in corso..."
-            echo ""
-            brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                if [[ "$line" == "Password:"* ]]; then
-                    echo "$line"
-                    echo ""
-                else
-                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                fi
-            done
-            echo ""
-            if [ ${pipestatus[1]} -eq 0 ]; then
-                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
-            else
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
-            fi
-        else
-            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
-        fi
-    fi
-else
-    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun font selezionato"
-fi
-
 # ===== INSTALLAZIONE APPLICAZIONI =====
 if [ ${#selected_apps_array[@]} -gt 0 ]; then
     if [ "$TEST_MODE" = true ]; then
@@ -326,6 +277,56 @@ if [ ${#selected_apps_array[@]} -gt 0 ]; then
     fi
 else
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
+fi
+
+# ===== INSTALLAZIONE FONT PER TERMINALE =====
+if [ ${#selected_fonts_array[@]} -gt 0 ]; then
+    if [ "$TEST_MODE" = true ]; then
+        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
+        echo ""
+        sleep 0.8
+
+        echo "Installazione font per terminale in corso..."
+        echo ""
+        for font in "${selected_fonts_array[@]}"; do
+            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $font"
+            sleep 0.3
+            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $font"
+            sleep 0.4
+        done
+        echo ""
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
+    else
+        fonts_to_install=()
+        for font in "${selected_fonts_array[@]}"; do
+            if ! brew list --cask "$font" &> /dev/null; then
+                fonts_to_install+=("$font")
+            fi
+        done
+
+        if [ ${#fonts_to_install[@]} -gt 0 ]; then
+            echo "Installazione font per terminale in corso..."
+            echo ""
+            brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+                if [[ "$line" == "Password:"* ]]; then
+                    echo "$line"
+                    echo ""
+                else
+                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                fi
+            done
+            echo ""
+            if [ ${pipestatus[1]} -eq 0 ]; then
+                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
+            else
+                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
+            fi
+        else
+            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
+        fi
+    fi
+else
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun font selezionato"
 fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====

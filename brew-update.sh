@@ -52,7 +52,7 @@ GUM_PADDING="0 1"
 GUM_MARGIN="0"
 
 # ===== DISINSTALLAZIONE =====
-if [[ "$1" == "--uninstall" ]] || [[ "$1" == "-u" ]]; then
+if [[ "$1" == "--uninstall" ]] || [[ "$1" == "--u" ]] || [[ "$1" == "-u" ]]; then
     echo ""
     if gum confirm "Vuoi disinstallare brew-update?" --default=false; then
         # Rimuovi alias da .zshrc

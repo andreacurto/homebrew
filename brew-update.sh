@@ -15,11 +15,11 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.8.4"
+SCRIPT_VERSION="1.9.0"
 TEST_MODE=false
 [[ "$1" == "--test" ]] && TEST_MODE=true
 
-SCRIPT_SOURCE="https://api.github.com/repos/andreacurto/homebrew/contents/brew-update.sh"
+SCRIPT_REPO="andreacurto/homebrew"
 
 # Verifica/installa gum se non presente
 if ! command -v gum &> /dev/null; then
@@ -69,19 +69,30 @@ TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
 TMP_UPDATE="/tmp/brew_update_$$.sh"
 trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
 
-# ===== AUTO-AGGIORNAMENTO SCRIPT =====
+# ===== AUTO-AGGIORNAMENTO SCRIPT (tag-based) =====
 SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
-script_update_checked=false
 script_remote_version=""
 script_update_declined=false
 
-if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys,json,base64; sys.stdout.buffer.write(base64.b64decode(json.load(sys.stdin)['content']))" > "$TMP_UPDATE" 2>/dev/null; then
-    if [ -f "$SCRIPT_LOCAL" ] && [ -f "$TMP_UPDATE" ]; then
-        local_hash=$(shasum "$SCRIPT_LOCAL" 2>/dev/null | cut -d' ' -f1)
-        remote_hash=$(shasum "$TMP_UPDATE" 2>/dev/null | cut -d' ' -f1)
-        script_remote_version=$(grep '^SCRIPT_VERSION=' "$TMP_UPDATE" 2>/dev/null | cut -d'"' -f2)
+# Controlla ultimo tag rilasciato su GitHub
+latest_tag=$(curl -fsSL --max-time 5 "https://api.github.com/repos/$SCRIPT_REPO/tags" 2>/dev/null | python3 -c "
+import sys, json
+tags = json.load(sys.stdin)
+if tags:
+    print(tags[0]['name'])
+" 2>/dev/null)
 
-        if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ] && [ -n "$script_remote_version" ]; then
+if [ -n "$latest_tag" ]; then
+    script_remote_version="${latest_tag#v}"
+
+    # Confronta versione locale vs tag remoto (semver)
+    if [ "$script_remote_version" != "$SCRIPT_VERSION" ] && python3 -c "
+v_local = list(map(int, '$SCRIPT_VERSION'.split('.')))
+v_remote = list(map(int, '$script_remote_version'.split('.')))
+exit(0 if v_remote > v_local else 1)
+" 2>/dev/null; then
+        # Scarica script dal tag specifico (non da HEAD master)
+        if curl -fsSL --max-time 5 "https://raw.githubusercontent.com/$SCRIPT_REPO/$latest_tag/brew-update.sh" > "$TMP_UPDATE" 2>/dev/null; then
             echo ""
             if gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true; then
                 cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
@@ -96,7 +107,6 @@ if curl -fsSL --max-time 5 "$SCRIPT_SOURCE" 2>/dev/null | python3 -c "import sys
                 script_update_declined=true
             fi
         fi
-        script_update_checked=true
     fi
 fi
 

@@ -490,6 +490,20 @@ Per vedere output Homebrew completo, rimuovere `2>/dev/null` dai comandi:
 
 ## Workflow Git
 
+### Branching Strategy
+
+Usare branch di sviluppo per non triggerare aggiornamenti prematuri agli utenti:
+
+```
+master (stabile, solo release taggate)
+  └── dev/feature-name   (nuove funzionalità)
+  └── fix/bug-name       (bug fix)
+```
+
+- **Sviluppo**: sempre su branch (`dev/...` o `fix/...`)
+- **Merge su master**: solo quando la feature/fix è pronta e testata
+- **Tag**: creato dopo il merge su master → solo a quel punto gli utenti vedono l'aggiornamento
+
 ### Commit e Push
 
 - Dopo ogni commit, eseguire sempre il push automaticamente senza attendere conferma
@@ -503,17 +517,56 @@ Dopo ogni commit+push, valutare automaticamente il bump di versione seguendo [Se
 - **MINOR** (x.Y.0): nuove funzionalità backward-compatible
 - **MAJOR** (X.0.0): breaking changes
 
-**IMPORTANTE**: Ad ogni nuovo tag, aggiornare SEMPRE la variabile `SCRIPT_VERSION` in `brew-update.sh` per farla corrispondere al tag. Se non viene aggiornata, il messaggio di versione mostrerà un valore sbagliato.
+**IMPORTANTE**: Ad ogni nuovo tag, aggiornare SEMPRE la variabile `SCRIPT_VERSION` in `brew-update.sh` per farla corrispondere al tag. Il meccanismo di auto-update confronta `SCRIPT_VERSION` con l'ultimo tag GitHub per decidere se proporre l'aggiornamento.
 
-Esempio:
+### Flusso di Rilascio
+
 ```bash
-# 1. Aggiornare SCRIPT_VERSION in brew-update.sh
-# 2. Commit e push
-# 3. Creare tag
-git tag v1.0.1 && git push origin v1.0.1
+# 1. Sviluppo su branch
+git checkout -b dev/feature-name
+
+# 2. Commit e push del branch
+git push -u origin dev/feature-name
+
+# 3. Merge su master quando pronto
+git checkout master && git merge dev/feature-name
+
+# 4. Aggiornare SCRIPT_VERSION in brew-update.sh con la nuova versione
+# 5. Commit e push
+# 6. Creare tag e push
+git tag v1.9.0 && git push origin v1.9.0
+
+# 7. Eliminare branch di sviluppo
+git branch -d dev/feature-name && git push origin --delete dev/feature-name
 ```
 
+### Auto-aggiornamento Script (tag-based)
+
+Il meccanismo di auto-update in `brew-update.sh` funziona così:
+
+1. **Controlla ultimo tag** su GitHub API (`/repos/{repo}/tags`)
+2. **Confronta versioni** (semver): `SCRIPT_VERSION` locale vs tag remoto
+3. **Solo se il tag è più recente**: propone aggiornamento all'utente
+4. **Scarica dal tag specifico**: `raw.githubusercontent.com/{repo}/{tag}/brew-update.sh`
+
+**Conseguenze importanti:**
+- Commit su master senza nuovo tag → **nessun aggiornamento** proposto agli utenti
+- Commit su branch di sviluppo → **nessun impatto** sugli utenti
+- Nuovo tag creato → **utenti notificati** al prossimo avvio di brew-update
+
 ## Changelog
+
+### v1.9.0 - Auto-update tag-based e branching workflow (2026-02-08)
+
+- **Auto-update basato su tag**: sostituito meccanismo hash-based con confronto semver vs ultimo tag GitHub
+  - Prima: confrontava hash SHA dei file (qualsiasi differenza triggerava update, anche a parità di versione)
+  - Ora: confronta `SCRIPT_VERSION` locale con ultimo tag GitHub (update solo quando il tag è più recente)
+- **Download dal tag specifico**: scarica script da `raw.githubusercontent.com/{repo}/{tag}/` invece che da HEAD master
+- **Confronto semver**: usa python3 per confronto versioni affidabile (v_remote > v_local)
+- **Branching strategy documentata**: sviluppo su branch `dev/` o `fix/`, merge + tag su master per rilascio
+- **Variabile `SCRIPT_REPO`**: sostituisce `SCRIPT_SOURCE`, contiene solo `owner/repo`
+- Rimosse variabili inutilizzate: `script_update_checked`, `SCRIPT_SOURCE`
+- Flusso di rilascio documentato in CLAUDE.md
 
 ### v1.8.1 - Miglioramenti UI auto-aggiornamento (2026-02-07)
 
@@ -697,4 +750,4 @@ git tag v1.0.1 && git push origin v1.0.1
 
 ---
 
-_Ultimo aggiornamento: 2026-02-07_ _Versione: 1.8.1 (Miglioramenti UI auto-aggiornamento)_
+_Ultimo aggiornamento: 2026-02-08_ _Versione: 1.9.0 (Auto-update tag-based e branching workflow)_

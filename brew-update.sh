@@ -11,12 +11,14 @@
 # - Pulizia cache e vecchie versioni
 # - Diagnostica sistema (brew doctor)
 # - Auto-aggiornamento script dalla repo GitHub
+# - Disinstallazione con --uninstall o -u
 
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 SCRIPT_VERSION="1.10.0"
 SCRIPT_REPO="andreacurto/homebrew"
+INSTALL_DIR="$HOME/.brew"
 
 # Verifica/installa gum se non presente
 if ! command -v gum &> /dev/null; then
@@ -48,6 +50,23 @@ GUM_SPINNER_TYPE="monkey"
 GUM_BORDER_ROUNDED="rounded"
 GUM_PADDING="0 1"
 GUM_MARGIN="0"
+
+# ===== DISINSTALLAZIONE =====
+if [[ "$1" == "--uninstall" ]] || [[ "$1" == "-u" ]]; then
+    echo ""
+    if gum confirm "Vuoi disinstallare brew-update?" --default=false; then
+        # Rimuovi alias da .zshrc
+        if [ -f ~/.zshrc ]; then
+            sed -i '' '/alias brew-update=/d' ~/.zshrc
+        fi
+        echo ""
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update disinstallato"
+        gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Esegui il comando 'source ~/.zshrc' o riavvia il terminale per applicare le modifiche"
+        echo ""
+        rm -rf "$INSTALL_DIR"
+    fi
+    exit 0
+fi
 
 # ===== TEST CONNESSIONE INTERNET =====
 if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then

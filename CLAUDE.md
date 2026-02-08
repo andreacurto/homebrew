@@ -496,49 +496,59 @@ Usare branch di sviluppo per non triggerare aggiornamenti prematuri agli utenti:
 
 ```
 master (stabile, solo release taggate)
-  └── dev/feature-name   (nuove funzionalità)
-  └── fix/bug-name       (bug fix)
+  └── feature/nome-feature   (nuove funzionalità)
+  └── fix/nome-bug           (bug fix)
 ```
 
-- **Sviluppo**: sempre su branch (`dev/...` o `fix/...`)
-- **Merge su master**: solo quando la feature/fix è pronta e testata
-- **Tag**: creato dopo il merge su master → solo a quel punto gli utenti vedono l'aggiornamento
+- **`feature/...`**: nuove funzionalità, modifiche significative → bump MINOR
+- **`fix/...`**: bug fix, correzioni, tweaks → bump PATCH
+- **Merge su master**: solo dopo approvazione esplicita dell'utente
+- **Tag**: creato dopo il merge → solo a quel punto gli utenti vedono l'aggiornamento
 
-### Commit e Push
+### Processo di Sviluppo
 
-- Dopo ogni commit, eseguire sempre il push automaticamente senza attendere conferma
-- Non aspettare che l'utente chieda di pushare
+**IMPORTANTE**: Seguire SEMPRE questo processo per qualsiasi modifica.
+
+#### 1. Piano di rilascio (PRIMA di qualsiasi codice)
+
+Quando l'utente chiede una modifica, presentare SEMPRE un piano che includa:
+- **Tipo di branch**: `feature/` o `fix/` (valutare in autonomia)
+- **Nome branch**: descrittivo e conciso
+- **Elenco commit previsti**: lista dei commit pianificati con descrizione
+- **Versione target**: bump previsto (PATCH/MINOR/MAJOR)
+
+Attendere approvazione dell'utente prima di procedere.
+
+#### 2. Sviluppo (dopo approvazione piano)
+
+- Creare il branch e lavorare in autonomia
+- Eseguire TUTTE le operazioni (commit, edit, test) senza chiedere permesso
+- Ogni commit viene pushato automaticamente
+
+#### 3. Review pre-merge (PRIMA del merge in master)
+
+- **Chiedere SEMPRE conferma** all'utente prima di mergiare in master
+- L'utente potrebbe voler aggiungere o correggere qualcosa
+- Se l'utente chiede modifiche ulteriori: valutare se tenerle nello stesso branch o chiudere + nuovo branch, e proporre la soluzione
+
+#### 4. Rilascio (dopo approvazione merge)
+
+Eseguire TUTTO in autonomia senza chiedere permesso:
+- Merge su master
+- Aggiornare `SCRIPT_VERSION` in `brew-update.sh`
+- Commit version bump + push
+- Creare tag + push tag
+- Eliminare branch locale
 
 ### Versionamento Semantico (Semver)
 
-Dopo ogni commit+push, valutare automaticamente il bump di versione seguendo [Semantic Versioning](https://semver.org/lang/it/) e aggiornare il tag git:
+Seguire [Semantic Versioning](https://semver.org/lang/it/):
 
 - **PATCH** (x.y.Z): bug fix, UI tweaks, modifiche minori
 - **MINOR** (x.Y.0): nuove funzionalità backward-compatible
 - **MAJOR** (X.0.0): breaking changes
 
 **IMPORTANTE**: Ad ogni nuovo tag, aggiornare SEMPRE la variabile `SCRIPT_VERSION` in `brew-update.sh` per farla corrispondere al tag. Il meccanismo di auto-update confronta `SCRIPT_VERSION` con l'ultimo tag GitHub per decidere se proporre l'aggiornamento.
-
-### Flusso di Rilascio
-
-```bash
-# 1. Sviluppo su branch
-git checkout -b dev/feature-name
-
-# 2. Commit e push del branch
-git push -u origin dev/feature-name
-
-# 3. Merge su master quando pronto
-git checkout master && git merge dev/feature-name
-
-# 4. Aggiornare SCRIPT_VERSION in brew-update.sh con la nuova versione
-# 5. Commit e push
-# 6. Creare tag e push
-git tag v1.9.0 && git push origin v1.9.0
-
-# 7. Eliminare branch di sviluppo
-git branch -d dev/feature-name && git push origin --delete dev/feature-name
-```
 
 ### Auto-aggiornamento Script (tag-based)
 

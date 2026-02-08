@@ -171,6 +171,13 @@ selected_theme=$(gum choose \
     "pararussel" \
     "Continua senza tema")
 
+# ===== CARTELLA INSTALLAZIONE SCRIPT =====
+install_dir=$(gum input \
+    --header="Dove installare lo script di aggiornamento?" \
+    --value="$HOME/Shell")
+[[ -z "$install_dir" ]] && install_dir="$HOME/Shell"
+install_dir="${install_dir/#\~/$HOME}"
+
 # ===== INSTALLAZIONI =====
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Homebrew già installato"
@@ -327,7 +334,7 @@ if [ "$TEST_MODE" = true ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p ~/Shell && cp '$SCRIPT_DIR/brew-update.sh' ~/Shell/brew-update.sh && chmod +x ~/Shell/brew-update.sh"
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$install_dir' && cp '$SCRIPT_DIR/brew-update.sh' '$install_dir/brew-update.sh' && chmod +x '$install_dir/brew-update.sh'"
     if [ $? -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
     else
@@ -349,9 +356,9 @@ else
     fi
 
     if [ "$selected_theme" = "Continua senza tema" ] || [ -z "$selected_theme" ]; then
-        cat > ~/.zshrc << 'EOF'
+        cat > ~/.zshrc << EOF
 # Alias
-alias brew-update='zsh ~/Shell/brew-update.sh'
+alias brew-update='zsh $install_dir/brew-update.sh'
 EOF
         gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
     else
@@ -360,7 +367,7 @@ EOF
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
-alias brew-update='zsh ~/Shell/brew-update.sh'
+alias brew-update='zsh $install_dir/brew-update.sh'
 EOF
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme)"
     fi

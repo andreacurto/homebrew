@@ -162,15 +162,14 @@ done <<< "$selected_fonts"
 
 # ===== SELEZIONE TEMA OH MY POSH =====
 selected_theme=$(gum choose \
-    --header="Seleziona il tema per terminale da installare (Oh My Posh):" \
+    --header="Seleziona il tema per terminale (Oh My Posh):" \
     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
     --selected="zash" \
     "zash" \
     "material" \
     "robbyrussell" \
-    "pararussel")
-
-[[ -z "$selected_theme" ]] && selected_theme="zash"
+    "pararussel" \
+    "Continua senza tema")
 
 # ===== INSTALLAZIONI =====
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
@@ -339,21 +338,32 @@ fi
 # ===== CONFIGURAZIONE SHELL =====
 if [ "$TEST_MODE" = true ]; then
     sleep 0.3
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato"
+    if [ "$selected_theme" = "Continua senza tema" ] || [ -z "$selected_theme" ]; then
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
+    else
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme)"
+    fi
 else
     if [ -f ~/.zshrc ]; then
         cp ~/.zshrc ~/.zshrc.bak
     fi
 
-    cat > ~/.zshrc << EOF
+    if [ "$selected_theme" = "Continua senza tema" ] || [ -z "$selected_theme" ]; then
+        cat > ~/.zshrc << 'EOF'
+# Alias
+alias brew-update='zsh ~/Shell/brew-update.sh'
+EOF
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
+    else
+        cat > ~/.zshrc << EOF
 # Oh My Posh
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
 alias brew-update='zsh ~/Shell/brew-update.sh'
 EOF
-
-    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme)"
+    fi
 fi
 
 # ===== MESSAGGIO FINALE =====

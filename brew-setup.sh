@@ -71,6 +71,9 @@ THEME_FILES=(
     "pararussel"
 )
 
+# Cartella installazione script
+INSTALL_DIR="$HOME/.brew"
+
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
 echo ""
 echo -e "${MUTED}╭──────────────────────────────╮${RESET}"
@@ -84,7 +87,7 @@ echo -e "${MUTED}  → Strumenti e librerie (node, gh, oh-my-posh, gum)${RESET}"
 echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
 echo -e "${MUTED}  → Font per terminale a tua scelta${RESET}"
 echo -e "${MUTED}  → Tema terminale a tua scelta${RESET}"
-echo -e "${MUTED}  → Script di aggiornamento (percorso a tua scelta)${RESET}"
+echo -e "${MUTED}  → Script di aggiornamento${RESET}"
 echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
@@ -210,27 +213,6 @@ for i in {1..${#THEME_LABELS[@]}}; do
 done
 selected_theme="${theme_to_file[$selected_theme_label]}"
 
-# ===== CARTELLA INSTALLAZIONE SCRIPT =====
-install_choice=$(gum choose \
-    --header="Dove installare lo script di aggiornamento?" \
-    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
-    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
-    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-    "$HOME/Shell" \
-    "$HOME/Scripts" \
-    "$HOME/.local/bin" \
-    "Personalizzato...")
-
-if [ "$install_choice" = "Personalizzato..." ]; then
-    install_dir=$(gum input \
-        --header="Inserisci il percorso di installazione:" \
-        --placeholder="~/Shell")
-    [[ -z "$install_dir" ]] && install_dir="$HOME/Shell"
-    install_dir="${install_dir/#\~/$HOME}"
-else
-    install_dir="$install_choice"
-fi
-
 # ===== INSTALLAZIONI =====
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Homebrew già installato"
@@ -333,7 +315,7 @@ fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$install_dir' && cp '$SCRIPT_DIR/brew-update.sh' '$install_dir/brew-update.sh' && chmod +x '$install_dir/brew-update.sh'"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$INSTALL_DIR' && cp '$SCRIPT_DIR/brew-update.sh' '$INSTALL_DIR/brew-update.sh' && chmod +x '$INSTALL_DIR/brew-update.sh'"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
@@ -348,7 +330,7 @@ fi
 if [ -z "$selected_theme" ]; then
     cat > ~/.zshrc << EOF
 # Alias
-alias brew-update='zsh $install_dir/brew-update.sh'
+alias brew-update='zsh $INSTALL_DIR/brew-update.sh'
 EOF
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
 else
@@ -357,7 +339,7 @@ else
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
-alias brew-update='zsh $install_dir/brew-update.sh'
+alias brew-update='zsh $INSTALL_DIR/brew-update.sh'
 EOF
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
 fi

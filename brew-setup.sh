@@ -78,7 +78,7 @@ if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
     if ! command -v brew &> /dev/null; then
-        echo -e "${RED}! Errore installazione Homebrew${RESET}"
+        echo -e "${RED}✘ Errore installazione Homebrew${RESET}"
         exit 1
     fi
 else
@@ -89,7 +89,7 @@ fi
 if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
     if ! command -v gum &> /dev/null; then
-        echo -e "${RED}! Errore installazione gum${RESET}"
+        echo -e "${RED}✘ Errore installazione gum${RESET}"
         exit 1
     fi
 fi

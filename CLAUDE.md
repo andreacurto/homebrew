@@ -176,19 +176,19 @@ Formato [Conventional Commits](https://www.conventionalcommits.org/):
 
 | Prefisso   | Uso                        | Esempio                                  |
 |------------|----------------------------|------------------------------------------|
-| `feat`     | nuova funzionalità         | `feat: selezione tema opzionale`         |
-| `fix`      | bug fix                    | `fix: simboli errore consistenti`        |
-| `style`    | UI/UX, formattazione       | `style: messaggio connessione su due righe` |
-| `refactor` | ristrutturazione codice    | `refactor: auto-update tag-based`        |
-| `docs`     | documentazione             | `docs: workflow di sviluppo`             |
-| `chore`    | manutenzione, version bump | `chore: bump version to 1.10.0`          |
+| `Feat`     | nuova funzionalità         | `Feat: selezione tema opzionale`         |
+| `Fix`      | bug fix                    | `Fix: simboli errore consistenti`        |
+| `Style`    | UI/UX, formattazione       | `Style: messaggio connessione su due righe` |
+| `Refactor` | ristrutturazione codice    | `Refactor: auto-update tag-based`        |
+| `Docs`     | documentazione             | `Docs: workflow di sviluppo`             |
+| `Chore`    | manutenzione, version bump | `Chore: bump version to 1.10.0`          |
 
 ### Regole
 
-- Prima riga: max ~70 caratteri, minuscolo dopo il prefisso
+- Prefisso: sempre con iniziale maiuscola (`Feat`, `Fix`, `Docs`...)
+- Prima riga: max ~70 caratteri, minuscolo dopo i due punti
 - Lingua: italiano per la descrizione
 - Corpo: opzionale, separato da riga vuota, per spiegare cosa e perché
-- **Non usare** maiuscola dopo i due punti (`feat: selezione tema`, non `feat: Selezione tema`)
 
 ## Convenzioni Codice
 

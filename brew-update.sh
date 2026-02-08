@@ -70,7 +70,7 @@ TMP_UPDATE="/tmp/brew_update_$$.sh"
 trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
 
 # ===== AUTO-AGGIORNAMENTO SCRIPT (tag-based) =====
-SCRIPT_LOCAL="$HOME/Shell/brew-update.sh"
+SCRIPT_LOCAL="${0:A}"
 script_remote_version=""
 script_update_declined=false
 

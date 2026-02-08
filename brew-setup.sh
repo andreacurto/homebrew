@@ -173,11 +173,25 @@ selected_theme=$(gum choose \
     "Continua senza tema")
 
 # ===== CARTELLA INSTALLAZIONE SCRIPT =====
-install_dir=$(gum input \
+install_choice=$(gum choose \
     --header="Dove installare lo script di aggiornamento?" \
-    --value="$HOME/Shell")
-[[ -z "$install_dir" ]] && install_dir="$HOME/Shell"
-install_dir="${install_dir/#\~/$HOME}"
+    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+    "$HOME/Shell" \
+    "$HOME/Scripts" \
+    "$HOME/.local/bin" \
+    "Personalizzato...")
+
+if [ "$install_choice" = "Personalizzato..." ]; then
+    install_dir=$(gum input \
+        --header="Inserisci il percorso di installazione:" \
+        --placeholder="~/Shell")
+    [[ -z "$install_dir" ]] && install_dir="$HOME/Shell"
+    install_dir="${install_dir/#\~/$HOME}"
+else
+    install_dir="$install_choice"
+fi
 
 # ===== INSTALLAZIONI =====
 if [ "$HOMEBREW_ALREADY_INSTALLED" = true ]; then

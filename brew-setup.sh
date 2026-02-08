@@ -20,7 +20,24 @@ TEST_MODE=false
 [[ "$1" == "--test" ]] && TEST_MODE=true
 
 # ===== LISTE INSTALLAZIONE =====
-APP_LIST=(
+# Label (visualizzata) e cask (pacchetto Homebrew) devono avere lo stesso ordine
+
+APP_LABELS=(
+    "1Password"
+    "AppCleaner"
+    "Claude Code"
+    "Dropbox"
+    "Figma"
+    "Google Chrome"
+    "ImageOptim"
+    "Numi"
+    "Rectangle"
+    "Spotify"
+    "Visual Studio Code"
+    "Wailbrew"
+    "WhatsApp"
+)
+APP_CASKS=(
     "1password"
     "appcleaner"
     "claude-code"
@@ -36,9 +53,26 @@ APP_LIST=(
     "whatsapp"
 )
 
-FONT_LIST=(
+FONT_LABELS=(
+    "Meslo LG Nerd Font"
+    "Roboto Mono Nerd Font"
+)
+FONT_CASKS=(
     "font-meslo-lg-nerd-font"
     "font-roboto-mono-nerd-font"
+)
+
+THEME_LABELS=(
+    "Zash"
+    "Material"
+    "Robby Russell"
+    "ParaRussel"
+)
+THEME_FILES=(
+    "zash"
+    "material"
+    "robbyrussell"
+    "pararussel"
 )
 
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
@@ -131,46 +165,62 @@ fi
 
 # ===== SELEZIONE APPLICAZIONI =====
 selected_apps=""
-if [ ${#APP_LIST[@]} -gt 0 ]; then
+if [ ${#APP_LABELS[@]} -gt 0 ]; then
     selected_apps=$(gum choose --no-limit --height 15 \
         --header="Seleziona le applicazioni da installare:" \
         --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
         --selected-prefix="$GUM_CHECKBOX_SELECTED " \
         --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-        "${APP_LIST[@]}")
+        "${APP_LABELS[@]}")
 fi
 
+# Converti label selezionate in nomi cask
+typeset -A app_to_cask
+for i in {1..${#APP_LABELS[@]}}; do
+    app_to_cask[${APP_LABELS[$i]}]=${APP_CASKS[$i]}
+done
 selected_apps_array=()
-while IFS= read -r line; do
-    [[ -n "$line" ]] && selected_apps_array+=("$line")
+while IFS= read -r label; do
+    [[ -n "$label" ]] && selected_apps_array+=("${app_to_cask[$label]}")
 done <<< "$selected_apps"
 
 # ===== SELEZIONE FONT =====
 selected_fonts=""
-if [ ${#FONT_LIST[@]} -gt 0 ]; then
+if [ ${#FONT_LABELS[@]} -gt 0 ]; then
     selected_fonts=$(gum choose --no-limit \
         --header="Seleziona i font da installare:" \
         --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
         --selected-prefix="$GUM_CHECKBOX_SELECTED " \
         --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-        "${FONT_LIST[@]}")
+        "${FONT_LABELS[@]}")
 fi
 
+# Converti label selezionate in nomi cask
+typeset -A font_to_cask
+for i in {1..${#FONT_LABELS[@]}}; do
+    font_to_cask[${FONT_LABELS[$i]}]=${FONT_CASKS[$i]}
+done
 selected_fonts_array=()
-while IFS= read -r line; do
-    [[ -n "$line" ]] && selected_fonts_array+=("$line")
+while IFS= read -r label; do
+    [[ -n "$label" ]] && selected_fonts_array+=("${font_to_cask[$label]}")
 done <<< "$selected_fonts"
 
 # ===== SELEZIONE TEMA OH MY POSH =====
-selected_theme=$(gum choose \
+selected_theme_label=$(gum choose \
     --header="Seleziona il tema per terminale (Oh My Posh):" \
     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
-    --selected="zash" \
-    "zash" \
-    "material" \
-    "robbyrussell" \
-    "pararussel" \
+    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+    --selected="Zash" \
+    "${THEME_LABELS[@]}" \
     "Continua senza tema")
+
+# Converti label in nome file tema
+typeset -A theme_to_file
+for i in {1..${#THEME_LABELS[@]}}; do
+    theme_to_file[${THEME_LABELS[$i]}]=${THEME_FILES[$i]}
+done
+selected_theme="${theme_to_file[$selected_theme_label]}"
 
 # ===== CARTELLA INSTALLAZIONE SCRIPT =====
 install_choice=$(gum choose \
@@ -360,17 +410,17 @@ fi
 # ===== CONFIGURAZIONE SHELL =====
 if [ "$TEST_MODE" = true ]; then
     sleep 0.3
-    if [ "$selected_theme" = "Continua senza tema" ] || [ -z "$selected_theme" ]; then
+    if [ -z "$selected_theme" ]; then
         gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
     else
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme)"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
     fi
 else
     if [ -f ~/.zshrc ]; then
         cp ~/.zshrc ~/.zshrc.bak
     fi
 
-    if [ "$selected_theme" = "Continua senza tema" ] || [ -z "$selected_theme" ]; then
+    if [ -z "$selected_theme" ]; then
         cat > ~/.zshrc << EOF
 # Alias
 alias brew-update='zsh $install_dir/brew-update.sh'
@@ -384,7 +434,7 @@ eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${sele
 # Alias
 alias brew-update='zsh $install_dir/brew-update.sh'
 EOF
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme)"
+        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
     fi
 fi
 

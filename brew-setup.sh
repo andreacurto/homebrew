@@ -377,6 +377,6 @@ fi
 echo ""
 gum style --border "$GUM_BORDER_ROUNDED" --border-foreground "$GUM_COLOR_MUTED" --padding "$GUM_PADDING" --margin "$GUM_MARGIN" --bold "Homebrew Setup → Completato 🎉"
 echo ""
-gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Riavvia il terminale per applicare le modifiche"
+gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Esegui il comando 'source ~/.zshrc' o riavvia il terminale per applicare le modifiche"
 gum style --foreground "$GUM_COLOR_MUTED" "Usa da terminale il comando 'brew-update' per aggiornare Homebrew in futuro"
 echo ""

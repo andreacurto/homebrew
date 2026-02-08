@@ -15,10 +15,6 @@ MUTED="\033[38;5;244m"
 RED="\033[38;5;9m"
 RESET="\033[0m"
 
-# ===== MODALITÀ TEST =====
-TEST_MODE=false
-[[ "$1" == "--test" ]] && TEST_MODE=true
-
 # ===== LISTE INSTALLAZIONE =====
 # Label (visualizzata) e cask (pacchetto Homebrew) devono avere lo stesso ordine
 
@@ -94,14 +90,12 @@ echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
 
 # ===== TEST CONNESSIONE INTERNET =====
-if [ "$TEST_MODE" = false ]; then
-    if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
-        echo ""
-        echo -e "${RED}✘ Connessione internet assente.${RESET}"
-        echo -e "${MUTED}Lo script richiede una connessione internet attiva per funzionare.${RESET}"
-        echo ""
-        exit 1
-    fi
+if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
+    echo ""
+    echo -e "${RED}✘ Connessione internet assente.${RESET}"
+    echo -e "${MUTED}Lo script richiede una connessione internet attiva per funzionare.${RESET}"
+    echo ""
+    exit 1
 fi
 
 # ===== VERIFICA PRELIMINARE =====
@@ -156,12 +150,6 @@ GUM_SPINNER_TYPE="monkey"
 GUM_BORDER_ROUNDED="rounded"
 GUM_PADDING="0 1"
 GUM_MARGIN="0"
-
-if [ "$TEST_MODE" = true ]; then
-    echo ""
-    gum style --bold "⚠️  MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
-    echo ""
-fi
 
 # ===== SELEZIONE APPLICAZIONI =====
 selected_apps=""
@@ -261,22 +249,35 @@ if [ "$CLI_ALREADY_INSTALLED" = true ]; then
 else
     echo "Installazione strumenti e librerie in corso..."
     echo ""
-
-    if [ "$TEST_MODE" = true ]; then
-        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
-        echo ""
-        sleep 0.8
-
-        for tool in "node" "gh" "oh-my-posh"; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $tool"
-            sleep 0.3
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $tool"
-            sleep 0.5
-        done
-        echo ""
+    (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+        if [[ "$line" == "Password:"* ]]; then
+            echo "$line"
+            echo ""
+        else
+            gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+        fi
+    done
+    echo ""
+    if [ ${pipestatus[1]} -eq 0 ]; then
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie installati"
     else
-        (brew install node gh && brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh) 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare strumenti e librerie"
+    fi
+fi
+
+# ===== INSTALLAZIONE APPLICAZIONI =====
+if [ ${#selected_apps_array[@]} -gt 0 ]; then
+    apps_to_install=()
+    for app in "${selected_apps_array[@]}"; do
+        if ! brew list --cask "$app" &> /dev/null; then
+            apps_to_install+=("$app")
+        fi
+    done
+
+    if [ ${#apps_to_install[@]} -gt 0 ]; then
+        echo "Installazione applicazioni in corso..."
+        echo ""
+        brew install --cask ${apps_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
             if [[ "$line" == "Password:"* ]]; then
                 echo "$line"
                 echo ""
@@ -286,58 +287,12 @@ else
         done
         echo ""
         if [ ${pipestatus[1]} -eq 0 ]; then
-            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Strumenti e librerie installati"
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
         else
-            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare strumenti e librerie"
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare applicazioni"
         fi
-    fi
-fi
-
-# ===== INSTALLAZIONE APPLICAZIONI =====
-if [ ${#selected_apps_array[@]} -gt 0 ]; then
-    if [ "$TEST_MODE" = true ]; then
-        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
-        echo ""
-        sleep 0.8
-
-        echo "Installazione applicazioni in corso..."
-        echo ""
-        for app in "${selected_apps_array[@]}"; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $app"
-            sleep 0.4
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $app"
-            sleep 0.6
-        done
-        echo ""
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
     else
-        apps_to_install=()
-        for app in "${selected_apps_array[@]}"; do
-            if ! brew list --cask "$app" &> /dev/null; then
-                apps_to_install+=("$app")
-            fi
-        done
-
-        if [ ${#apps_to_install[@]} -gt 0 ]; then
-            echo "Installazione applicazioni in corso..."
-            echo ""
-            brew install --cask ${apps_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                if [[ "$line" == "Password:"* ]]; then
-                    echo "$line"
-                    echo ""
-                else
-                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                fi
-            done
-            echo ""
-            if [ ${pipestatus[1]} -eq 0 ]; then
-                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni installate"
-            else
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare applicazioni"
-            fi
-        else
-            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Applicazioni già installate"
-        fi
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Applicazioni già installate"
     fi
 else
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
@@ -345,97 +300,66 @@ fi
 
 # ===== INSTALLAZIONE FONT PER TERMINALE =====
 if [ ${#selected_fonts_array[@]} -gt 0 ]; then
-    if [ "$TEST_MODE" = true ]; then
-        gum style --foreground "$GUM_COLOR_WARNING" "🔒 Password amministratore richiesta (simulata in test)"
-        echo ""
-        sleep 0.8
+    fonts_to_install=()
+    for font in "${selected_fonts_array[@]}"; do
+        if ! brew list --cask "$font" &> /dev/null; then
+            fonts_to_install+=("$font")
+        fi
+    done
 
+    if [ ${#fonts_to_install[@]} -gt 0 ]; then
         echo "Installazione font per terminale in corso..."
         echo ""
-        for font in "${selected_fonts_array[@]}"; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Downloading $font"
-            sleep 0.3
-            gum style --foreground "$GUM_COLOR_MUTED" "  ==> Installing $font"
-            sleep 0.4
+        brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
+            if [[ "$line" == "Password:"* ]]; then
+                echo "$line"
+                echo ""
+            else
+                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+            fi
         done
         echo ""
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
-    else
-        fonts_to_install=()
-        for font in "${selected_fonts_array[@]}"; do
-            if ! brew list --cask "$font" &> /dev/null; then
-                fonts_to_install+=("$font")
-            fi
-        done
-
-        if [ ${#fonts_to_install[@]} -gt 0 ]; then
-            echo "Installazione font per terminale in corso..."
-            echo ""
-            brew install --cask --force ${fonts_to_install[*]} 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Pouring|==> Summary)" | while IFS= read -r line; do
-                if [[ "$line" == "Password:"* ]]; then
-                    echo "$line"
-                    echo ""
-                else
-                    gum style --foreground "$GUM_COLOR_MUTED" "  $line"
-                fi
-            done
-            echo ""
-            if [ ${pipestatus[1]} -eq 0 ]; then
-                gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
-            else
-                gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
-            fi
+        if [ ${pipestatus[1]} -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Font per terminale installati"
         else
-            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
+            gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile installare font per terminale"
         fi
+    else
+        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Font per terminale già installati"
     fi
 else
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun font selezionato"
 fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====
-if [ "$TEST_MODE" = true ]; then
-    sleep 0.5
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$install_dir' && cp '$SCRIPT_DIR/brew-update.sh' '$install_dir/brew-update.sh' && chmod +x '$install_dir/brew-update.sh'"
+if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
-    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$install_dir' && cp '$SCRIPT_DIR/brew-update.sh' '$install_dir/brew-update.sh' && chmod +x '$install_dir/brew-update.sh'"
-    if [ $? -eq 0 ]; then
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
-    else
-        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile configurare script aggiornamento"
-    fi
+    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile configurare script aggiornamento"
 fi
 
 # ===== CONFIGURAZIONE SHELL =====
-if [ "$TEST_MODE" = true ]; then
-    sleep 0.3
-    if [ -z "$selected_theme" ]; then
-        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
-    else
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
-    fi
-else
-    if [ -f ~/.zshrc ]; then
-        cp ~/.zshrc ~/.zshrc.bak
-    fi
+if [ -f ~/.zshrc ]; then
+    cp ~/.zshrc ~/.zshrc.bak
+fi
 
-    if [ -z "$selected_theme" ]; then
-        cat > ~/.zshrc << EOF
+if [ -z "$selected_theme" ]; then
+    cat > ~/.zshrc << EOF
 # Alias
 alias brew-update='zsh $install_dir/brew-update.sh'
 EOF
-        gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
-    else
-        cat > ~/.zshrc << EOF
+    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
+else
+    cat > ~/.zshrc << EOF
 # Oh My Posh
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
 alias brew-update='zsh $install_dir/brew-update.sh'
 EOF
-        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
-    fi
+    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
 fi
 
 # ===== MESSAGGIO FINALE =====

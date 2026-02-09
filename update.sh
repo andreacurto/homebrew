@@ -16,7 +16,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.11.0"
+SCRIPT_VERSION="1.12.0"
 SCRIPT_REPO="andreacurto/homebrew"
 INSTALL_DIR="$HOME/.brew"
 
@@ -106,7 +106,7 @@ v_remote = list(map(int, '$script_remote_version'.split('.')))
 exit(0 if v_remote > v_local else 1)
 " 2>/dev/null; then
         # Scarica script dal tag specifico (non da HEAD master)
-        if curl -fsSL --max-time 5 "https://raw.githubusercontent.com/$SCRIPT_REPO/$latest_tag/brew-update.sh" > "$TMP_UPDATE" 2>/dev/null; then
+        if curl -fsSL --max-time 5 "https://raw.githubusercontent.com/$SCRIPT_REPO/$latest_tag/update.sh" > "$TMP_UPDATE" 2>/dev/null; then
             echo ""
             if gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true; then
                 cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null

@@ -11,7 +11,7 @@
 # - Pulizia cache e vecchie versioni
 # - Diagnostica sistema (brew doctor)
 # - Auto-aggiornamento script dalla repo GitHub
-# - Disinstallazione con --uninstall o -u
+# - Disinstallazione con --uninstall (-u)
 
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
@@ -52,12 +52,12 @@ GUM_PADDING="0 1"
 GUM_MARGIN="0"
 
 # ===== DISINSTALLAZIONE =====
-if [[ "$1" == "--uninstall" ]] || [[ "$1" == "--u" ]] || [[ "$1" == "-u" ]]; then
+if [[ "$1" == "--uninstall" ]] || [[ "$1" == "-u" ]]; then
     echo ""
     if gum confirm "Vuoi disinstallare brew-update?" --default=false; then
         # Rimuovi alias da .zshrc
         if [ -f ~/.zshrc ]; then
-            sed -i '' '/alias brew-update=/d' ~/.zshrc
+            sed -i '' '/# Alias/d; /alias brew-update=/d' ~/.zshrc
         fi
         echo ""
         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS brew-update disinstallato"

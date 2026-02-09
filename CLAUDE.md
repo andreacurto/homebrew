@@ -19,16 +19,15 @@ Documentazione tecnica per sviluppatori e AI assistants per modifiche future al 
 
 ```
 homebrew/
-├── brew-setup.sh      # Script setup iniziale sistema
-├── brew-update.sh     # Script aggiornamento e manutenzione
-├── .zshrc-example     # Template configurazione shell (riferimento)
+├── setup.sh           # Script setup iniziale sistema
+├── update.sh          # Script aggiornamento e manutenzione
 ├── README.md          # Documentazione utente
 └── CLAUDE.md          # Documentazione tecnica (questo file)
 ```
 
-### Script Installati in ~/Shell/
+### Script Installati in ~/.brew/
 
-- `~/Shell/brew-update.sh` - Copia di brew-update.sh accessibile via alias
+- `~/.brew/update.sh` - Copia di update.sh accessibile via alias `brew-update`
 
 ### File Generati
 
@@ -245,7 +244,7 @@ fi
 
 ## Flussi Operativi
 
-### brew-setup.sh
+### setup.sh
 
 **Flusso Completo:**
 
@@ -262,7 +261,7 @@ fi
 11. **Installazione CLI tools**: node, gh, oh-my-posh, gum
 12. **Installazione font** selezionati
 13. **Installazione applicazioni** selezionate
-14. **Setup script aggiornamento**: Copia in ~/Shell/
+14. **Setup script aggiornamento**: Copia in ~/.brew/
 15. **Configurazione shell**: Genera ~/.zshrc con tema
 16. Messaggio completamento
 
@@ -274,7 +273,7 @@ fi
 - `selected_fonts_array[]`: Font selezionati dall'utente
 - `selected_theme`: Tema Oh My Posh scelto
 
-### brew-update.sh
+### update.sh
 
 **Flusso Completo:**
 
@@ -394,7 +393,7 @@ GUM_ERROR_PADDING="0 1"    # Padding errori
 
 ## Liste Installazione
 
-App e font sono configurati tramite array in testata di `brew-setup.sh` (sezione LISTE INSTALLAZIONE).
+App e font sono configurati tramite array in testata di `setup.sh` (sezione LISTE INSTALLAZIONE).
 Separare i dati dalla logica permette di aggiungere/rimuovere elementi senza toccare il codice.
 
 ### Applicazioni (`APP_LIST`)
@@ -440,7 +439,7 @@ FONT_LIST=(
 
 ## Temi Oh My Posh
 
-Lista temi in `brew-setup.sh` nel blocco `gum choose` tema:
+Lista temi in `setup.sh` nel blocco `gum choose` tema:
 
 - `zash` (default)
 - `material`
@@ -562,11 +561,13 @@ Attendere approvazione dell'utente prima di procedere.
 #### 4. Rilascio (dopo approvazione merge)
 
 Eseguire TUTTO in autonomia senza chiedere permesso:
-- Merge su master
-- Aggiornare `SCRIPT_VERSION` in `brew-update.sh`
-- Commit version bump + push
-- Creare tag + push tag
-- Eliminare branch locale
+- Aggiornare `SCRIPT_VERSION` in `update.sh` come **ultimo commit sul branch di sviluppo**
+- Push del branch
+- Merge su master (il merge commit contiene già la versione corretta)
+- Creare tag **sul merge commit** + push tag
+- Eliminare branch locale e remoto
+
+**Risultato su master**: solo merge commit + tag, nessun commit di bump separato.
 
 ### Versionamento Semantico (Semver)
 
@@ -576,16 +577,16 @@ Seguire [Semantic Versioning](https://semver.org/lang/it/):
 - **MINOR** (x.Y.0): nuove funzionalità backward-compatible
 - **MAJOR** (X.0.0): breaking changes
 
-**IMPORTANTE**: Ad ogni nuovo tag, aggiornare SEMPRE la variabile `SCRIPT_VERSION` in `brew-update.sh` per farla corrispondere al tag. Il meccanismo di auto-update confronta `SCRIPT_VERSION` con l'ultimo tag GitHub per decidere se proporre l'aggiornamento.
+**IMPORTANTE**: `SCRIPT_VERSION` in `update.sh` deve SEMPRE corrispondere al tag. Aggiornare come ultimo commit sul branch di sviluppo, prima del merge su master. Il meccanismo di auto-update confronta `SCRIPT_VERSION` con l'ultimo tag GitHub per decidere se proporre l'aggiornamento.
 
 ### Auto-aggiornamento Script (tag-based)
 
-Il meccanismo di auto-update in `brew-update.sh` funziona così:
+Il meccanismo di auto-update in `update.sh` funziona così:
 
 1. **Controlla ultimo tag** su GitHub API (`/repos/{repo}/tags`)
 2. **Confronta versioni** (semver): `SCRIPT_VERSION` locale vs tag remoto
 3. **Solo se il tag è più recente**: propone aggiornamento all'utente
-4. **Scarica dal tag specifico**: `raw.githubusercontent.com/{repo}/{tag}/brew-update.sh`
+4. **Scarica dal tag specifico**: `raw.githubusercontent.com/{repo}/{tag}/update.sh`
 
 **Conseguenze importanti:**
 - Commit su master senza nuovo tag → **nessun aggiornamento** proposto agli utenti
@@ -593,6 +594,14 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 - Nuovo tag creato → **utenti notificati** al prossimo avvio di brew-update
 
 ## Changelog
+
+### v1.12.0 - Rinomina file e workflow tag-on-merge (2026-02-09)
+
+- **Rinomina file progetto**: `brew-update.sh` → `update.sh`, `brew-setup.sh` → `setup.sh`
+- **Rimosso `.zshrc-example`**: file non più utile
+- **Aggiornati tutti i riferimenti interni**: URL auto-update, percorsi copia, alias
+- **Nuovo workflow rilascio tag-on-merge**: version bump come ultimo commit sul branch di sviluppo, tag applicato direttamente sul merge commit (niente commit di bump separato su master)
+- **Nota**: utenti con versione precedente dovranno rieseguire setup (URL auto-update cambiato)
 
 ### v1.9.0 - Auto-update tag-based e branching workflow (2026-02-08)
 
@@ -620,11 +629,11 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 ### v1.8.0 - Test connessione e auto-aggiornamento interattivo (2026-02-07)
 
 - **Test connessione internet** obbligatorio all'avvio di entrambi gli script
-  - brew-update.sh: test dopo installazione gum, messaggio errore con gum style
-  - brew-setup.sh: test prima di installare Homebrew/gum, messaggio errore con ANSI colors
+  - update.sh: test dopo installazione gum, messaggio errore con gum style
+  - setup.sh: test prima di installare Homebrew/gum, messaggio errore con ANSI colors
   - Se connessione assente: mostra warning e termina script (exit 1)
   - Skip automatico in modalità TEST (--test)
-- **Auto-aggiornamento interattivo** in brew-update.sh
+- **Auto-aggiornamento interattivo** in update.sh
   - Non più silenzioso: chiede conferma all'utente prima di aggiornare
   - Usa gum confirm con messaggio: "È disponibile una nuova versione di brew-update (vX.X.X). Vuoi aggiornarla ora?"
   - Default: true (consiglia aggiornamento)
@@ -639,21 +648,21 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 
 - Aggiunto fake password prompt visivo in modalità TEST
 - Simula "🔒 Password amministratore richiesta" prima delle installazioni
-- Applicato a brew-update.sh (sezione greedy app update)
-- Applicato a brew-setup.sh (sezioni CLI tools, font, app)
+- Applicato a update.sh (sezione greedy app update)
+- Applicato a setup.sh (sezioni CLI tools, font, app)
 - Permette di testare anche la casistica password senza dover autenticarsi
 - UX TEST completa: replica tutti gli scenari reali inclusa richiesta admin
 
 ### v1.7.0 - Modalità TEST per entrambi gli script (2026-02-07)
 
-- Aggiunta modalità test completa con flag `--test` per brew-update.sh e brew-setup.sh
+- Aggiunta modalità test completa con flag `--test` per update.sh e setup.sh
 - Banner warning visibile: "⚠️ MODALITÀ TEST - Dati simulati, nessuna modifica reale al sistema"
-- **brew-update.sh --test**: Simula tutte le operazioni con dati fake e delay realistici
+- **update.sh --test**: Simula tutte le operazioni con dati fake e delay realistici
   - App obsolete fake (chrome, vscode, 1password, spotify, dropbox)
   - Output brew progressivo simulato per installazioni (Downloading, Installing, Summary)
   - Delay variabili per realismo (0.3s-1.2s a seconda dell'operazione)
   - Diagnostica fake "Your system is ready to brew"
-- **brew-setup.sh --test**: Simula installazioni senza modifiche filesystem
+- **setup.sh --test**: Simula installazioni senza modifiche filesystem
   - CLI tools, font, applicazioni con output simulato
   - Skip configurazione .zshrc e copia script in modalità test
 - Uso: `brew-update --test` o `brew-setup --test`
@@ -670,7 +679,7 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 ### v1.6.0 - Fix blocco app greedy con output filtrato (2026-02-07)
 
 - Risolto blocco apparente durante aggiornamento app con --greedy
-- Sostituito spinner con output filtrato (pattern identico a brew-setup.sh)
+- Sostituito spinner con output filtrato (pattern identico a setup.sh)
 - Rimosso `sudo -v` e `gum spin` che nascondevano richiesta password di brew
 - Output filtrato permette di vedere password prompt e progresso installazione
 - Output pulito mostrando solo righe rilevanti (Password, Downloading, Installing, etc.)
@@ -716,7 +725,7 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 
 - Aggiunta selezione interattiva delle app quando use_greedy=true
 - L'utente può scegliere quali app aggiornare tramite checkbox multi-select
-- Menu gum choose con stile identico a brew-setup.sh
+- Menu gum choose con stile identico a setup.sh
 - Gestione caso "nessuna selezione" con messaggio INFO
 - Flusso non-greedy invariato (aggiorna tutte le app automaticamente)
 - Nuova variabile `selected_casks_array[]` per app selezionate dall'utente
@@ -735,12 +744,12 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 
 ### v2.4 - Auto-aggiornamento script (2026-02-06)
 
-- Auto-update silenzioso di `brew-update.sh` dalla repo GitHub pubblica
-- Scarica l'ultima versione all'avvio e aggiorna `~/Shell/brew-update.sh` se diversa
+- Auto-update silenzioso di `update.sh` dalla repo GitHub pubblica
+- Scarica l'ultima versione all'avvio e aggiorna `~/.brew/update.sh` se diversa
 - Nessun output per l'utente: completamente trasparente
 - Timeout 5s per non bloccare in caso di assenza di rete
 - Nuova variabile `SCRIPT_SOURCE` per URL sorgente
-- Aggiunto hint `brew-update` nel messaggio finale di `brew-setup.sh`
+- Aggiunto hint `brew-update` nel messaggio finale di `setup.sh`
 - Migliorate spaziature output aggiornamento applicazioni
 
 ### v2.3 - Liste configurabili e selezione font (2026-02-06)
@@ -788,4 +797,4 @@ Il meccanismo di auto-update in `brew-update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-08_ _Versione: 1.9.0 (Auto-update tag-based e branching workflow)_
+_Ultimo aggiornamento: 2026-02-09_ _Versione: 1.12.0 (Rinomina file e workflow tag-on-merge)_

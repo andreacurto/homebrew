@@ -35,7 +35,7 @@ Scarica questa cartella sul tuo Mac (o clonala con git se sai come fare).
 Copia e incolla questo comando:
 
 ```bash
-chmod +x brew-setup.sh
+chmod +x setup.sh
 ```
 
 ### Passo 4: Avvia l'installazione
@@ -43,7 +43,7 @@ chmod +x brew-setup.sh
 Copia e incolla questo comando:
 
 ```bash
-./brew-setup.sh
+./setup.sh
 ```
 
 ### Passo 5: Segui le istruzioni
@@ -189,12 +189,12 @@ Se vuoi cambiare tema in seguito:
 
 ## Risoluzione Problemi
 
-### "Permission denied" quando eseguo ./brew-setup.sh
+### "Permission denied" quando eseguo ./setup.sh
 
 Hai dimenticato il Passo 3. Esegui:
 
 ```bash
-chmod +x brew-setup.sh
+chmod +x setup.sh
 ```
 
 ### "Command not found: brew-update"
@@ -207,7 +207,7 @@ Alcune applicazioni potrebbero richiedere conferme manuali o avere problemi di c
 
 ### Voglio reinstallare tutto
 
-Puoi rieseguire `./brew-setup.sh` senza problemi. Lo script rileva cosa è già installato e salta quei passaggi.
+Puoi rieseguire `./setup.sh` senza problemi. Lo script rileva cosa è già installato e salta quei passaggi.
 
 ---
 
@@ -217,12 +217,12 @@ Per documentazione tecnica dettagliata (architettura, convenzioni, configurazion
 
 ### Quick Reference
 
-**Aggiungere app/font:** `brew search nome`, poi aggiungi all'array `APP_LIST` o `FONT_LIST` in testata di `brew-setup.sh`
+**Aggiungere app/font:** `brew search nome`, poi aggiungi all'array `APP_LIST` o `FONT_LIST` in testata di `setup.sh`
 
 **Testare modifiche:**
 ```bash
-./brew-setup.sh                                           # Setup
-cp brew-update.sh ~/Shell/brew-update.sh && brew-update   # Update
+./setup.sh                                                # Setup
+cp update.sh ~/.brew/update.sh && brew-update             # Update
 ```
 
 **Link utili:** [Gum](https://github.com/charmbracelet/gum) · [Oh My Posh](https://ohmyposh.dev/docs/themes) · [Homebrew](https://docs.brew.sh/)

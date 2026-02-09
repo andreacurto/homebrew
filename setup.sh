@@ -315,7 +315,7 @@ fi
 
 # ===== SETUP SCRIPT DI AGGIORNAMENTO =====
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$INSTALL_DIR' && cp '$SCRIPT_DIR/brew-update.sh' '$INSTALL_DIR/brew-update.sh' && chmod +x '$INSTALL_DIR/brew-update.sh'"
+gum spin --spinner "$GUM_SPINNER_TYPE" --title "Configurazione script aggiornamento..." -- sh -c "mkdir -p '$INSTALL_DIR' && cp '$SCRIPT_DIR/update.sh' '$INSTALL_DIR/update.sh' && chmod +x '$INSTALL_DIR/update.sh'"
 if [ $? -eq 0 ]; then
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Script aggiornamento configurato"
 else
@@ -330,7 +330,7 @@ fi
 if [ -z "$selected_theme" ]; then
     cat > ~/.zshrc << EOF
 # Alias
-alias brew-update='zsh $INSTALL_DIR/brew-update.sh'
+alias brew-update='zsh $INSTALL_DIR/update.sh'
 EOF
     gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessun tema selezionato"
 else
@@ -339,7 +339,7 @@ else
 eval "\$(oh-my-posh init zsh --config \$(brew --prefix oh-my-posh)/themes/${selected_theme}.omp.json)"
 
 # Alias
-alias brew-update='zsh $INSTALL_DIR/brew-update.sh'
+alias brew-update='zsh $INSTALL_DIR/update.sh'
 EOF
     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Tema terminale configurato ($selected_theme_label)"
 fi

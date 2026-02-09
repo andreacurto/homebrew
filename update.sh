@@ -16,7 +16,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.11.0"
+SCRIPT_VERSION="1.12.0"
 SCRIPT_REPO="andreacurto/homebrew"
 INSTALL_DIR="$HOME/.brew"
 

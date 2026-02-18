@@ -68,6 +68,14 @@ if [[ "$1" == "--uninstall" ]] || [[ "$1" == "-u" ]]; then
     exit 0
 fi
 
+# ===== VERSIONE =====
+if [[ "$1" == "--version" ]] || [[ "$1" == "-v" ]]; then
+    echo ""
+    gum style "brew-update v$SCRIPT_VERSION"
+    echo ""
+    exit 0
+fi
+
 # ===== TEST CONNESSIONE INTERNET =====
 if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
     echo ""

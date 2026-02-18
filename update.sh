@@ -215,8 +215,10 @@ if [ "$do_cask_upgrade" = true ]; then
             else
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
+                printf '\033[38;5;244m'
                 brew upgrade --cask --greedy "${selected_casks_array[@]}"
                 brew_exit=$?
+                printf '\033[0m'
                 echo ""
                 if [ $brew_exit -eq 0 ]; then
                     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"

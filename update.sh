@@ -16,7 +16,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.12.0"
+SCRIPT_VERSION="1.12.1"
 SCRIPT_REPO="andreacurto/homebrew"
 INSTALL_DIR="$HOME/.brew"
 
@@ -221,7 +221,7 @@ if [ "$do_cask_upgrade" = true ]; then
             if [ ${#selected_casks_array[@]} -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
             else
-                echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
+                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
                 brew upgrade --cask --greedy "${selected_casks_array[@]}"
                 brew_exit=$?

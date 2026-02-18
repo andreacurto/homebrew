@@ -26,6 +26,7 @@ APP_LABELS=(
     "Figma"
     "Google Chrome"
     "ImageOptim"
+    "Mole"
     "Numi"
     "Rectangle"
     "Spotify"
@@ -41,6 +42,7 @@ APP_CASKS=(
     "figma"
     "google-chrome"
     "imageoptim"
+    "mole"
     "numi"
     "rectangle"
     "spotify"
@@ -76,18 +78,18 @@ INSTALL_DIR="$HOME/.brew"
 
 # ===== MESSAGGIO INIZIALE E CONFERMA =====
 echo ""
-echo -e "${MUTED}╭──────────────────────────────╮${RESET}"
-echo -e "${MUTED}│${RESET}  Homebrew Setup → Inizio 🚀  ${MUTED}│${RESET}"
-echo -e "${MUTED}╰──────────────────────────────╯${RESET}"
+printf "%b\n" "${MUTED}╭──────────────────────────────╮${RESET}"
+printf "%b\n" "${MUTED}│${RESET}  Homebrew Setup → Inizio 🚀  ${MUTED}│${RESET}"
+printf "%b\n" "${MUTED}╰──────────────────────────────╯${RESET}"
 echo ""
 echo "Questo script installerà:"
 echo ""
-echo -e "${MUTED}  → Homebrew (package manager per macOS)${RESET}"
-echo -e "${MUTED}  → Strumenti e librerie (node, gh, oh-my-posh, gum)${RESET}"
-echo -e "${MUTED}  → Applicazioni a tua scelta${RESET}"
-echo -e "${MUTED}  → Font per terminale a tua scelta${RESET}"
-echo -e "${MUTED}  → Tema terminale a tua scelta${RESET}"
-echo -e "${MUTED}  → Script di aggiornamento${RESET}"
+printf "%b\n" "${MUTED}→ Homebrew (package manager per macOS)${RESET}"
+printf "%b\n" "${MUTED}→ Strumenti e librerie (node, gh, oh-my-posh, gum)${RESET}"
+printf "%b\n" "${MUTED}→ Applicazioni a tua scelta${RESET}"
+printf "%b\n" "${MUTED}→ Font per terminale a tua scelta${RESET}"
+printf "%b\n" "${MUTED}→ Tema terminale a tua scelta${RESET}"
+printf "%b\n" "${MUTED}→ Script di aggiornamento${RESET}"
 echo ""
 echo "Premi Invio per continuare o Ctrl+C per annullare..."
 read -r
@@ -95,14 +97,14 @@ read -r
 # ===== TEST CONNESSIONE INTERNET =====
 if ! curl --head --silent --fail --max-time 3 https://www.google.com > /dev/null 2>&1; then
     echo ""
-    echo -e "${RED}✘ Connessione internet assente.${RESET}"
-    echo -e "${MUTED}Lo script richiede una connessione internet attiva per funzionare.${RESET}"
+    printf "%b\n" "${RED}✘ Connessione internet assente.${RESET}"
+    printf "%b\n" "${MUTED}Lo script richiede una connessione internet attiva per funzionare.${RESET}"
     echo ""
     exit 1
 fi
 
 # ===== VERIFICA PRELIMINARE =====
-echo -e "${MUTED}⌛ Verifica preliminare in corso, non chiudere il terminale...${RESET}"
+printf "%b\n" "${MUTED}⌛ Verifica preliminare in corso, non chiudere il terminale...${RESET}"
 
 # ===== INSTALLAZIONE SILENZIOSA HOMEBREW =====
 HOMEBREW_ALREADY_INSTALLED=false
@@ -110,7 +112,7 @@ if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
     if ! command -v brew &> /dev/null; then
-        echo -e "${RED}✘ Errore installazione Homebrew${RESET}"
+        printf "%b\n" "${RED}✘ Errore installazione Homebrew${RESET}"
         exit 1
     fi
 else
@@ -121,13 +123,13 @@ fi
 if ! command -v gum &> /dev/null; then
     brew install gum &> /dev/null
     if ! command -v gum &> /dev/null; then
-        echo -e "${RED}✘ Errore installazione gum${RESET}"
+        printf "%b\n" "${RED}✘ Errore installazione gum${RESET}"
         exit 1
     fi
 fi
 
 # Cancella il messaggio di verifica preliminare
-echo -e "\033[1A\033[2K\033[1A\033[2K"
+printf "\033[1A\033[2K\033[1A\033[2K"
 
 # ===== CONFIGURAZIONE UI =====
 # Colori (256 terminal colors)

@@ -189,13 +189,6 @@ if [ "$do_cask_upgrade" = true ]; then
     outdated_casks=$(<"$TMP_OUTDATED")
 
     if [[ -n "$outdated_casks" ]]; then
-        echo "Aggiornamenti app disponibili:"
-        echo ""
-        echo "$outdated_casks" | while IFS= read -r line; do
-            gum style --foreground "$GUM_COLOR_MUTED" "  $GUM_SYMBOL_BULLET $line"
-        done
-        echo ""
-
         outdated_casks_array=()
         while IFS= read -r line; do
             [[ -n "$line" ]] && outdated_casks_array+=("$line")
@@ -205,7 +198,7 @@ if [ "$do_cask_upgrade" = true ]; then
             selected_casks=""
             if [ ${#outdated_casks_array[@]} -gt 0 ]; then
                 selected_casks=$(gum choose --no-limit \
-                    --header="Seleziona le applicazioni da aggiornare:" \
+                    --header="Seleziona le applicazioni con aggiornamenti disponibili che vuoi aggiornare:" \
                     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
                     --selected-prefix="$GUM_CHECKBOX_SELECTED " \
                     --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
@@ -223,7 +216,9 @@ if [ "$do_cask_upgrade" = true ]; then
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
                 brew upgrade --cask --greedy "${selected_casks_array[@]}"
-                if [ $? -eq 0 ]; then
+                brew_exit=$?
+                echo ""
+                if [ $brew_exit -eq 0 ]; then
                     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
                 else
                     gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"

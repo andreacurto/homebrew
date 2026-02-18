@@ -71,7 +71,7 @@ fi
 # ===== VERSIONE =====
 if [[ "$1" == "--version" ]] || [[ "$1" == "-v" ]]; then
     echo ""
-    gum style "brew-update v$SCRIPT_VERSION"
+    echo "v$SCRIPT_VERSION"
     echo ""
     exit 0
 fi
@@ -89,7 +89,7 @@ fi
 TMP_OUTDATED="/tmp/outdated_casks_$$.txt"
 TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
 TMP_UPDATE="/tmp/brew_update_$$.sh"
-trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
+trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"; kill "$SUDO_KEEPALIVE_PID" 2>/dev/null' EXIT
 
 # ===== AUTO-AGGIORNAMENTO SCRIPT (tag-based) =====
 SCRIPT_LOCAL="${0:A}"
@@ -222,14 +222,16 @@ if [ "$do_cask_upgrade" = true ]; then
             else
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
-                # Pre-autenticazione sudo se necessario (evita riga "Password:" orfana durante l'upgrade)
+                # Pre-autenticazione sudo se necessario.
+                # Usa save/restore cursore per cancellare le righe di sudo (/dev/tty) dopo l'inserimento.
                 sudo_ok=true
                 if ! sudo -n true 2>/dev/null; then
-                    gum style --foreground "$GUM_COLOR_MUTED" "  🔒 Password amministratore richiesta:"
-                    echo ""
+                    printf '\033[s'
+                    gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Password amministratore richiesta"
                     sudo -v 2>/dev/null
                     sudo_exit=$?
-                    printf '\033[1A\033[2K'
+                    # Ripristina cursore ed elimina tutto il blocco password dallo schermo
+                    printf '\033[u\033[J'
                     if [ $sudo_exit -ne 0 ]; then
                         gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Autenticazione fallita, aggiornamento annullato"
                         echo ""
@@ -238,6 +240,10 @@ if [ "$do_cask_upgrade" = true ]; then
                 fi
 
                 if [ "$sudo_ok" = true ]; then
+                    # Keep-alive del ticket sudo durante operazioni lunghe (download + install)
+                    ( while true; do sudo -n -v 2>/dev/null; sleep 30; done ) &
+                    SUDO_KEEPALIVE_PID=$!
+
                     # Filtro a stati: fetch/download completo, poi solo summary globale (no fasi interne per singola app)
                     in_summary=false
                     brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | while IFS= read -r line; do
@@ -263,6 +269,9 @@ if [ "$do_cask_upgrade" = true ]; then
                             fi
                         fi
                     done
+
+                    kill $SUDO_KEEPALIVE_PID 2>/dev/null
+                    SUDO_KEEPALIVE_PID=""
                     echo ""
                     if [ ${pipestatus[1]} -eq 0 ]; then
                         gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"

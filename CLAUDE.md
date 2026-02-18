@@ -558,16 +558,42 @@ Attendere approvazione dell'utente prima di procedere.
 - L'utente potrebbe voler aggiungere o correggere qualcosa
 - Se l'utente chiede modifiche ulteriori: valutare se tenerle nello stesso branch o chiudere + nuovo branch, e proporre la soluzione
 
-#### 4. Rilascio (dopo approvazione merge)
+#### 4. Rilascio (dopo approvazione merge) — Squash Merge
 
 Eseguire TUTTO in autonomia senza chiedere permesso:
-- Aggiornare `SCRIPT_VERSION` in `update.sh` come **ultimo commit sul branch di sviluppo**
-- Push del branch
-- Merge su master (il merge commit contiene già la versione corretta)
-- Creare tag **sul merge commit** + push tag
-- Eliminare branch locale e remoto
 
-**Risultato su master**: solo merge commit + tag, nessun commit di bump separato.
+```bash
+# 1. Aggiornare SCRIPT_VERSION come ultimo commit sul branch
+sed -i '' 's/SCRIPT_VERSION="x.y.z"/SCRIPT_VERSION="a.b.c"/' update.sh
+git add update.sh && git commit -m "Chore: bump version to a.b.c" && git push
+
+# 2. Squash merge su master (tutti i commit del branch → un solo commit)
+git checkout master
+git merge --squash feature/nome
+
+# 3. Commit unico con changelog (filtrare i fix intermedi di testing)
+git commit -m "$(cat <<'EOF'
+Tipo: titolo descrittivo
+
+Versione: x.y.z → a.b.c
+
+Modifiche:
+- Feat: descrizione funzionalità 1
+- Fix: descrizione bug fix significativo
+- Style: descrizione miglioramento UI
+EOF
+)"
+
+# 4. Push + tag + cleanup
+git push
+git tag va.b.c && git push origin va.b.c
+git branch -d feature/nome
+git push origin --delete feature/nome
+```
+
+**Formato commit su master**: prima riga sintetica, poi `Versione: X → Y`, poi `Modifiche:` con i cambiamenti significativi (NON i fix intermedi di testing). Il log del branch (`git log master..feature/nome --format="- %s" --reverse`) è un punto di partenza da sintetizzare.
+
+**Risultato su master**: un solo commit per release, leggibile come changelog. Nessun commit di bump separato.
 
 ### Versionamento Semantico (Semver)
 
@@ -595,13 +621,16 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
-### v1.12.0 - Rinomina file e workflow tag-on-merge (2026-02-09)
+### v1.12.0 - UX improvements, SIGINT e rinomina file (2026-02-18)
 
+- **Opzione `-v` / `--version`**: stampa la versione corrente (`v1.12.0`) e termina
+- **Ctrl+C in qualsiasi fase**: trap SIGINT che esce silenziosamente senza output; fix specifico per `gum confirm` (che intercetta il segnale internamente e richiede `kill -INT $$`) e per tutti i `gum choose` in command substitution (exit code 130 check esplicito)
+- **UI lista app obsolete rimossa**: nella selezione greedy la `gum choose` mostra direttamente le app senza intestazione ridondante; header rinominato in "Seleziona le applicazioni con aggiornamenti disponibili che vuoi aggiornare:"
+- **Riga vuota separatore**: aggiunta dopo l'output di brew upgrade --greedy, prima del messaggio di feedback
+- **Strategia squash merge**: adottata per master — un commit per release con changelog integrato, nessun commit intermedio di sviluppo su master
 - **Rinomina file progetto**: `brew-update.sh` → `update.sh`, `brew-setup.sh` → `setup.sh`
-- **Rimosso `.zshrc-example`**: file non più utile
 - **Aggiornati tutti i riferimenti interni**: URL auto-update, percorsi copia, alias
-- **Nuovo workflow rilascio tag-on-merge**: version bump come ultimo commit sul branch di sviluppo, tag applicato direttamente sul merge commit (niente commit di bump separato su master)
-- **Nota**: utenti con versione precedente dovranno rieseguire setup (URL auto-update cambiato)
+- **Nota breaking change**: utenti con versione ≤ 1.11.0 non ricevono l'auto-update (URL download cambiato da `brew-update.sh` a `update.sh`); devono rieseguire `setup.sh` manualmente
 
 ### v1.9.0 - Auto-update tag-based e branching workflow (2026-02-08)
 
@@ -797,4 +826,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-09_ _Versione: 1.12.0 (Rinomina file e workflow tag-on-merge)_
+_Ultimo aggiornamento: 2026-02-18_ _Versione: 1.12.0 (UX improvements, SIGINT, squash merge workflow)_

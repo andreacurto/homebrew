@@ -210,6 +210,7 @@ if [ "$do_cask_upgrade" = true ]; then
                     --selected-prefix="$GUM_CHECKBOX_SELECTED " \
                     --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
                     "${outdated_casks_array[@]}")
+                [ $? -eq 130 ] && exit 130
             fi
 
             selected_casks_array=()

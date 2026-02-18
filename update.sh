@@ -117,18 +117,21 @@ exit(0 if v_remote > v_local else 1)
         # Scarica script dal tag specifico (non da HEAD master)
         if curl -fsSL --max-time 5 "https://raw.githubusercontent.com/$SCRIPT_REPO/$latest_tag/update.sh" > "$TMP_UPDATE" 2>/dev/null; then
             echo ""
-            if gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true; then
-                cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
-                chmod +x "$SCRIPT_LOCAL" 2>/dev/null
+            gum confirm "È disponibile una nuova versione di brew-update (v$script_remote_version). Vuoi aggiornarla ora?" --default=true
+            case $? in
+                0)
+                    cp "$TMP_UPDATE" "$SCRIPT_LOCAL" 2>/dev/null
+                    chmod +x "$SCRIPT_LOCAL" 2>/dev/null
 
-                echo ""
-                gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
-                gum style --foreground "$GUM_COLOR_MUTED" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
-                echo ""
-                exit 0
-            else
-                script_update_declined=true
-            fi
+                    echo ""
+                    gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING brew-update aggiornato da v$SCRIPT_VERSION a v$script_remote_version"
+                    gum style --foreground "$GUM_COLOR_MUTED" "Riavvia il comando 'brew-update' per utilizzare la nuova versione."
+                    echo ""
+                    exit 0
+                    ;;
+                130) kill -INT $$ ;;
+                *) script_update_declined=true ;;
+            esac
         fi
     fi
 fi
@@ -173,9 +176,11 @@ while IFS= read -r operation; do
 done <<< "$selected_operations"
 
 if [ "$do_cask_upgrade" = true ]; then
-    if gum confirm "Includere anche app con auto-aggiornamento?" --default=false; then
-        use_greedy=true
-    fi
+    gum confirm "Includere anche app con auto-aggiornamento?" --default=false
+    case $? in
+        0) use_greedy=true ;;
+        130) kill -INT $$ ;;
+    esac
 fi
 
 # ===== MESSAGGIO VERSIONE SCRIPT =====

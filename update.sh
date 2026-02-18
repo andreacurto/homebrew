@@ -16,7 +16,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.12.2"
+SCRIPT_VERSION="1.12.3"
 SCRIPT_REPO="andreacurto/homebrew"
 INSTALL_DIR="$HOME/.brew"
 
@@ -163,7 +163,6 @@ do_upgrade=false
 do_autoremove=false
 do_cleanup=false
 do_doctor=false
-use_greedy=false
 
 while IFS= read -r operation; do
     case "$operation" in
@@ -176,14 +175,6 @@ while IFS= read -r operation; do
     esac
 done <<< "$selected_operations"
 
-if [ "$do_cask_upgrade" = true ]; then
-    gum confirm "Includere anche app con auto-aggiornamento?" --default=false
-    case $? in
-        0) use_greedy=true ;;
-        130) kill -INT $$ ;;
-    esac
-fi
-
 # ===== MESSAGGIO VERSIONE SCRIPT =====
 if [ "$script_update_declined" = true ] && [ -n "$script_remote_version" ]; then
     gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Nuova versione v$script_remote_version disponibile (corrente: v$SCRIPT_VERSION)"
@@ -192,7 +183,7 @@ fi
 
 # ===== AGGIORNAMENTO APPLICAZIONI =====
 if [ "$do_cask_upgrade" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo aggiornamenti applicazioni..." -- sh -c "if [ \"$use_greedy\" = true ]; then brew outdated --cask --greedy --quiet; else brew outdated --cask --quiet; fi > \"$TMP_OUTDATED\""
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo aggiornamenti applicazioni..." -- sh -c "brew outdated --cask --greedy --quiet > \"$TMP_OUTDATED\""
     outdated_casks=$(<"$TMP_OUTDATED")
 
     if [[ -n "$outdated_casks" ]]; then
@@ -201,40 +192,28 @@ if [ "$do_cask_upgrade" = true ]; then
             [[ -n "$line" ]] && outdated_casks_array+=("$line")
         done <<< "$outdated_casks"
 
-        if [ "$use_greedy" = true ]; then
-            selected_casks=""
-            if [ ${#outdated_casks_array[@]} -gt 0 ]; then
-                selected_casks=$(gum choose --no-limit \
-                    --header="Seleziona le applicazioni con aggiornamenti disponibili che vuoi aggiornare:" \
-                    --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
-                    --selected-prefix="$GUM_CHECKBOX_SELECTED " \
-                    --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-                    "${outdated_casks_array[@]}")
-                [ $? -eq 130 ] && exit 130
-            fi
+        selected_casks=$(gum choose --no-limit \
+            --header="Seleziona le applicazioni con aggiornamenti disponibili che vuoi aggiornare:" \
+            --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
+            --selected-prefix="$GUM_CHECKBOX_SELECTED " \
+            --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
+            "${outdated_casks_array[@]}")
+        [ $? -eq 130 ] && exit 130
 
-            selected_casks_array=()
-            while IFS= read -r line; do
-                [[ -n "$line" ]] && selected_casks_array+=("$line")
-            done <<< "$selected_casks"
+        selected_casks_array=()
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && selected_casks_array+=("$line")
+        done <<< "$selected_casks"
 
-            if [ ${#selected_casks_array[@]} -eq 0 ]; then
-                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
-            else
-                gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
-                echo ""
-                brew upgrade --cask --greedy "${selected_casks_array[@]}"
-                brew_exit=$?
-                echo ""
-                if [ $brew_exit -eq 0 ]; then
-                    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
-                else
-                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
-                fi
-            fi
+        if [ ${#selected_casks_array[@]} -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Nessuna applicazione selezionata"
         else
-            gum spin --spinner "$GUM_SPINNER_TYPE" --title "Aggiornamento applicazioni in corso..." -- brew upgrade --cask "${outdated_casks_array[@]}"
-            if [ $? -eq 0 ]; then
+            gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Aggiornamento applicazioni in corso..."
+            echo ""
+            brew upgrade --cask --greedy "${selected_casks_array[@]}"
+            brew_exit=$?
+            echo ""
+            if [ $brew_exit -eq 0 ]; then
                 gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
             else
                 gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"

@@ -90,6 +90,7 @@ TMP_OUTDATED="/tmp/outdated_casks_$$.txt"
 TMP_DOCTOR="/tmp/brew_doctor_$$.txt"
 TMP_UPDATE="/tmp/brew_update_$$.sh"
 trap 'rm -f "$TMP_OUTDATED" "$TMP_DOCTOR" "$TMP_UPDATE"' EXIT
+trap 'echo ""; gum style --foreground "$GUM_COLOR_WARNING" "$GUM_SYMBOL_WARNING Esecuzione interrotta"; echo ""; exit 130' INT
 
 # ===== AUTO-AGGIORNAMENTO SCRIPT (tag-based) =====
 SCRIPT_LOCAL="${0:A}"
@@ -215,10 +216,8 @@ if [ "$do_cask_upgrade" = true ]; then
             else
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
-                printf '\033[38;5;244m'
                 brew upgrade --cask --greedy "${selected_casks_array[@]}"
                 brew_exit=$?
-                printf '\033[0m'
                 echo ""
                 if [ $brew_exit -eq 0 ]; then
                     gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"

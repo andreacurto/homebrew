@@ -222,25 +222,53 @@ if [ "$do_cask_upgrade" = true ]; then
             else
                 echo "Aggiornamento applicazioni in corso (incluse app con auto-aggiornamento)..."
                 echo ""
-                password_shown=false
-                brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | grep -E "(Password:|==> Downloading|==> Installing|==> Upgrading|==> Summary)" | while IFS= read -r line; do
-                    if [[ "$line" == "Password:"* ]]; then
-                        echo "$line"
+                # Pre-autenticazione sudo se necessario (evita riga "Password:" orfana durante l'upgrade)
+                sudo_ok=true
+                if ! sudo -n true 2>/dev/null; then
+                    gum style --foreground "$GUM_COLOR_MUTED" "  🔒 Password amministratore richiesta:"
+                    echo ""
+                    sudo -v 2>/dev/null
+                    sudo_exit=$?
+                    printf '\033[1A\033[2K'
+                    if [ $sudo_exit -ne 0 ]; then
+                        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Autenticazione fallita, aggiornamento annullato"
                         echo ""
-                        password_shown=true
-                    else
-                        if [ "$password_shown" = true ]; then
-                            echo -ne "\033[1A\033[2K\033[1A\033[2K"
-                            password_shown=false
-                        fi
-                        gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                        sudo_ok=false
                     fi
-                done
-                echo ""
-                if [ ${pipestatus[1]} -eq 0 ]; then
-                    gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
-                else
-                    gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                fi
+
+                if [ "$sudo_ok" = true ]; then
+                    # Filtro a stati: fetch/download completo, poi solo summary globale (no fasi interne per singola app)
+                    in_summary=false
+                    brew upgrade --cask --greedy "${selected_casks_array[@]}" 2>&1 | while IFS= read -r line; do
+                        if [[ "$in_summary" == false ]]; then
+                            # Fase fetch: JSON API, Fetching, progress bar Cask
+                            if [[ "$line" == *"JSON API"* ]] || \
+                               [[ "$line" == "==> Fetching"* ]] || \
+                               [[ "$line" == *" Cask "* ]]; then
+                                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                            # Titolo globale upgrade: "==> Upgrading N outdated packages:"
+                            elif [[ "$line" == "==> Upgrading "* ]] && [[ "$line" == *"outdated"* ]]; then
+                                echo ""
+                                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                                in_summary=true
+                            fi
+                        else
+                            # In summary: mostra solo righe versione (es: anydesk 9.6.1 -> 9.6.2)
+                            if [[ "$line" == *" -> "* ]]; then
+                                gum style --foreground "$GUM_COLOR_MUTED" "  $line"
+                            # Fine summary quando iniziano le fasi interne per singola app
+                            elif [[ "$line" == "==>"* ]]; then
+                                in_summary=false
+                            fi
+                        fi
+                    done
+                    echo ""
+                    if [ ${pipestatus[1]} -eq 0 ]; then
+                        gum style --foreground "$GUM_COLOR_SUCCESS" "$GUM_SYMBOL_SUCCESS Applicazioni aggiornate"
+                    else
+                        gum style --foreground "$GUM_COLOR_ERROR" "$GUM_SYMBOL_ERROR Impossibile completare l'aggiornamento delle applicazioni"
+                    fi
                 fi
             fi
         else

@@ -621,6 +621,26 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.12.4 - Fix compatibilità sh e nuova app Mole (2026-02-18)
+
+- **Aggiunta Mole**: aggiunta `mole` alla lista app in `setup.sh`
+- **Fix `printf`**: sostituito `echo -e` con `printf` per evitare la stampa letterale di `-e` con shell `sh`
+- **Style**: rimossi spazi superflui prima di `→` nella lista iniziale di `update.sh`
+
+### v1.12.3 - Aggiornamento app sempre greedy con selezione interattiva (2026-02-18)
+
+- **Rimossa scelta greedy**: eliminata la domanda "Includere anche app con auto-aggiornamento?" — il flusso è ora sempre greedy
+- **Selezione interattiva sempre presente**: la `gum choose` per scegliere le app da aggiornare è sempre mostrata, flusso lineare senza branch if/else
+- **Style**: messaggio "Aggiornamento applicazioni in corso..." semplificato
+
+### v1.12.2 - Fix brew upgrade limitato alle formulae (2026-02-18)
+
+- **Fix**: aggiunto `--formula` a `brew upgrade` nella sezione "strumenti e librerie" per escludere i cask dallo step (evita conflitti con la gestione separata delle app)
+
+### v1.12.1 - Style messaggio greedy (2026-02-18)
+
+- **Style**: il messaggio "Aggiornamento applicazioni in corso..." usa ora colore info (`GUM_COLOR_INFO`) e icona bullet, coerente con il resto della UI
+
 ### v1.12.0 - UX improvements, SIGINT e rinomina file (2026-02-18)
 
 - **Opzione `-v` / `--version`**: stampa la versione corrente (`v1.12.0`) e termina
@@ -826,4 +846,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-18_ _Versione: 1.12.0 (UX improvements, SIGINT, squash merge workflow)_
+_Ultimo aggiornamento: 2026-02-22_ _Versione: 1.12.4 (fix sh compatibilità, app sempre greedy, Mole)_

@@ -621,6 +621,11 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.12.6 - Aggiunta Space Mono Nerd Font (2026-02-26)
+
+- **Feat**: aggiunto `Space Mono Nerd Font` (`font-space-mono-nerd-font`) alla lista font in `setup.sh`
+- **Docs**: aggiornato README.md con Space Mono Nerd Font nella tabella font disponibili
+
 ### v1.12.5 - Fix documentazione app Mole nel README (2026-02-26)
 
 - **Docs**: aggiunta `Mole` alla tabella delle applicazioni disponibili in README.md
@@ -850,4 +855,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-26_ _Versione: 1.12.5 (fix documentazione Mole in README)_
+_Ultimo aggiornamento: 2026-02-26_ _Versione: 1.12.6 (aggiunta Space Mono Nerd Font)_

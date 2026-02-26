@@ -54,10 +54,12 @@ APP_CASKS=(
 FONT_LABELS=(
     "Meslo LG Nerd Font"
     "Roboto Mono Nerd Font"
+    "Space Mono Nerd Font"
 )
 FONT_CASKS=(
     "font-meslo-lg-nerd-font"
     "font-roboto-mono-nerd-font"
+    "font-space-mono-nerd-font"
 )
 
 THEME_LABELS=(

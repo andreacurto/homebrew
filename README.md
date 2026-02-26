@@ -152,6 +152,7 @@ Durante il setup puoi scegliere quali font installare:
 | ------------------------- | ---------------------------------------- |
 | Meslo LG Nerd Font        | Font monospaced con icone e simboli      |
 | Roboto Mono Nerd Font     | Font monospaced ispirato a Roboto        |
+| Space Mono Nerd Font      | Font monospaced geometrico e moderno     |
 
 **Nota**: I Nerd Font includono icone speciali necessarie per i temi del terminale (Oh My Posh).
 

@@ -621,6 +621,10 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.12.5 - Fix documentazione app Mole nel README (2026-02-26)
+
+- **Docs**: aggiunta `Mole` alla tabella delle applicazioni disponibili in README.md
+
 ### v1.12.4 - Fix compatibilità sh e nuova app Mole (2026-02-18)
 
 - **Aggiunta Mole**: aggiunta `mole` alla lista app in `setup.sh`
@@ -846,4 +850,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-22_ _Versione: 1.12.4 (fix sh compatibilità, app sempre greedy, Mole)_
+_Ultimo aggiornamento: 2026-02-26_ _Versione: 1.12.5 (fix documentazione Mole in README)_

@@ -132,6 +132,7 @@ Durante il setup puoi scegliere quali installare:
 | Figma              | Design e prototipazione       |
 | Google Chrome      | Browser web                   |
 | ImageOptim         | Ottimizzazione immagini       |
+| Mole               | Pulizia e ottimizzazione del Mac |
 | Numi               | Calcolatrice intelligente     |
 | Rectangle          | Window manager                |
 | Spotify            | Streaming musicale            |

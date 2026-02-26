@@ -551,6 +551,7 @@ Attendere approvazione dell'utente prima di procedere.
 - Creare il branch e lavorare in autonomia
 - Eseguire TUTTE le operazioni (commit, edit, test) senza chiedere permesso
 - Ogni commit viene pushato automaticamente
+- Aggiornare sempre `CLAUDE.md` (changelog + footer versione) e `README.md` (se coinvolto dalla modifica) come parte del rilascio, senza chiedere conferma
 
 #### 3. Review pre-merge (PRIMA del merge in master)
 

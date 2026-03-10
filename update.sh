@@ -16,7 +16,7 @@
 # ===== SETUP AMBIENTE =====
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-SCRIPT_VERSION="1.12.6"
+SCRIPT_VERSION="1.12.7"
 SCRIPT_REPO="andreacurto/homebrew"
 INSTALL_DIR="$HOME/.brew"
 
@@ -147,9 +147,9 @@ selected_operations=$(gum choose --no-limit \
     --cursor-prefix="$GUM_CHECKBOX_CURSOR " \
     --selected-prefix="$GUM_CHECKBOX_SELECTED " \
     --unselected-prefix="$GUM_CHECKBOX_UNSELECTED " \
-    --selected="Aggiornamento Homebrew,Aggiornamento applicazioni,Aggiornamento strumenti e librerie,Rimozione pacchetti non utilizzati,Pulizia cache,Diagnostica sistema" \
-    "Aggiornamento Homebrew" \
+    --selected="Aggiornamento applicazioni,Aggiornamento Homebrew,Aggiornamento strumenti e librerie,Rimozione pacchetti non utilizzati,Pulizia cache,Diagnostica sistema" \
     "Aggiornamento applicazioni" \
+    "Aggiornamento Homebrew" \
     "Aggiornamento strumenti e librerie" \
     "Rimozione pacchetti non utilizzati" \
     "Pulizia cache" \

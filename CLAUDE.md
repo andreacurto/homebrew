@@ -536,6 +536,17 @@ master (stabile, solo release taggate)
 
 **IMPORTANTE**: Seguire SEMPRE questo processo per qualsiasi modifica.
 
+#### 0. Sincronizzazione (PRIMA di qualsiasi altra cosa)
+
+Prima di iniziare qualsiasi modifica, eseguire sempre:
+
+```bash
+git fetch origin
+git pull --rebase origin master
+```
+
+Questo garantisce di lavorare sempre sull'ultima versione pubblicata ed evita conflitti o versioni sfasate.
+
 #### 1. Piano di rilascio (PRIMA di qualsiasi codice)
 
 Quando l'utente chiede una modifica, presentare SEMPRE un piano che includa:

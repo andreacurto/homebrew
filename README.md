@@ -77,7 +77,7 @@ Lo script ti mostrerà:
     - Vedrai gli spinner e poi i check verdi ✔︎
 
 7. **Messaggio finale**
-    - "Homebrew Setup - Completato 🎉"
+    - "Homebrew Setup → Completato 🎉"
     - **Chiudi e riapri il terminale** per vedere le modifiche
 
 ---
@@ -111,7 +111,7 @@ brew-update
     - Vedrai l'output completo di brew doctor
 
 4. **Messaggio finale**
-    - "Homebrew Update - Completato 🎉"
+    - "Homebrew Update → Completato 🎉"
 
 ---
 
@@ -133,7 +133,7 @@ Durante il setup puoi scegliere quali installare:
 | Rectangle          | Window manager                |
 | Spotify            | Streaming musicale            |
 | Visual Studio Code | Editor di codice              |
-| WailBrew           | GUI per Homebrew              |
+| Wailbrew           | GUI per Homebrew              |
 | WhatsApp           | Messaggistica                 |
 
 **Nota**: Puoi selezionare solo quelle che ti servono, non sei obbligato a installarle tutte.

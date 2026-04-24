@@ -569,6 +569,15 @@ Attendere approvazione dell'utente prima di procedere.
 
 #### 3. Review pre-merge (PRIMA del merge in master)
 
+Verificare che README.md sia allineato allo stato attuale del progetto:
+
+- **App/font/temi**: nomi e lista in README corrispondono agli array in `setup.sh`
+- **Messaggi UI**: stringhe citate nel README (es. messaggi finali) corrispondono all'output reale degli script
+- **Flusso utente**: i passi descritti in "Come Aggiornare" e "Come Iniziare" rispecchiano il comportamento attuale degli script
+- **Sezioni rimosse/aggiunte**: se una funzionalità è stata tolta o aggiunta, aggiornare la sezione README corrispondente
+
+Solo dopo questa verifica:
+
 - **Chiedere SEMPRE conferma** all'utente prima di mergiare in master
 - L'utente potrebbe voler aggiungere o correggere qualcosa
 - Se l'utente chiede modifiche ulteriori: valutare se tenerle nello stesso branch o chiudere + nuovo branch, e proporre la soluzione

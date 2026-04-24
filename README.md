@@ -101,20 +101,16 @@ brew-update
     - Puoi deselezionare (□) quelle che non vuoi eseguire
     - Premi **Invio** per continuare
 
-2. **Opzione per app con auto-update**
-    - Ti chiede se includere anche app che si aggiornano da sole
-    - Scegli Yes o No
-
-3. **Esecuzione operazioni**
+2. **Esecuzione operazioni**
     - Vedrai uno spinner per ogni operazione
     - Quando finisce, lo spinner diventa un check verde ✔︎
     - Se c'è un errore, vedi un croce rossa ✘
 
-4. **Output diagnostica**
+3. **Output diagnostica**
     - Se hai selezionato "Diagnostica sistema"
     - Vedrai l'output completo di brew doctor
 
-5. **Messaggio finale**
+4. **Messaggio finale**
     - "Homebrew Update - Completato 🎉"
 
 ---

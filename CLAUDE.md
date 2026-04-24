@@ -622,6 +622,11 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.12.7 - Rimosso --greedy da aggiornamento applicazioni (2026-04-24)
+
+- **Fix**: rimosso `--greedy` da `brew outdated --cask` e `brew upgrade --cask` — le app con auto-update nativo (es. Chrome) non vengono più incluse nelle proposte di aggiornamento
+- **Docs**: aggiornato README.md rimuovendo il riferimento all'opzione greedy nella sezione "Cosa succede"
+
 ### v1.12.6 - Aggiunta Space Mono Nerd Font (2026-02-26)
 
 - **Feat**: aggiunto `Space Mono Nerd Font` (`font-space-mono-nerd-font`) alla lista font in `setup.sh`
@@ -856,4 +861,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-02-26_ _Versione: 1.12.6 (aggiunta Space Mono Nerd Font)_
+_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.7 (rimosso --greedy da aggiornamento applicazioni)_

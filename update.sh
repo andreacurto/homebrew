@@ -183,7 +183,7 @@ fi
 
 # ===== AGGIORNAMENTO APPLICAZIONI =====
 if [ "$do_cask_upgrade" = true ]; then
-    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo aggiornamenti applicazioni..." -- sh -c "brew outdated --cask --greedy --quiet > \"$TMP_OUTDATED\""
+    gum spin --spinner "$GUM_SPINNER_TYPE" --title "Controllo aggiornamenti applicazioni..." -- sh -c "brew outdated --cask --quiet > \"$TMP_OUTDATED\""
     outdated_casks=$(<"$TMP_OUTDATED")
 
     if [[ -n "$outdated_casks" ]]; then
@@ -210,7 +210,7 @@ if [ "$do_cask_upgrade" = true ]; then
         else
             gum style --foreground "$GUM_COLOR_INFO" "$GUM_SYMBOL_INFO Aggiornamento applicazioni in corso..."
             echo ""
-            brew upgrade --cask --greedy "${selected_casks_array[@]}"
+            brew upgrade --cask "${selected_casks_array[@]}"
             brew_exit=$?
             echo ""
             if [ $brew_exit -eq 0 ]; then

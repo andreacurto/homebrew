@@ -536,16 +536,19 @@ master (stabile, solo release taggate)
 
 **IMPORTANTE**: Seguire SEMPRE questo processo per qualsiasi modifica.
 
-#### 0. Sincronizzazione (PRIMA di qualsiasi altra cosa)
+#### 0. Sincronizzazione e verifica versione (PRIMA di qualsiasi altra cosa)
 
 Prima di iniziare qualsiasi modifica, eseguire sempre:
 
 ```bash
 git fetch origin
 git pull --rebase origin master
+git tag --sort=-version:refname | head -5
 ```
 
-Questo garantisce di lavorare sempre sull'ultima versione pubblicata ed evita conflitti o versioni sfasate.
+- `fetch` + `pull --rebase` garantisce di lavorare sull'ultima versione pubblicata
+- Controllare i tag remoti **prima** di decidere la versione target, per evitare conflitti (es. un tag già esistente sul remote che non si aveva in locale)
+- La versione target va stabilita **dopo** questo controllo, non prima
 
 #### 1. Piano di rilascio (PRIMA di qualsiasi codice)
 
@@ -553,7 +556,7 @@ Quando l'utente chiede una modifica, presentare SEMPRE un piano che includa:
 - **Tipo di branch**: `feature/` o `fix/` (valutare in autonomia)
 - **Nome branch**: descrittivo e conciso
 - **Elenco commit previsti**: lista dei commit pianificati con descrizione
-- **Versione target**: bump previsto (PATCH/MINOR/MAJOR)
+- **Versione target**: bump previsto (PATCH/MINOR/MAJOR) — determinata **dopo** lo step 0
 
 Attendere approvazione dell'utente prima di procedere.
 
@@ -633,7 +636,7 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
-### v1.12.7 - Rimosso --greedy da aggiornamento applicazioni (2026-04-24)
+### v1.12.8 - Rimosso --greedy da aggiornamento applicazioni (2026-04-24)
 
 - **Fix**: rimosso `--greedy` da `brew outdated --cask` e `brew upgrade --cask` — le app con auto-update nativo (es. Chrome) non vengono più incluse nelle proposte di aggiornamento
 - **Docs**: aggiornato README.md rimuovendo il riferimento all'opzione greedy nella sezione "Cosa succede"
@@ -872,4 +875,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.7 (rimosso --greedy da aggiornamento applicazioni)_
+_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.8 (rimosso --greedy da aggiornamento applicazioni)_

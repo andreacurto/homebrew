@@ -645,6 +645,13 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.12.9 - Fix allineamento README e processo di rilascio (2026-04-24)
+
+- **Docs**: corretti messaggi finali nel README (`-` → `→`) per allineamento con output reale degli script
+- **Docs**: corretta capitalizzazione `WailBrew` → `Wailbrew` in coerenza con `setup.sh`
+- **Docs**: aggiunta checklist allineamento README nella review pre-merge del processo di rilascio (CLAUDE.md)
+- **Docs**: rafforzato step 0 del processo con verifica tag remoti prima di scegliere la versione target
+
 ### v1.12.8 - Rimosso --greedy da aggiornamento applicazioni (2026-04-24)
 
 - **Fix**: rimosso `--greedy` da `brew outdated --cask` e `brew upgrade --cask` — le app con auto-update nativo (es. Chrome) non vengono più incluse nelle proposte di aggiornamento
@@ -884,4 +891,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.8 (rimosso --greedy da aggiornamento applicazioni)_
+_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.9 (fix allineamento README e processo di rilascio)_

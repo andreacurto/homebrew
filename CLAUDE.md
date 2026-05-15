@@ -645,6 +645,11 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ## Changelog
 
+### v1.13.0 - Aggiunta Codex CLI alla lista app (2026-05-15)
+
+- **Feat**: aggiunto `Codex` (`codex`) alla lista app in `setup.sh` — agente AI da terminale di OpenAI
+- **Docs**: aggiornato README.md con Codex nella tabella applicazioni disponibili
+
 ### v1.12.9 - Fix allineamento README e processo di rilascio (2026-04-24)
 
 - **Docs**: corretti messaggi finali nel README (`-` → `→`) per allineamento con output reale degli script
@@ -891,4 +896,4 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 
 ---
 
-_Ultimo aggiornamento: 2026-04-24_ _Versione: 1.12.9 (fix allineamento README e processo di rilascio)_
+_Ultimo aggiornamento: 2026-05-15_ _Versione: 1.13.0 (aggiunta Codex CLI alla lista app)_

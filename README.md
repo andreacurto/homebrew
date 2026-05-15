@@ -123,7 +123,8 @@ Durante il setup puoi scegliere quali installare:
 | ------------------ | ----------------------------- |
 | 1Password          | Password manager              |
 | AppCleaner         | Disinstallazione completa app |
-| Claude Code        | Editor AI-powered             |
+| Claude Code        | Agente AI da terminale (Anthropic) |
+| Codex              | Agente AI da terminale (OpenAI) |
 | Dropbox            | Cloud storage                 |
 | Figma              | Design e prototipazione       |
 | Google Chrome      | Browser web                   |

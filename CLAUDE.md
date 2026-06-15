@@ -12,6 +12,7 @@ Documentazione tecnica per sviluppatori e AI assistants per modifiche future al 
 6. [Gestione Errori](#gestione-errori)
 7. [Configurazione UI](#configurazione-ui)
 8. [Workflow Git](#workflow-git)
+9. [Tooling Claude Code](#tooling-claude-code)
 
 ## Architettura Progetto
 
@@ -22,7 +23,15 @@ homebrew/
 ├── setup.sh           # Script setup iniziale sistema
 ├── update.sh          # Script aggiornamento e manutenzione
 ├── README.md          # Documentazione utente
-└── CLAUDE.md          # Documentazione tecnica (questo file)
+├── CLAUDE.md          # Documentazione tecnica (questo file)
+└── .claude/           # Tooling Claude Code (vedi sezione dedicata)
+    ├── settings.json          # Hook SessionStart e PreToolUse (versionato)
+    ├── settings.local.json    # Preferenze personali (gitignored)
+    ├── session-fetch.sh       # Script hook SessionStart: fetch + riepilogo stato
+    ├── check-release-tag.sh   # Script hook PreToolUse: guardrail sui git tag
+    └── commands/              # Slash command personalizzati
+        ├── branch.md          # /branch — avvia una modifica
+        └── release.md         # /release — rilascia su master
 ```
 
 ### Script Installati in ~/.brew/
@@ -642,6 +651,38 @@ Il meccanismo di auto-update in `update.sh` funziona così:
 - Commit su master senza nuovo tag → **nessun aggiornamento** proposto agli utenti
 - Commit su branch di sviluppo → **nessun impatto** sugli utenti
 - Nuovo tag creato → **utenti notificati** al prossimo avvio di brew-update
+
+## Tooling Claude Code
+
+La cartella `.claude/` contiene automazioni per chi sviluppa il progetto con Claude Code.
+Sono **versionate nel repo** (eccetto `settings.local.json`), così valgono identiche ovunque si cloni la repo.
+Questi file sono tooling di sviluppo: **non** fanno parte degli script rilasciati agli utenti
+e **non** seguono il workflow di release (niente bump `SCRIPT_VERSION`, niente tag).
+
+### Hook
+
+Configurati in `.claude/settings.json`. Gli hook intercettano solo le azioni di Claude, non i comandi manuali nel terminale.
+
+| Hook | Script | Quando scatta | Cosa fa |
+|------|--------|---------------|---------|
+| `SessionStart` | `session-fetch.sh` | All'avvio di ogni sessione | Esegue `git fetch --all --tags --prune`; se il branch locale è disallineato dal remoto, inietta un riepilogo e chiede all'utente se fare pull o mantenere. Non agisce mai da solo. |
+| `PreToolUse` | `check-release-tag.sh` | Prima di un comando Bash `git tag ...` | Guardrail di release: blocca la creazione di tag che violano le invarianti di progetto — prefisso `v` mancante o `SCRIPT_VERSION` (in `update.sh`) diverso dalla versione del tag. |
+
+### Slash command
+
+File in `.claude/commands/`. Codificano il "Processo di Sviluppo" come comandi ripetibili.
+
+| Comando | Quando | Cosa fa |
+|---------|--------|---------|
+| `/branch [descrizione]` | All'inizio di una modifica | Sincronizza `master`, valuta `feature/` vs `fix/`, presenta il piano di rilascio e — dopo l'OK — crea il branch (passi 0-1 del workflow). |
+| `/release` | Quando il branch è pronto | Esegue il rilascio squash merge: review pre-merge, bump `SCRIPT_VERSION`, changelog, tag `vX.Y.Z`, cleanup (passi 3-4 del workflow). |
+
+I due comandi coprono il ciclo end-to-end; l'hook `PreToolUse` fa da rete di sicurezza automatica anche se un passo viene saltato.
+
+### Modifiche al tooling
+
+I file in `.claude/` si modificano e committano direttamente su `master` con un commit `Chore:`,
+senza bump di versione né tag (non impattano gli utenti). Aggiornare questa sezione se si aggiungono o cambiano hook/comandi.
 
 ## Changelog
 

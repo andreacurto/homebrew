@@ -83,6 +83,22 @@ homebrew/
 - Temi disponibili: zash, material, robbyrussell, pararussel
 - Configurazione tramite file JSON
 
+### zsh-autocomplete
+
+- **Scopo**: autocompletamento real-time (type-ahead) per zsh — installato sempre, parte del pacchetto base
+- **Repo**: https://github.com/marlonrichert/zsh-autocomplete
+- **Install**: `brew install zsh-autocomplete`
+- **Attivazione**: `source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh` inserito **in cima** a `~/.zshrc` (prima di Oh My Posh e di qualsiasi `compdef`; il plugin chiama `compinit` da sé)
+
+### homebrew-autoupdate + pinentry-mac (opzionale)
+
+- **Scopo**: aggiornamento automatico di Homebrew in background tramite `launchd`
+- **Repo**: https://github.com/domt4/homebrew-autoupdate
+- **Install**: `brew tap domt4/autoupdate` + `brew trust --command domt4/autoupdate/autoupdate`
+- **Avvio**: `brew autoupdate start <intervallo> [opzioni]` — intervallo come suffisso (`1d`, `7d`); opzioni usate: `--upgrade`, `--cleanup`, `--ac-only`, `--immediate`, `--sudo`
+- **pinentry-mac**: fornisce il prompt password GUI usato da `--sudo` per i cask che richiedono privilegi admin (basta installarlo, ci pensa il flag a collegarlo)
+- **Gestione**: `brew autoupdate status|stop|start|delete`; log in `~/Library/Logs/com.github.domt4.homebrew-autoupdate`
+
 ## Specifiche UI/UX
 
 ### Principi Design
@@ -257,30 +273,34 @@ fi
 
 **Flusso Completo:**
 
-1. Definizione liste installazione (`APP_LIST`, `FONT_LIST`)
+1. Definizione liste installazione (`APP_LABELS`/`APP_CASKS`, `FONT_LABELS`/`FONT_CASKS`)
 2. Definizione colori ANSI (per messaggi pre-gum)
 3. Messaggio iniziale con lista operazioni (ANSI styled)
 4. Attesa conferma utente (Invio per continuare)
 5. Installazione silenziosa Homebrew (se non presente)
 6. Installazione silenziosa gum (se non presente)
-7. **Selezione applicazioni**: Multi-select con checkbox (da `APP_LIST`)
-8. **Selezione font**: Multi-select con checkbox (da `FONT_LIST`)
+7. **Selezione applicazioni**: Multi-select con checkbox
+8. **Selezione font**: Multi-select con checkbox
 9. **Selezione tema**: Oh My Posh (default: zash)
-10. Messaggio "Homebrew installato" (con gum)
-11. **Installazione CLI tools**: node, gh, oh-my-posh, gum
-12. **Installazione font** selezionati
-13. **Installazione applicazioni** selezionate
-14. **Setup script aggiornamento**: Copia in ~/.brew/
-15. **Configurazione shell**: Genera ~/.zshrc con tema
-16. Messaggio completamento
+10. **Toggle aggiornamento automatico** (opzionale, default sì); se sì, raccolta preferenze (intervallo + opzioni). `clear` prima di ogni schermata di selezione
+11. Messaggio "Homebrew installato" (con gum)
+12. **Installazione CLI tools** (+ autocompletamento, sempre incluso): node, gh, oh-my-posh, gum, zsh-autocomplete
+13. **Installazione font** selezionati
+14. **Installazione applicazioni** selezionate
+15. **Configurazione aggiornamento automatico** (se scelto, unico passo silenzioso): `pinentry-mac`, tap+trust, `brew autoupdate start`
+16. **Setup comando di utility**: copia `update.sh` in ~/.brew/ + alias `brew-update`
+17. **Configurazione shell**: Genera ~/.zshrc (autocomplete in cima → Oh My Posh → alias)
+18. Messaggio completamento
 
 **Variabili Chiave:**
 
-- `APP_LIST[]`, `FONT_LIST[]`: Liste configurabili in testata
+- `APP_LABELS`/`APP_CASKS`, `FONT_LABELS`/`FONT_CASKS`, `THEME_LABELS`/`THEME_FILES`: liste configurabili in testata
 - `MUTED`, `RESET`: Colori ANSI per messaggi pre-gum
-- `selected_apps_array[]`: Applicazioni selezionate dall'utente
-- `selected_fonts_array[]`: Font selezionati dall'utente
+- `HOMEBREW_NO_AUTO_UPDATE`: esportata a 1 per evitare il `brew update` implicito prima di ogni install (più veloce, niente blocchi)
+- `selected_apps_array[]`, `selected_fonts_array[]`: selezioni utente
 - `selected_theme`: Tema Oh My Posh scelto
+- `autocomplete_installed`: stato installazione autocomplete (per scrivere la riga in ~/.zshrc)
+- `enable_autoupdate`, `au_interval`, `au_upgrade`, `au_cleanup`, `au_aconly`, `au_immediate`: preferenze auto-update
 
 ### update.sh
 
@@ -686,6 +706,14 @@ senza bump di versione né tag (non impattano gli utenti). Aggiornare questa sez
 
 ## Changelog
 
+### v1.14.0 - Autocompletamento terminale e auto-update Homebrew guidato (2026-06-25)
+
+- **Feat**: autocompletamento del terminale (`zsh-autocomplete`) installato sempre come parte del pacchetto base; riga `source` inserita in cima a `~/.zshrc` prima di Oh My Posh
+- **Feat**: aggiornamento automatico di Homebrew in background tramite `domt4/autoupdate` + `pinentry-mac`, configurato con un processo guidato nel setup (intervallo 1 giorno/1 settimana, opzioni `--upgrade`/`--cleanup`/`--ac-only`/`--immediate`, `--sudo` per il prompt password GUI)
+- **Fix**: risolto blocco dell'installazione (freeze su pinentry-mac) esportando `HOMEBREW_NO_AUTO_UPDATE=1` — niente più `brew update` implicito prima di ogni install
+- **Style**: `clear` prima di ogni schermata di selezione; anteprima iniziale riordinata (auto-update come 2ª voce); "comando di utility 'brew-update'"; opzioni auto-update con etichette più esplicite
+- **Docs**: README e CLAUDE.md aggiornati con le due funzionalità e i nuovi flussi
+
 ### v1.13.0 - Aggiunta Codex CLI alla lista app (2026-05-15)
 
 - **Feat**: aggiunto `Codex` (`codex`) alla lista app in `setup.sh` — agente AI da terminale di OpenAI
@@ -937,4 +965,4 @@ senza bump di versione né tag (non impattano gli utenti). Aggiornare questa sez
 
 ---
 
-_Ultimo aggiornamento: 2026-05-15_ _Versione: 1.13.0 (aggiunta Codex CLI alla lista app)_
+_Ultimo aggiornamento: 2026-06-25_ _Versione: 1.14.0 (autocompletamento terminale e auto-update Homebrew guidato)_

@@ -8,8 +8,9 @@ Questo progetto ti permette di:
 
 1. **Installare Homebrew** (se non ce l'hai già)
 2. **Scegliere quali applicazioni e font installare** tramite menu interattivi con checkbox
-3. **Mantenere tutto aggiornato** con un singolo comando da terminale
-4. **Personalizzare il tema del terminale** scegliendo tra 4 temi disponibili
+3. **Personalizzare il tema del terminale** scegliendo tra 4 temi disponibili
+4. **Avere l'autocompletamento del terminale** già attivo (suggerimenti in tempo reale)
+5. **Aggiornare Homebrew automaticamente in background**, oppure manualmente con un comando
 
 Tutto con un'interfaccia grafica nel terminale che ti guida passo dopo passo.
 
@@ -71,12 +72,16 @@ Lo script ti mostrerà:
     - 4 temi tra cui scegliere (consigliato: zash)
     - Usa le **frecce** e premi **Invio**
 
-6. **Installazione automatica**
-    - Font che hai selezionato
-    - Applicazioni che hai selezionato
+6. **Aggiornamento automatico** (opzionale)
+    - Ti viene chiesto se abilitare l'aggiornamento automatico di Homebrew in background
+    - Se accetti: scegli l'**intervallo** (una volta a settimana o al giorno) e le **opzioni** (aggiorna pacchetti e app, pulizia cache, ecc.)
+
+7. **Installazione automatica**
+    - Font e applicazioni che hai selezionato
+    - Autocompletamento del terminale (sempre incluso) e aggiornamento automatico se l'hai scelto
     - Vedrai gli spinner e poi i check verdi ✔︎
 
-7. **Messaggio finale**
+8. **Messaggio finale**
     - "Homebrew Setup → Completato 🎉"
     - **Chiudi e riapri il terminale** per vedere le modifiche
 
@@ -84,11 +89,23 @@ Lo script ti mostrerà:
 
 ## Come Aggiornare il Sistema
 
-Dopo l'installazione iniziale, puoi aggiornare tutto con un comando.
+Dopo l'installazione iniziale hai due modi per tenere tutto aggiornato.
 
-### Comando di aggiornamento
+### Aggiornamento automatico (in background)
 
-Apri il terminale e scrivi:
+Se durante il setup hai abilitato l'**aggiornamento automatico**, Homebrew si aggiorna da solo in background all'intervallo che hai scelto, senza che tu debba fare nulla. Per controllarlo o gestirlo:
+
+```bash
+brew autoupdate status   # stato e prossima esecuzione
+brew autoupdate stop     # mette in pausa
+brew autoupdate start    # riattiva
+```
+
+> Le app che richiedono privilegi di amministratore mostreranno un prompt password grafico (gestito da `pinentry-mac`), così l'aggiornamento può completarsi anche in background.
+
+### Aggiornamento manuale
+
+Puoi comunque aggiornare quando vuoi con un comando. Apri il terminale e scrivi:
 
 ```bash
 brew-update
@@ -186,6 +203,14 @@ Se vuoi cambiare tema in seguito:
 
 ---
 
+## Autocompletamento del terminale
+
+Il setup attiva l'**autocompletamento** del terminale (zsh-autocomplete): mentre digiti vedrai comparire in tempo reale i suggerimenti (comandi, file, opzioni). Usa le **frecce** per navigarli e **Invio**/**Tab** per accettarli.
+
+Per disabilitarlo: apri `~/.zshrc`, rimuovi la riga che inizia con `source ...zsh-autocomplete...` e riavvia il terminale.
+
+---
+
 ## Risoluzione Problemi
 
 ### "Permission denied" quando eseguo ./setup.sh
@@ -216,7 +241,7 @@ Per documentazione tecnica dettagliata (architettura, convenzioni, configurazion
 
 ### Quick Reference
 
-**Aggiungere app/font:** `brew search nome`, poi aggiungi all'array `APP_LIST` o `FONT_LIST` in testata di `setup.sh`
+**Aggiungere app/font:** `brew search nome`, poi aggiungi label e cask agli array `APP_LABELS`/`APP_CASKS` (o `FONT_LABELS`/`FONT_CASKS`) in testata di `setup.sh`
 
 **Testare modifiche:**
 ```bash

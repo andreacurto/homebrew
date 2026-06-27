@@ -8,9 +8,8 @@ import "github.com/charmbracelet/lipgloss"
 var (
 	Cream      = lipgloss.Color("#F3E9D2") // testo di base
 	Ash        = lipgloss.Color("#838383") // testi secondari (muted)
-	Tomato     = lipgloss.Color("#D04337") // brand / logo
+	Coral      = lipgloss.Color("#FE3850") // brand + selezione attiva
 	Cheddar    = lipgloss.Color("#F1A90E") // alert / slogan
-	Coral      = lipgloss.Color("#FE3850") // selezione attiva
 	Aquamarine = lipgloss.Color("#01C5B4") // comando aperto
 )
 
@@ -29,7 +28,7 @@ const (
 
 // Assegnazione semantica: ruolo nella TUI → colore della palette.
 var (
-	Logo    = lipgloss.NewStyle().Foreground(Tomato).Bold(true)     // brand "Donkey"
+	Logo    = lipgloss.NewStyle().Foreground(Coral).Bold(true)      // brand "Donkey"
 	Bullet  = lipgloss.NewStyle().Foreground(Ash)                   // il "•" tra nome e slogan/schermata
 	Tagline = lipgloss.NewStyle().Foreground(Cheddar)               // slogan
 	URL     = lipgloss.NewStyle().Foreground(Ash)                   // info secondaria

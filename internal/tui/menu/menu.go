@@ -27,6 +27,12 @@ var entries = []entry{
 	{"Status", "Lo stato di Donkey a colpo d'occhio"},
 }
 
+// monkeySpinner: le tre scimmiette + la faccia, a ritmo leggermente veloce.
+var monkeySpinner = spinner.Spinner{
+	Frames: []string{"🙈", "🙉", "🙊", "🐵"},
+	FPS:    time.Second / 5,
+}
+
 // Model è lo stato del menù principale.
 type Model struct {
 	cursor   int
@@ -38,9 +44,7 @@ type Model struct {
 // New crea il modello del menù.
 func New() Model {
 	s := spinner.New()
-	sp := spinner.Monkey
-	sp.FPS = time.Second / 5 // leggermente più veloce del default
-	s.Spinner = sp
+	s.Spinner = monkeySpinner
 	return Model{spin: s}
 }
 
@@ -129,20 +133,7 @@ func (m Model) menuView() string {
 
 	b.WriteString("\n")
 	b.WriteString(style.Footer.Render("↑↓ · Invio · U Disinstalla · V Versione · Q Esci"))
-
-	// Il logo è arte ANSI grezza: lo teniamo fuori da Lipgloss (solo indentazione)
-	// per non rischiare che gli stili ne alterino i codici colore.
-	logo := indentLines(style.DonkeyLogo(), "  ")
-	return "\n" + logo + "\n" + style.Screen.Render(b.String())
-}
-
-// indentLines antepone prefix a ogni riga di s.
-func indentLines(s, prefix string) string {
-	lines := strings.Split(s, "\n")
-	for i := range lines {
-		lines[i] = prefix + lines[i]
-	}
-	return strings.Join(lines, "\n")
+	return style.Screen.Render(b.String())
 }
 
 func (m Model) placeholderView() string {
@@ -157,8 +148,8 @@ func (m Model) placeholderView() string {
 	return style.Screen.Render(b.String())
 }
 
-// brandLine compone "Donkey • <destra>": il nome in brand, il pallino in ash,
-// la parte destra (slogan o nome schermata) nel suo colore.
+// brandLine compone "🐒 Donkey • <destra>": l'emoji + il nome in brand, il
+// pallino in ash, la parte destra (slogan o nome schermata) nel suo colore.
 func brandLine(right string, rightStyle lipgloss.Style) string {
-	return style.Logo.Render("Donkey") + style.Bullet.Render(" • ") + rightStyle.Render(right)
+	return "🐒 " + style.Logo.Render("Donkey") + style.Bullet.Render(" • ") + rightStyle.Render(right)
 }

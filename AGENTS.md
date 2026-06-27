@@ -254,22 +254,23 @@ Tutto lo stile vive in `internal/tui/style/`: cambiare qui si propaga ovunque.
 | Nome | Hex | Ruolo |
 |---|---|---|
 | `cream` | `#F3E9D2` | testo di base |
-| `ash` | `#838383` | testi secondari (descrizioni, footer) |
-| `coral` | `#FF3D2A` | brand — logo Donkey |
-| `gold` | `#F4BA15` | alert + slogan |
-| `magenta` | `#EC3193` | selezione attiva |
-| `sky` | `#29B6F6` | comando aperto (titolo della vista) |
+| `ash` | `#838383` | testi secondari (descrizioni, footer, pallino) |
+| `coral` | `#FE3850` | brand (logo "Donkey") + selezione attiva |
+| `cheddar` | `#F1A90E` | alert + slogan |
+| `aquamarine` | `#01C5B4` | comando aperto (titolo della vista) |
 
 ### Regole di colore
-- **Voce di menù**: titolo `cream` → `magenta` quando selezionata; descrizione `ash` → `cream` quando selezionata.
-- **Cursore** `magenta` · **logo** `coral` · **slogan** `gold` · **titolo della vista aperta** `sky`.
+- **Voce di menù**: titolo `cream` → `coral` quando selezionata; descrizione `ash` → `cream` quando selezionata.
+- **Cursore** `coral` · **"Donkey"** `coral` · **slogan** `cheddar` · **titolo della vista aperta** `aquamarine`.
+
+### Brand mark
+Emoji **🐒** prima di "Donkey", presente in **tutte le schermate** (`🐒 Donkey • <slogan o nome schermata>`). Niente logo ASCII.
 
 ### Simboli
 cursore `❖` · successo `✓` · errore `✗` · info `◆` · checkbox `■`/`□` · stato installato/non `●`/`○` · attenzione `▲`.
 
 ### Animazioni
 Vibe **giocoso ma sobrio** (effetto "wow" dosato, mai da prodotto per bambini):
-- **Spinner** durante le operazioni (stile da scegliere: monkey 🙈🙉🙊 o a punti).
-- **Pulse leggero** del cursore.
-- **Logo animato** all'avvio (leggero, una volta sola).
+- **Spinner monkey** durante le operazioni: 🙈🙉🙊🐵, ritmo leggermente veloce.
+- **Cursore fisso** (niente pulse).
 - **Niente fade** al cambio schermata, salvo transizioni leggerissime ed eleganti.

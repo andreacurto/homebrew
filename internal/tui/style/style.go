@@ -6,12 +6,12 @@ import "github.com/charmbracelet/lipgloss"
 
 // Palette Donkey (ispirata a Donkey Kong arcade). Nomi univoci, stile Tailwind.
 var (
-	Cream   = lipgloss.Color("#F3E9D2") // testo di base
-	Ash     = lipgloss.Color("#838383") // testi secondari (muted)
-	Coral   = lipgloss.Color("#FF3D2A") // brand / logo
-	Gold    = lipgloss.Color("#F4BA15") // alert / slogan
-	Magenta = lipgloss.Color("#EC3193") // selezione attiva
-	Sky     = lipgloss.Color("#29B6F6") // comando aperto
+	Cream      = lipgloss.Color("#F3E9D2") // testo di base
+	Ash        = lipgloss.Color("#838383") // testi secondari (muted)
+	Tomato     = lipgloss.Color("#D04337") // brand / logo
+	Cheddar    = lipgloss.Color("#F1A90E") // alert / slogan
+	Coral      = lipgloss.Color("#FE3850") // selezione attiva
+	Aquamarine = lipgloss.Color("#01C5B4") // comando aperto
 )
 
 // Simboli centralizzati (icone della UI).
@@ -29,19 +29,20 @@ const (
 
 // Assegnazione semantica: ruolo nella TUI → colore della palette.
 var (
-	Logo    = lipgloss.NewStyle().Foreground(Coral).Bold(true) // brand
-	Tagline = lipgloss.NewStyle().Foreground(Gold)             // slogan
-	URL     = lipgloss.NewStyle().Foreground(Ash)              // info secondaria
-	Heading = lipgloss.NewStyle().Foreground(Sky).Bold(true)   // titolo del comando aperto
+	Logo    = lipgloss.NewStyle().Foreground(Tomato).Bold(true)     // brand "Donkey"
+	Bullet  = lipgloss.NewStyle().Foreground(Ash)                   // il "•" tra nome e slogan/schermata
+	Tagline = lipgloss.NewStyle().Foreground(Cheddar)               // slogan
+	URL     = lipgloss.NewStyle().Foreground(Ash)                   // info secondaria
+	Heading = lipgloss.NewStyle().Foreground(Aquamarine).Bold(true) // nome del comando/vista aperta
 
 	// Voci di menù: il titolo passa da base a selezione; la descrizione da muted a base.
 	ItemTitle    = lipgloss.NewStyle().Foreground(Cream)
-	ItemTitleSel = lipgloss.NewStyle().Foreground(Magenta).Bold(true)
+	ItemTitleSel = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	ItemDesc     = lipgloss.NewStyle().Foreground(Ash)
 	ItemDescSel  = lipgloss.NewStyle().Foreground(Cream)
 
-	Cursor = lipgloss.NewStyle().Foreground(Magenta).Bold(true)
+	Cursor = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	Footer = lipgloss.NewStyle().Foreground(Ash)
-	Alert  = lipgloss.NewStyle().Foreground(Gold)
+	Alert  = lipgloss.NewStyle().Foreground(Cheddar)
 	Screen = lipgloss.NewStyle().Padding(1, 2)
 )

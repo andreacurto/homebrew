@@ -27,32 +27,26 @@ var entries = []entry{
 	{"Status", "Lo stato di Donkey a colpo d'occhio"},
 }
 
-// pulseMsg pilota il leggero pulse del cursore.
-type pulseMsg time.Time
-
-func pulseTick() tea.Cmd {
-	return tea.Tick(750*time.Millisecond, func(t time.Time) tea.Msg { return pulseMsg(t) })
-}
-
 // Model è lo stato del menù principale.
 type Model struct {
 	cursor   int
 	chosen   string // se valorizzato, mostra il placeholder della voce scelta
 	quitting bool
 	spin     spinner.Model
-	pulseOn  bool
 }
 
 // New crea il modello del menù.
 func New() Model {
 	s := spinner.New()
-	s.Spinner = spinner.Monkey
+	sp := spinner.Monkey
+	sp.FPS = time.Second / 5 // leggermente più veloce del default
+	s.Spinner = sp
 	return Model{spin: s}
 }
 
-// Init avvia le animazioni (spinner + pulse del cursore).
+// Init avvia lo spinner.
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.spin.Tick, pulseTick())
+	return m.spin.Tick
 }
 
 // Update gestisce input da tastiera e animazioni.
@@ -60,9 +54,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		return m.handleKey(msg)
-	case pulseMsg:
-		m.pulseOn = !m.pulseOn
-		return m, pulseTick()
 	case spinner.TickMsg:
 		var cmd tea.Cmd
 		m.spin, cmd = m.spin.Update(msg)
@@ -118,7 +109,7 @@ func (m Model) View() string {
 
 func (m Model) menuView() string {
 	var b strings.Builder
-	b.WriteString(header())
+	b.WriteString(brandLine("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline))
 	b.WriteString("\n\n")
 
 	for i, e := range entries {
@@ -130,8 +121,7 @@ func (m Model) menuView() string {
 			titleStyle = style.ItemTitleSel
 			descStyle = style.ItemDescSel
 		}
-		// Pulse leggero: il cursore fa un respiro alternando intensità.
-		b.WriteString(style.Cursor.Faint(m.pulseOn).Render(marker))
+		b.WriteString(style.Cursor.Render(marker))
 		b.WriteString(titleStyle.Width(24).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
 		b.WriteString(descStyle.Render(e.desc))
 		b.WriteString("\n")
@@ -139,12 +129,25 @@ func (m Model) menuView() string {
 
 	b.WriteString("\n")
 	b.WriteString(style.Footer.Render("↑↓ · Invio · U Disinstalla · V Versione · Q Esci"))
-	return style.Screen.Render(b.String())
+
+	// Il logo è arte ANSI grezza: lo teniamo fuori da Lipgloss (solo indentazione)
+	// per non rischiare che gli stili ne alterino i codici colore.
+	logo := indentLines(style.DonkeyLogo(), "  ")
+	return "\n" + logo + "\n" + style.Screen.Render(b.String())
+}
+
+// indentLines antepone prefix a ogni riga di s.
+func indentLines(s, prefix string) string {
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		lines[i] = prefix + lines[i]
+	}
+	return strings.Join(lines, "\n")
 }
 
 func (m Model) placeholderView() string {
 	var b strings.Builder
-	b.WriteString(style.Heading.Render(m.chosen))
+	b.WriteString(brandLine(m.chosen, style.Heading))
 	b.WriteString("\n\n")
 	b.WriteString(m.spin.View())
 	b.WriteString(" ")
@@ -154,9 +157,8 @@ func (m Model) placeholderView() string {
 	return style.Screen.Render(b.String())
 }
 
-func header() string {
-	logo := style.Logo.Render("Donkey")
-	tagline := style.Tagline.Render("Il tuo Mac, pronto all'uso senza pensieri.")
-	url := style.URL.Render("github.com/andreacurto/donkey")
-	return lipgloss.JoinVertical(lipgloss.Left, logo, tagline, url)
+// brandLine compone "Donkey • <destra>": il nome in brand, il pallino in ash,
+// la parte destra (slogan o nome schermata) nel suo colore.
+func brandLine(right string, rightStyle lipgloss.Style) string {
+	return style.Logo.Render("Donkey") + style.Bullet.Render(" • ") + rightStyle.Render(right)
 }

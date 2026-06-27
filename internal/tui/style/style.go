@@ -1,29 +1,47 @@
-// Package style centralizza la palette e gli stili Lipgloss della TUI di Donkey.
-// È l'unica fonte del look: cambiare i colori qui si propaga a tutta l'interfaccia.
+// Package style centralizza palette, simboli e stili Lipgloss della TUI di Donkey.
+// È l'unica fonte del look: cambiare qui si propaga a tutta l'interfaccia.
 package style
 
 import "github.com/charmbracelet/lipgloss"
 
-// Palette (256-color). Unico punto in cui vivono i colori.
+// Palette Donkey (ispirata a Donkey Kong arcade). Nomi univoci, stile Tailwind.
 var (
-	Primary = lipgloss.Color("10")  // verde brillante
-	Accent  = lipgloss.Color("14")  // cyan
-	Text    = lipgloss.Color("252") // testo chiaro
-	Muted   = lipgloss.Color("244") // grigio
-	Danger  = lipgloss.Color("9")   // rosso
+	Cream   = lipgloss.Color("#F3E9D2") // testo di base
+	Ash     = lipgloss.Color("#838383") // testi secondari (muted)
+	Coral   = lipgloss.Color("#FF3D2A") // brand / logo
+	Gold    = lipgloss.Color("#F4BA15") // alert / slogan
+	Magenta = lipgloss.Color("#EC3193") // selezione attiva
+	Sky     = lipgloss.Color("#29B6F6") // comando aperto
 )
 
-// Stili riusabili, derivati dalla palette.
+// Simboli centralizzati (icone della UI).
+const (
+	SymCursor   = "❖"
+	SymSuccess  = "✓"
+	SymError    = "✗"
+	SymInfo     = "◆"
+	SymCheckOn  = "■"
+	SymCheckOff = "□"
+	SymOn       = "●"
+	SymOff      = "○"
+	SymWarning  = "▲"
+)
+
+// Assegnazione semantica: ruolo nella TUI → colore della palette.
 var (
-	Logo         = lipgloss.NewStyle().Foreground(Primary).Bold(true)
-	Tagline      = lipgloss.NewStyle().Foreground(Muted)
-	URL          = lipgloss.NewStyle().Foreground(Accent)
-	Heading      = lipgloss.NewStyle().Foreground(Accent).Bold(true)
-	ItemTitle    = lipgloss.NewStyle().Foreground(Text)
-	ItemTitleSel = lipgloss.NewStyle().Foreground(Primary).Bold(true)
-	ItemDesc     = lipgloss.NewStyle().Foreground(Muted)
-	Cursor       = lipgloss.NewStyle().Foreground(Primary).Bold(true)
-	Footer       = lipgloss.NewStyle().Foreground(Muted)
-	Error        = lipgloss.NewStyle().Foreground(Danger)
-	Screen       = lipgloss.NewStyle().Padding(1, 2)
+	Logo    = lipgloss.NewStyle().Foreground(Coral).Bold(true) // brand
+	Tagline = lipgloss.NewStyle().Foreground(Gold)             // slogan
+	URL     = lipgloss.NewStyle().Foreground(Ash)              // info secondaria
+	Heading = lipgloss.NewStyle().Foreground(Sky).Bold(true)   // titolo del comando aperto
+
+	// Voci di menù: il titolo passa da base a selezione; la descrizione da muted a base.
+	ItemTitle    = lipgloss.NewStyle().Foreground(Cream)
+	ItemTitleSel = lipgloss.NewStyle().Foreground(Magenta).Bold(true)
+	ItemDesc     = lipgloss.NewStyle().Foreground(Ash)
+	ItemDescSel  = lipgloss.NewStyle().Foreground(Cream)
+
+	Cursor = lipgloss.NewStyle().Foreground(Magenta).Bold(true)
+	Footer = lipgloss.NewStyle().Foreground(Ash)
+	Alert  = lipgloss.NewStyle().Foreground(Gold)
+	Screen = lipgloss.NewStyle().Padding(1, 2)
 )

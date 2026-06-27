@@ -4,7 +4,9 @@ package menu
 import (
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
@@ -19,10 +21,17 @@ type entry struct {
 // Le voci del menù principale (vedi AGENTS.md §2.2).
 var entries = []entry{
 	{"App", "Installa o disinstalla singole app"},
-	{"Terminal", "Tema, font e autocompletamento"},
-	{"Update", "Aggiorna e fai ordine in Homebrew"},
-	{"Auto-update", "Gestisci l'aggiornamento automatico"},
-	{"Status", "Lo stato del tuo Mac a colpo d'occhio"},
+	{"Terminale", "Personalizza il terminale con tema, font e autocompletamento"},
+	{"Update manuale", "Aggiorna ora app e librerie"},
+	{"Update automatico", "Gestisci l'aggiornamento automatico di app e librerie"},
+	{"Status", "Lo stato di Donkey a colpo d'occhio"},
+}
+
+// pulseMsg pilota il leggero pulse del cursore.
+type pulseMsg time.Time
+
+func pulseTick() tea.Cmd {
+	return tea.Tick(750*time.Millisecond, func(t time.Time) tea.Msg { return pulseMsg(t) })
 }
 
 // Model è lo stato del menù principale.
@@ -30,21 +39,39 @@ type Model struct {
 	cursor   int
 	chosen   string // se valorizzato, mostra il placeholder della voce scelta
 	quitting bool
+	spin     spinner.Model
+	pulseOn  bool
 }
 
 // New crea il modello del menù.
-func New() Model { return Model{} }
+func New() Model {
+	s := spinner.New()
+	s.Spinner = spinner.Monkey
+	return Model{spin: s}
+}
 
-// Init soddisfa tea.Model.
-func (m Model) Init() tea.Cmd { return nil }
+// Init avvia le animazioni (spinner + pulse del cursore).
+func (m Model) Init() tea.Cmd {
+	return tea.Batch(m.spin.Tick, pulseTick())
+}
 
-// Update gestisce gli input da tastiera.
+// Update gestisce input da tastiera e animazioni.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	key, ok := msg.(tea.KeyMsg)
-	if !ok {
-		return m, nil
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		return m.handleKey(msg)
+	case pulseMsg:
+		m.pulseOn = !m.pulseOn
+		return m, pulseTick()
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spin, cmd = m.spin.Update(msg)
+		return m, cmd
 	}
+	return m, nil
+}
 
+func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch key.String() {
 	case "ctrl+c", "q":
 		m.quitting = true
@@ -97,13 +124,16 @@ func (m Model) menuView() string {
 	for i, e := range entries {
 		marker := "  "
 		titleStyle := style.ItemTitle
+		descStyle := style.ItemDesc
 		if i == m.cursor {
-			marker = "▸ "
+			marker = style.SymCursor + " "
 			titleStyle = style.ItemTitleSel
+			descStyle = style.ItemDescSel
 		}
-		b.WriteString(style.Cursor.Render(marker))
-		b.WriteString(titleStyle.Width(20).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
-		b.WriteString(style.ItemDesc.Render(e.desc))
+		// Pulse leggero: il cursore fa un respiro alternando intensità.
+		b.WriteString(style.Cursor.Faint(m.pulseOn).Render(marker))
+		b.WriteString(titleStyle.Width(24).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
+		b.WriteString(descStyle.Render(e.desc))
 		b.WriteString("\n")
 	}
 
@@ -116,6 +146,8 @@ func (m Model) placeholderView() string {
 	var b strings.Builder
 	b.WriteString(style.Heading.Render(m.chosen))
 	b.WriteString("\n\n")
+	b.WriteString(m.spin.View())
+	b.WriteString(" ")
 	b.WriteString(style.ItemDesc.Render("Questa vista arriverà presto."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Footer.Render("Esc · torna al menù    Q · esci"))
@@ -124,7 +156,7 @@ func (m Model) placeholderView() string {
 
 func header() string {
 	logo := style.Logo.Render("Donkey")
-	tagline := style.Tagline.Render("Allestisci il tuo Mac. Tienilo fresco.")
+	tagline := style.Tagline.Render("Il tuo Mac, pronto all'uso senza pensieri.")
 	url := style.URL.Render("github.com/andreacurto/donkey")
 	return lipgloss.JoinVertical(lipgloss.Left, logo, tagline, url)
 }

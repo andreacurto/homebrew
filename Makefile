@@ -5,8 +5,11 @@ BINARY := dk
 build: ## compila il binario in bin/
 	go build -o bin/$(BINARY) .
 
-run: ## lancia la TUI
+run: ## lancia la TUI (menù)
 	go run .
+
+run-setup: ## lancia il wizard di setup coi cataloghi locali (sviluppo)
+	DONKEY_CATALOG_URL=$(CURDIR)/config go run . setup
 
 test: ## esegue i test
 	go test ./...

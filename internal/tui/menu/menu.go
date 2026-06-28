@@ -4,11 +4,9 @@ package menu
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 
 	"github.com/andreacurto/donkey/internal/tui/style"
 )
@@ -27,12 +25,6 @@ var entries = []entry{
 	{"Status", "Lo stato di Donkey a colpo d'occhio"},
 }
 
-// monkeySpinner: le tre scimmiette + la faccia, a ritmo leggermente veloce.
-var monkeySpinner = spinner.Spinner{
-	Frames: []string{"🙈", "🙉", "🙊", "🐵"},
-	FPS:    time.Second / 5,
-}
-
 // Model è lo stato del menù principale.
 type Model struct {
 	cursor   int
@@ -43,9 +35,7 @@ type Model struct {
 
 // New crea il modello del menù.
 func New() Model {
-	s := spinner.New()
-	s.Spinner = monkeySpinner
-	return Model{spin: s}
+	return Model{spin: style.NewSpinner()}
 }
 
 // Init avvia lo spinner.
@@ -113,7 +103,7 @@ func (m Model) View() string {
 
 func (m Model) menuView() string {
 	var b strings.Builder
-	b.WriteString(brandLine("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline))
+	b.WriteString(style.Brand("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline))
 	b.WriteString("\n\n")
 
 	for i, e := range entries {
@@ -138,7 +128,7 @@ func (m Model) menuView() string {
 
 func (m Model) placeholderView() string {
 	var b strings.Builder
-	b.WriteString(brandLine(m.chosen, style.Heading))
+	b.WriteString(style.Brand(m.chosen, style.Heading))
 	b.WriteString("\n\n")
 	b.WriteString(m.spin.View())
 	b.WriteString(" ")
@@ -146,10 +136,4 @@ func (m Model) placeholderView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.Footer.Render("Esc · torna al menù    Q · esci"))
 	return style.Screen.Render(b.String())
-}
-
-// brandLine compone "🐒 Donkey • <destra>": l'emoji + il nome in brand, il
-// pallino in ash, la parte destra (slogan o nome schermata) nel suo colore.
-func brandLine(right string, rightStyle lipgloss.Style) string {
-	return "🐒 " + style.Logo.Render("Donkey") + style.Bullet.Render(" • ") + rightStyle.Render(right)
 }

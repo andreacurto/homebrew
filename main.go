@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/andreacurto/donkey/internal/tui/menu"
+	"github.com/andreacurto/donkey/internal/tui/setup"
 )
 
 const version = "2.0.0-dev"
@@ -21,10 +22,17 @@ func main() {
 		case "help", "-h", "--help":
 			help()
 			return
+		case "setup":
+			run(setup.New())
+			return
 		}
 	}
+	run(menu.New())
+}
 
-	if _, err := tea.NewProgram(menu.New(), tea.WithAltScreen()).Run(); err != nil {
+// run avvia un programma Bubble Tea a schermo intero.
+func run(m tea.Model) {
+	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "errore:", err)
 		os.Exit(1)
 	}
@@ -35,10 +43,11 @@ func help() {
 
 Uso:
   dk            apre il menù principale
+  dk setup      avvia l'onboarding
   dk version    mostra la versione
   dk help       mostra questo aiuto
 
-I sottocomandi (app, terminal, update, autoupdate, status, setup, uninstall)
+I sottocomandi (app, terminal, update, autoupdate, status, uninstall)
 arriveranno nei prossimi passi della roadmap.
 `)
 }

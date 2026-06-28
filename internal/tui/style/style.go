@@ -2,7 +2,12 @@
 // È l'unica fonte del look: cambiare qui si propaga a tutta l'interfaccia.
 package style
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"time"
+
+	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/lipgloss"
+)
 
 // Palette Donkey (ispirata a Donkey Kong arcade). Nomi univoci, stile Tailwind.
 var (
@@ -34,7 +39,7 @@ var (
 	URL     = lipgloss.NewStyle().Foreground(Ash)                   // info secondaria
 	Heading = lipgloss.NewStyle().Foreground(Aquamarine).Bold(true) // nome del comando/vista aperta
 
-	// Voci di menù: il titolo passa da base a selezione; la descrizione da muted a base.
+	// Voci di menù/liste: il titolo passa da base a selezione; la descrizione da muted a base.
 	ItemTitle    = lipgloss.NewStyle().Foreground(Cream)
 	ItemTitleSel = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	ItemDesc     = lipgloss.NewStyle().Foreground(Ash)
@@ -43,5 +48,24 @@ var (
 	Cursor = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	Footer = lipgloss.NewStyle().Foreground(Ash)
 	Alert  = lipgloss.NewStyle().Foreground(Cheddar)
+	Error  = lipgloss.NewStyle().Foreground(Coral)
 	Screen = lipgloss.NewStyle().Padding(1, 2)
 )
+
+// MonkeySpinner è lo spinner brandizzato: tre scimmiette + la faccia.
+var MonkeySpinner = spinner.Spinner{
+	Frames: []string{"🙈", "🙉", "🙊", "🐵"},
+	FPS:    time.Second / 5,
+}
+
+// NewSpinner crea uno spinner già impostato sullo stile Donkey.
+func NewSpinner() spinner.Model {
+	s := spinner.New()
+	s.Spinner = MonkeySpinner
+	return s
+}
+
+// Brand compone l'header "🐒 Donkey • <destra>", presente in tutte le schermate.
+func Brand(right string, rightStyle lipgloss.Style) string {
+	return "🐒 " + Logo.Render("Donkey") + Bullet.Render(" • ") + rightStyle.Render(right)
+}

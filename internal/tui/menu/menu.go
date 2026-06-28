@@ -103,7 +103,7 @@ func (m Model) View() string {
 
 func (m Model) menuView() string {
 	var b strings.Builder
-	b.WriteString(style.Brand("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline))
+	b.WriteString(style.Header("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline, ""))
 	b.WriteString("\n\n")
 
 	for i, e := range entries {
@@ -128,7 +128,7 @@ func (m Model) menuView() string {
 
 func (m Model) placeholderView() string {
 	var b strings.Builder
-	b.WriteString(style.Brand(m.chosen, style.Heading))
+	b.WriteString(style.Header(m.chosen, style.Heading, ""))
 	b.WriteString("\n\n")
 	b.WriteString(m.spin.View())
 	b.WriteString(" ")

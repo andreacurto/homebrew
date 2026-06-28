@@ -36,6 +36,14 @@ func (c *checklist) toggle() {
 	}
 }
 
+// toggleAll seleziona tutte le voci; se sono già tutte selezionate, le deseleziona.
+func (c *checklist) toggleAll() {
+	selectAll := len(c.chosen()) < len(c.items)
+	for i := range c.items {
+		c.selected[i] = selectAll
+	}
+}
+
 // chosen ritorna le voci selezionate, nell'ordine del catalogo.
 func (c checklist) chosen() []catalog.Entry {
 	var out []catalog.Entry

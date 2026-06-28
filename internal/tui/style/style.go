@@ -65,7 +65,20 @@ func NewSpinner() spinner.Model {
 	return s
 }
 
-// Brand compone l'header "🐒 Donkey • <destra>", presente in tutte le schermate.
-func Brand(right string, rightStyle lipgloss.Style) string {
-	return "🐒 " + Logo.Render("Donkey") + Bullet.Render(" • ") + rightStyle.Render(right)
+// RepoURL è l'indirizzo del progetto, mostrato sotto il brand in ogni schermata.
+const RepoURL = "github.com/andreacurto/donkey"
+
+// Header compone l'intestazione comune a tutte le schermate:
+//
+//	🐒 Donkey • <secondo livello> [• <terzo livello>]
+//	github.com/andreacurto/donkey
+//
+// secondStyle veste il secondo livello (slogan nel menù, nome vista altrove);
+// third, se non vuoto, aggiunge un terzo livello breadcrumb sempre in ash.
+func Header(second string, secondStyle lipgloss.Style, third string) string {
+	line := "🐒 " + Logo.Render("Donkey") + Bullet.Render(" • ") + secondStyle.Render(second)
+	if third != "" {
+		line += Bullet.Render(" • ") + URL.Render(third)
+	}
+	return line + "\n" + URL.Render(RepoURL)
 }

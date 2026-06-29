@@ -206,7 +206,7 @@ func (m Model) appsView() string {
 		))
 
 	default:
-		b.WriteString(style.ItemDesc.Render("Scegli le app da installare:"))
+		b.WriteString(style.ItemTitle.Render("Scegli le app da installare:"))
 		b.WriteString("\n\n")
 		b.WriteString(m.apps.view())
 		b.WriteString("\n")

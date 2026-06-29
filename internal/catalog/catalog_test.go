@@ -7,7 +7,7 @@ import (
 
 func TestParse(t *testing.T) {
 	in := `# commento da ignorare
-1Password|1password
+1Password|1password|Gestore di password
 
   Figma | figma
 riga-senza-separatore
@@ -20,8 +20,8 @@ etichetta-senza-valore|
 	}
 
 	want := []Entry{
-		{Label: "1Password", Value: "1password"},
-		{Label: "Figma", Value: "figma"},
+		{Label: "1Password", Value: "1password", Desc: "Gestore di password"},
+		{Label: "Figma", Value: "figma"}, // descrizione opzionale: assente
 	}
 	if len(got) != len(want) {
 		t.Fatalf("ottenute %d voci, attese %d: %+v", len(got), len(want), got)

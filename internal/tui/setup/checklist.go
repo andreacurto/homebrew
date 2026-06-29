@@ -55,6 +55,9 @@ func (c checklist) chosen() []catalog.Entry {
 	return out
 }
 
+// labelWidth allinea le descrizioni: largo quanto l'etichetta più lunga + respiro.
+const labelWidth = 20
+
 func (c checklist) view() string {
 	var b strings.Builder
 	for i, e := range c.items {
@@ -63,17 +66,23 @@ func (c checklist) view() string {
 		if c.selected[i] {
 			box = style.ItemTitleSel.Render(style.SymCheckOn)
 		}
-		// Riga sotto cursore: etichetta in coral; altrimenti crema.
+		// Riga sotto cursore: etichetta in coral e descrizione in crema;
+		// altrimenti etichetta crema e descrizione ash.
 		marker := "  "
 		labelStyle := style.ItemTitle
+		descStyle := style.ItemDesc
 		if i == c.cursor {
 			marker = style.SymCursor + " "
 			labelStyle = style.ItemTitleSel
+			descStyle = style.ItemDescSel
 		}
 		b.WriteString(style.Cursor.Render(marker))
 		b.WriteString(box)
 		b.WriteString(" ")
-		b.WriteString(labelStyle.Render(e.Label))
+		b.WriteString(labelStyle.Width(labelWidth).Render(e.Label))
+		if e.Desc != "" {
+			b.WriteString(descStyle.Render(e.Desc))
+		}
 		b.WriteString("\n")
 	}
 	return b.String()

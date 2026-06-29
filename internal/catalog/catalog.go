@@ -13,10 +13,12 @@ import (
 	"time"
 )
 
-// Entry è una voce di catalogo: l'etichetta mostrata e il valore (cask o file tema).
+// Entry è una voce di catalogo: l'etichetta mostrata, il valore (cask o file
+// tema) e una descrizione breve opzionale.
 type Entry struct {
 	Label string
 	Value string
+	Desc  string
 }
 
 // Nomi dei cataloghi nel repo.
@@ -68,8 +70,9 @@ func isLocalPath(src string) bool {
 		strings.HasPrefix(src, "file://")
 }
 
-// Parse legge righe nel formato "Etichetta|valore", saltando righe vuote e
-// commenti ('#'). Le righe malformate o con campi vuoti vengono ignorate.
+// Parse legge righe nel formato "Etichetta|valore[|descrizione]", saltando
+// righe vuote e commenti ('#'). La descrizione è opzionale. Le righe malformate
+// o con etichetta/valore vuoti vengono ignorate.
 func Parse(r io.Reader) ([]Entry, error) {
 	var out []Entry
 	sc := bufio.NewScanner(r)
@@ -78,15 +81,19 @@ func Parse(r io.Reader) ([]Entry, error) {
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
-		label, value, found := strings.Cut(line, "|")
-		if !found {
+		parts := strings.SplitN(line, "|", 3)
+		if len(parts) < 2 {
 			continue
 		}
-		label, value = strings.TrimSpace(label), strings.TrimSpace(value)
+		label, value := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
 		if label == "" || value == "" {
 			continue
 		}
-		out = append(out, Entry{Label: label, Value: value})
+		var desc string
+		if len(parts) == 3 {
+			desc = strings.TrimSpace(parts[2])
+		}
+		out = append(out, Entry{Label: label, Value: value, Desc: desc})
 	}
 	return out, sc.Err()
 }

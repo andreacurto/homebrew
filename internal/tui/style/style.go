@@ -71,13 +71,13 @@ const RepoURL = "github.com/andreacurto/donkey"
 
 // Header compone l'intestazione comune a tutte le schermate:
 //
-//	🐒 Donkey • <secondo livello> [• <terzo livello>]
+//	🐵 Donkey • <secondo livello> [• <terzo livello>]
 //	github.com/andreacurto/donkey
 //
 // secondStyle veste il secondo livello (slogan nel menù, nome vista altrove);
 // third, se non vuoto, aggiunge un terzo livello breadcrumb sempre in ash.
 func Header(second string, secondStyle lipgloss.Style, third string) string {
-	line := "🐒 " + Logo.Render("Donkey") + Bullet.Render(" • ") + secondStyle.Render(second)
+	line := "🐵 " + Logo.Render("Donkey") + Bullet.Render(" • ") + secondStyle.Render(second)
 	if third != "" {
 		line += Bullet.Render(" • ") + URL.Render(third)
 	}

@@ -172,7 +172,7 @@ func (m Model) welcomeView() string {
 			"vuoi, personalizza il terminale e aggiorna tutto da solo. Tu decidi\n" +
 			"cosa, lui fa tutto il resto."))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐵"))
+	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Invio", Desc: "inizia"},

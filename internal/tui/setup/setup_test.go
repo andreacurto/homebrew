@@ -52,15 +52,31 @@ func TestChecklistToggleAll(t *testing.T) {
 func TestCatalogMsgLoadsApps(t *testing.T) {
 	m := New()
 	m.step = stepApps
-	m.loading = true
+	m.apps.loading = true
 
-	updated, _ := m.Update(catalogMsg{entries: []catalog.Entry{{Label: "Figma", Value: "figma"}}})
+	updated, _ := m.Update(catalogMsg{target: catalog.Apps, entries: []catalog.Entry{{Label: "Figma", Value: "figma"}}})
 	mm := updated.(Model)
 
-	if mm.loading || !mm.appsLoaded {
-		t.Fatal("dopo catalogMsg lo stato dovrebbe essere caricato")
+	if mm.apps.loading || !mm.apps.loaded {
+		t.Fatal("dopo catalogMsg lo stato delle app dovrebbe essere caricato")
 	}
 	if !strings.Contains(mm.View(), "Figma") {
 		t.Error("la view App non mostra l'app caricata")
+	}
+}
+
+func TestCatalogMsgLoadsFonts(t *testing.T) {
+	m := New()
+	m.step = stepFonts
+	m.fonts.loading = true
+
+	updated, _ := m.Update(catalogMsg{target: catalog.Fonts, entries: []catalog.Entry{{Label: "Meslo LG Nerd Font", Value: "font-meslo-lg-nerd-font"}}})
+	mm := updated.(Model)
+
+	if mm.fonts.loading || !mm.fonts.loaded {
+		t.Fatal("dopo catalogMsg lo stato dei font dovrebbe essere caricato")
+	}
+	if !strings.Contains(mm.View(), "Meslo") {
+		t.Error("la view Font non mostra il font caricato")
 	}
 }

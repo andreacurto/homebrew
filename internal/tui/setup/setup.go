@@ -17,37 +17,34 @@ type step int
 const (
 	stepWelcome step = iota
 	stepApps
+	stepFonts
 	stepNext // placeholder: il resto del wizard arriva nei prossimi passi
 )
 
-// catalogMsg trasporta l'esito del download di un catalogo.
+// catalogMsg trasporta l'esito del download di un catalogo, instradato per nome.
 type catalogMsg struct {
+	target  string
 	entries []catalog.Entry
 	err     error
-}
-
-func loadApps() tea.Cmd {
-	return func() tea.Msg {
-		e, err := catalog.Fetch(catalog.Apps)
-		return catalogMsg{entries: e, err: err}
-	}
 }
 
 // Model è lo stato del wizard di setup.
 type Model struct {
 	step        step
 	spin        spinner.Model
-	loading     bool
-	loadErr     error
-	apps        checklist
-	appsLoaded  bool
-	confirmQuit bool // mostra la conferma d'uscita (Esc da qualunque schermata)
+	apps        picker
+	fonts       picker
+	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting    bool
 }
 
 // New crea il modello del wizard.
 func New() Model {
-	return Model{spin: style.NewSpinner()}
+	return Model{
+		spin:  style.NewSpinner(),
+		apps:  newPicker(catalog.Apps, "App", "Scegli le app da installare:"),
+		fonts: newPicker(catalog.Fonts, "Font", "Scegli i font da installare:"),
+	}
 }
 
 // Init avvia lo spinner.
@@ -63,13 +60,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spin, cmd = m.spin.Update(msg)
 		return m, cmd
 	case catalogMsg:
-		m.loading = false
-		if msg.err != nil {
-			m.loadErr = msg.err
-			return m, nil
+		switch msg.target {
+		case catalog.Apps:
+			m.apps.setResult(msg.entries, msg.err)
+		case catalog.Fonts:
+			m.fonts.setResult(msg.entries, msg.err)
 		}
-		m.apps = newChecklist(msg.entries)
-		m.appsLoaded = true
 		return m, nil
 	case tea.KeyMsg:
 		return m.handleKey(msg)
@@ -107,39 +103,29 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case stepWelcome:
 		if k == "enter" {
 			m.step = stepApps
-			if !m.appsLoaded && m.loadErr == nil {
-				m.loading = true
-				return m, loadApps()
-			}
+			return m, m.apps.begin()
 		}
 
 	case stepApps:
-		if m.loading {
-			if k == "esc" {
-				m.step = stepWelcome
-			}
-			return m, nil
-		}
-		switch k {
-		case "up", "k":
-			m.apps.up()
-		case "down", "j":
-			m.apps.down()
-		case " ":
-			m.apps.toggle()
-		case "a", "A":
-			m.apps.toggleAll()
-		case "enter":
-			if m.loadErr == nil {
-				m.step = stepNext
-			}
-		case "esc":
+		switch m.apps.handleKey(k) {
+		case pickNext:
+			m.step = stepFonts
+			return m, m.fonts.begin()
+		case pickBack:
 			m.step = stepWelcome
+		}
+
+	case stepFonts:
+		switch m.fonts.handleKey(k) {
+		case pickNext:
+			m.step = stepNext
+		case pickBack:
+			m.step = stepApps
 		}
 
 	case stepNext:
 		if k == "esc" {
-			m.step = stepApps
+			m.step = stepFonts
 		}
 	}
 	return m, nil
@@ -157,7 +143,9 @@ func (m Model) View() string {
 	case stepWelcome:
 		return m.welcomeView()
 	case stepApps:
-		return m.appsView()
+		return m.apps.view(m.spin)
+	case stepFonts:
+		return m.fonts.view(m.spin)
 	default:
 		return m.nextView()
 	}
@@ -181,55 +169,16 @@ func (m Model) welcomeView() string {
 	return style.Screen.Render(b.String())
 }
 
-func (m Model) appsView() string {
-	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "App"))
-	b.WriteString("\n\n")
-
-	switch {
-	case m.loading:
-		b.WriteString(m.spin.View() + " " + style.ItemDesc.Render("Carico il catalogo…"))
-		b.WriteString("\n\n")
-		b.WriteString(style.Hints(
-			style.FootKey{Key: "Esc", Desc: "indietro"},
-			style.FootKey{Key: "Q", Desc: "esci"},
-		))
-
-	case m.loadErr != nil:
-		b.WriteString(style.Error.Render(style.SymError + " Impossibile caricare il catalogo."))
-		b.WriteString("\n")
-		b.WriteString(style.ItemDesc.Render(m.loadErr.Error()))
-		b.WriteString("\n\n")
-		b.WriteString(style.Hints(
-			style.FootKey{Key: "Esc", Desc: "indietro"},
-			style.FootKey{Key: "Q", Desc: "esci"},
-		))
-
-	default:
-		b.WriteString(style.ItemTitle.Render("Scegli le app da installare:"))
-		b.WriteString("\n\n")
-		b.WriteString(m.apps.view())
-		b.WriteString("\n")
-		b.WriteString(style.Hints(
-			style.FootKey{Key: "↑↓"},
-			style.FootKey{Key: "Spazio", Desc: "seleziona"},
-			style.FootKey{Key: "A", Desc: "seleziona tutto"},
-			style.FootKey{Key: "Invio", Desc: "avanti"},
-			style.FootKey{Key: "Esc", Desc: "indietro"},
-			style.FootKey{Key: "Q", Desc: "esci"},
-		))
-		b.WriteString(style.Footer.Render(fmt.Sprintf("    (%d selezionate)", len(m.apps.chosen()))))
-	}
-	return style.Screen.Render(b.String())
-}
-
 func (m Model) nextView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render(fmt.Sprintf("Hai scelto %d app. 👍", len(m.apps.chosen()))))
+	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
+		"Hai scelto %d app e %d font. 👍",
+		len(m.apps.list.chosen()), len(m.fonts.list.chosen()),
+	)))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Il resto del wizard (font, terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
+	b.WriteString(style.ItemDesc.Render("Il resto del wizard (terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Esc", Desc: "indietro"},

@@ -1,5 +1,6 @@
-# Catalogo font di Donkey — una riga per font, formato "Etichetta|cask|descrizione".
-# La descrizione è opzionale. I Nerd Font servono per i temi del terminale (Oh My Posh).
-Meslo LG Nerd Font|font-meslo-lg-nerd-font|Monospaziato versatile, ottimo per i temi
-Roboto Mono Nerd Font|font-roboto-mono-nerd-font|Pulito e leggibile, in stile Google
-Space Mono Nerd Font|font-space-mono-nerd-font|Monospaziato dal carattere deciso
+# Catalogo font di Donkey — una riga per font, formato "Etichetta|cask".
+# Selezione singola: il font scelto viene applicato al Terminale di sistema.
+# I Nerd Font servono per i temi del terminale (Oh My Posh).
+Meslo LG Nerd Font|font-meslo-lg-nerd-font
+Roboto Mono Nerd Font|font-roboto-mono-nerd-font
+Space Mono Nerd Font|font-space-mono-nerd-font

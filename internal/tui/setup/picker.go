@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -21,20 +20,30 @@ const (
 	pickBack
 )
 
-// picker è una schermata di selezione multipla su un catalogo live (App, Font).
-// Comportamento identico tra i due: lista, spinner di caricamento, errore.
+// listBody è il corpo selezionabile di un picker: multi-scelta (checklist) o
+// singola scelta (radiolist). Gestisce i tasti e disegna lista, footer e riepilogo.
+type listBody interface {
+	handleKey(k string) pickerAction
+	view() string    // righe della lista
+	hints() string   // barra comandi
+	summary() string // testo extra dopo la barra (es. conteggio); "" se assente
+}
+
+// picker è una schermata di selezione su un catalogo live (App, Font).
+// Scaffolding comune (caricamento, errore, header); il corpo è multi o singola scelta.
 type picker struct {
 	catalog string // nome del catalogo (catalog.Apps, catalog.Fonts)
-	crumb   string // terzo livello dell'header (es. "App", "Font")
+	crumb   string // terzo livello dell'header (es. "App", "Font terminale")
 	prompt  string // testo sopra la lista
+	single  bool   // selezione singola (radio) anziché multipla (checkbox)
 	loaded  bool
 	loading bool
 	err     error
-	list    checklist
+	body    listBody
 }
 
-func newPicker(catalogName, crumb, prompt string) picker {
-	return picker{catalog: catalogName, crumb: crumb, prompt: prompt}
+func newPicker(catalogName, crumb, prompt string, single bool) picker {
+	return picker{catalog: catalogName, crumb: crumb, prompt: prompt, single: single}
 }
 
 // load scarica il catalogo associato; il messaggio è instradato per nome catalogo.
@@ -55,41 +64,30 @@ func (p *picker) begin() tea.Cmd {
 	return p.load()
 }
 
-// setResult registra l'esito del download.
+// setResult registra l'esito del download e costruisce il corpo adatto.
 func (p *picker) setResult(entries []catalog.Entry, err error) {
 	p.loading = false
 	p.err = err
-	if err == nil {
-		p.list = newChecklist(entries)
-		p.loaded = true
+	if err != nil {
+		return
 	}
+	if p.single {
+		p.body = newRadiolist(entries)
+	} else {
+		p.body = newChecklist(entries)
+	}
+	p.loaded = true
 }
 
-// handleKey gestisce la navigazione interna alla lista.
+// handleKey delega al corpo, gestendo a parte gli stati di caricamento/errore.
 func (p *picker) handleKey(k string) pickerAction {
-	if p.loading {
+	if p.loading || p.err != nil {
 		if k == "esc" {
 			return pickBack
 		}
 		return pickStay
 	}
-	switch k {
-	case "up", "k":
-		p.list.up()
-	case "down", "j":
-		p.list.down()
-	case " ":
-		p.list.toggle()
-	case "a", "A":
-		p.list.toggleAll()
-	case "enter":
-		if p.err == nil {
-			return pickNext
-		}
-	case "esc":
-		return pickBack
-	}
-	return pickStay
+	return p.body.handleKey(k)
 }
 
 func (p picker) view(spin spinner.Model) string {
@@ -113,19 +111,35 @@ func (p picker) view(spin spinner.Model) string {
 	default:
 		b.WriteString(style.ItemTitle.Render(p.prompt))
 		b.WriteString("\n\n")
-		b.WriteString(p.list.view())
+		b.WriteString(p.body.view())
 		b.WriteString("\n")
-		b.WriteString(style.Hints(
-			style.FootKey{Key: "↑↓"},
-			style.FootKey{Key: "Spazio", Desc: "seleziona"},
-			style.FootKey{Key: "A", Desc: "seleziona tutto"},
-			style.FootKey{Key: "Invio", Desc: "avanti"},
-			style.FootKey{Key: "Esc", Desc: "indietro"},
-			style.FootKey{Key: "Q", Desc: "esci"},
-		))
-		b.WriteString(style.Footer.Render(fmt.Sprintf("    (%d selezionate)", len(p.list.chosen()))))
+		b.WriteString(p.body.hints())
+		b.WriteString(p.body.summary())
 	}
 	return style.Screen.Render(b.String())
+}
+
+// selectedCount: voci selezionate (multi) o 1 se c'è una scelta (single).
+func (p picker) selectedCount() int {
+	switch t := p.body.(type) {
+	case *checklist:
+		return len(t.chosen())
+	case *radiolist:
+		if _, ok := t.selection(); ok {
+			return 1
+		}
+	}
+	return 0
+}
+
+// selectionLabel: etichetta della scelta singola (vuota se non a scelta singola).
+func (p picker) selectionLabel() string {
+	if r, ok := p.body.(*radiolist); ok {
+		if e, ok := r.selection(); ok {
+			return e.Label
+		}
+	}
+	return ""
 }
 
 // backQuitHints è la barra comandi minima delle schermate di caricamento/errore.

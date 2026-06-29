@@ -42,8 +42,8 @@ type Model struct {
 func New() Model {
 	return Model{
 		spin:  style.NewSpinner(),
-		apps:  newPicker(catalog.Apps, "App", "Scegli le app da installare:"),
-		fonts: newPicker(catalog.Fonts, "Font", "Scegli i font da installare:"),
+		apps:  newPicker(catalog.Apps, "App", "Scegli le app da installare:", false),
+		fonts: newPicker(catalog.Fonts, "Font terminale", "Scegli il font per il terminale:", true),
 	}
 }
 
@@ -174,8 +174,8 @@ func (m Model) nextView() string {
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
-		"Hai scelto %d app e %d font. 👍",
-		len(m.apps.list.chosen()), len(m.fonts.list.chosen()),
+		"Hai scelto %d app e il font \"%s\". 👍",
+		m.apps.selectedCount(), m.fonts.selectionLabel(),
 	)))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemDesc.Render("Il resto del wizard (terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))

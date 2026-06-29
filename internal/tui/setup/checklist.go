@@ -1,7 +1,10 @@
 package setup
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/andreacurto/donkey/internal/catalog"
 	"github.com/andreacurto/donkey/internal/tui/style"
@@ -12,10 +15,21 @@ type checklist struct {
 	items    []catalog.Entry
 	cursor   int
 	selected map[int]bool
+	labelW   int // larghezza colonna nomi: si adatta al nome più lungo
 }
 
-func newChecklist(items []catalog.Entry) checklist {
-	return checklist{items: items, selected: make(map[int]bool, len(items))}
+func newChecklist(items []catalog.Entry) *checklist {
+	w := 0
+	for _, e := range items {
+		if l := lipgloss.Width(e.Label); l > w {
+			w = l
+		}
+	}
+	return &checklist{
+		items:    items,
+		selected: make(map[int]bool, len(items)),
+		labelW:   w + 2, // due spazi di respiro prima della descrizione
+	}
 }
 
 func (c *checklist) up() {
@@ -55,8 +69,23 @@ func (c checklist) chosen() []catalog.Entry {
 	return out
 }
 
-// labelWidth allinea le descrizioni: largo quanto l'etichetta più lunga + respiro.
-const labelWidth = 20
+func (c *checklist) handleKey(k string) pickerAction {
+	switch k {
+	case "up", "k":
+		c.up()
+	case "down", "j":
+		c.down()
+	case " ":
+		c.toggle()
+	case "a", "A":
+		c.toggleAll()
+	case "enter":
+		return pickNext
+	case "esc":
+		return pickBack
+	}
+	return pickStay
+}
 
 func (c checklist) view() string {
 	var b strings.Builder
@@ -79,11 +108,26 @@ func (c checklist) view() string {
 		b.WriteString(style.Cursor.Render(marker))
 		b.WriteString(box)
 		b.WriteString(" ")
-		b.WriteString(labelStyle.Width(labelWidth).Render(e.Label))
+		b.WriteString(labelStyle.Width(c.labelW).Render(e.Label))
 		if e.Desc != "" {
 			b.WriteString(descStyle.Render(e.Desc))
 		}
 		b.WriteString("\n")
 	}
 	return b.String()
+}
+
+func (c checklist) hints() string {
+	return style.Hints(
+		style.FootKey{Key: "↑↓"},
+		style.FootKey{Key: "Spazio", Desc: "seleziona"},
+		style.FootKey{Key: "A", Desc: "seleziona tutto"},
+		style.FootKey{Key: "Invio", Desc: "avanti"},
+		style.FootKey{Key: "Esc", Desc: "indietro"},
+		style.FootKey{Key: "Q", Desc: "esci"},
+	)
+}
+
+func (c checklist) summary() string {
+	return style.Footer.Render(fmt.Sprintf("    (%d selezionate)", len(c.chosen())))
 }

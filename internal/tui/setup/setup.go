@@ -88,10 +88,10 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 	// La conferma d'uscita ha la precedenza su tutto.
 	if m.confirmQuit {
 		switch k {
-		case "s", "S":
+		case "enter":
 			m.quitting = true
 			return m, tea.Quit
-		case "n", "N", "esc", "q", "Q":
+		case "esc":
 			m.confirmQuit = false
 		}
 		return m, nil
@@ -242,13 +242,13 @@ func (m Model) confirmView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
-	b.WriteString(style.Alert.Render(style.SymWarning + " Vuoi davvero uscire dal setup?"))
+	b.WriteString(style.Alert.Render(style.SymWarning + " Vuoi davvero uscire?"))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render("Le scelte fatte finora andranno perse."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "S", Desc: "esci"},
-		style.FootKey{Key: "N", Desc: "resta"},
+		style.FootKey{Key: "Invio", Desc: "esci"},
+		style.FootKey{Key: "Esc", Desc: "resta"},
 	))
 	return style.Screen.Render(b.String())
 }

@@ -169,7 +169,7 @@ func (m Model) welcomeView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render(
 		"Donkey si prende cura del tuo Mac in un attimo.\n" +
-			"Installa le app che vuoi, personalizza il terminale e aggiorna tutto da solo.\n" +
+			"Installa le app che vuoi, personalizza il terminale e mantiene tutto aggiornato da solo.\n" +
 			"Tu decidi, lui fa tutto il resto."))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐒"))

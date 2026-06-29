@@ -3,6 +3,7 @@
 package style
 
 import (
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -81,4 +82,32 @@ func Header(second string, secondStyle lipgloss.Style, third string) string {
 		line += Bullet.Render(" • ") + URL.Render(third)
 	}
 	return line + "\n" + URL.Render(RepoURL)
+}
+
+// FootKey è una voce della barra comandi: un tasto con descrizione opzionale.
+// Se Desc è vuota mostra solo il tasto (es. le frecce di navigazione).
+type FootKey struct {
+	Key  string
+	Desc string
+}
+
+var (
+	footKeyStyle = lipgloss.NewStyle().Foreground(Cream) // il tasto risalta
+	footSepStyle = lipgloss.NewStyle().Foreground(Ash)   // descrizione e separatori
+)
+
+// Hints compone la barra comandi in fondo alle schermate. Il tasto risalta,
+// la descrizione (dopo un dash lungo) è muted, i comandi sono divisi da "│":
+//
+//	↑↓  │  Invio — avanti  │  Esc — indietro  │  Q — esci
+func Hints(keys ...FootKey) string {
+	parts := make([]string, 0, len(keys))
+	for _, k := range keys {
+		s := footKeyStyle.Render(k.Key)
+		if k.Desc != "" {
+			s += footSepStyle.Render(" — " + k.Desc)
+		}
+		parts = append(parts, s)
+	}
+	return strings.Join(parts, footSepStyle.Render("  │  "))
 }

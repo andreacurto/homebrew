@@ -17,7 +17,7 @@ func TestMenuViewContainsEntries(t *testing.T) {
 			t.Errorf("la view non contiene la voce %q", e.title)
 		}
 	}
-	if !strings.Contains(view, "Esci") {
+	if !strings.Contains(view, "esci") {
 		t.Error("la view non contiene il footer")
 	}
 }

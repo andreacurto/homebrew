@@ -122,7 +122,13 @@ func (m Model) menuView() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(style.Footer.Render("↑↓ · Invio · U Disinstalla · V Versione · Q Esci"))
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "↑↓"},
+		style.FootKey{Key: "Invio", Desc: "apri"},
+		style.FootKey{Key: "U", Desc: "disinstalla"},
+		style.FootKey{Key: "V", Desc: "versione"},
+		style.FootKey{Key: "Q", Desc: "esci"},
+	))
 	return style.Screen.Render(b.String())
 }
 
@@ -134,6 +140,9 @@ func (m Model) placeholderView() string {
 	b.WriteString(" ")
 	b.WriteString(style.ItemDesc.Render("Questa vista arriverà presto."))
 	b.WriteString("\n\n")
-	b.WriteString(style.Footer.Render("Esc · torna al menù    Q · esci"))
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "Esc", Desc: "torna al menù"},
+		style.FootKey{Key: "Q", Desc: "esci"},
+	))
 	return style.Screen.Render(b.String())
 }

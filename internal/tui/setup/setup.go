@@ -88,24 +88,24 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 	// La conferma d'uscita ha la precedenza su tutto.
 	if m.confirmQuit {
 		switch k {
-		case "s", "S", "y", "enter":
+		case "s", "S":
 			m.quitting = true
 			return m, tea.Quit
-		case "n", "N", "esc":
+		case "n", "N", "esc", "q", "Q":
 			m.confirmQuit = false
 		}
 		return m, nil
 	}
 
-	// Esc apre la conferma d'uscita da qualunque schermata.
-	if k == "esc" {
+	// Q apre la conferma d'uscita da qualunque schermata.
+	if k == "q" || k == "Q" {
 		m.confirmQuit = true
 		return m, nil
 	}
 
 	switch m.step {
 	case stepWelcome:
-		if k == "enter" || k == "right" {
+		if k == "enter" {
 			m.step = stepApps
 			if !m.appsLoaded && m.loadErr == nil {
 				m.loading = true
@@ -115,7 +115,7 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 	case stepApps:
 		if m.loading {
-			if k == "left" {
+			if k == "esc" {
 				m.step = stepWelcome
 			}
 			return m, nil
@@ -129,16 +129,16 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.apps.toggle()
 		case "a", "A":
 			m.apps.toggleAll()
-		case "enter", "right":
+		case "enter":
 			if m.loadErr == nil {
 				m.step = stepNext
 			}
-		case "left":
+		case "esc":
 			m.step = stepWelcome
 		}
 
 	case stepNext:
-		if k == "left" {
+		if k == "esc" {
 			m.step = stepApps
 		}
 	}
@@ -168,22 +168,16 @@ func (m Model) welcomeView() string {
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render(
-		"Donkey allestisce il tuo Mac in un colpo solo: installa le app e i\n" +
-			"font che usi ogni giorno, mette a punto il terminale e tiene tutto\n" +
-			"aggiornato da sé. Tu scegli, al resto pensa lui."))
+		"Donkey si prende cura del tuo Mac in un attimo. Installa le app che\n" +
+			"vuoi, personalizza il terminale e aggiorna tutto da solo. Tu decidi\n" +
+			"cosa, lui fa tutto il resto."))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("In pochi passi configuriamo insieme:"))
+	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐵"))
 	b.WriteString("\n\n")
-	for _, it := range []string{
-		"app e font",
-		"terminale (tema e autocompletamento)",
-		"aggiornamento automatico",
-	} {
-		b.WriteString(style.ItemDesc.Render("  — " + it))
-		b.WriteString("\n")
-	}
-	b.WriteString("\n")
-	b.WriteString(style.Footer.Render("Invio o → · inizia    Esc · esci"))
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "Invio", Desc: "inizia"},
+		style.FootKey{Key: "Q", Desc: "esci"},
+	))
 	return style.Screen.Render(b.String())
 }
 
@@ -196,24 +190,35 @@ func (m Model) appsView() string {
 	case m.loading:
 		b.WriteString(m.spin.View() + " " + style.ItemDesc.Render("Carico il catalogo…"))
 		b.WriteString("\n\n")
-		b.WriteString(style.Footer.Render("← indietro · Esc esci"))
+		b.WriteString(style.Hints(
+			style.FootKey{Key: "Esc", Desc: "indietro"},
+			style.FootKey{Key: "Q", Desc: "esci"},
+		))
 
 	case m.loadErr != nil:
 		b.WriteString(style.Error.Render(style.SymError + " Impossibile caricare il catalogo."))
 		b.WriteString("\n")
 		b.WriteString(style.ItemDesc.Render(m.loadErr.Error()))
 		b.WriteString("\n\n")
-		b.WriteString(style.Footer.Render("← indietro · Esc esci"))
+		b.WriteString(style.Hints(
+			style.FootKey{Key: "Esc", Desc: "indietro"},
+			style.FootKey{Key: "Q", Desc: "esci"},
+		))
 
 	default:
 		b.WriteString(style.ItemDesc.Render("Scegli le app da installare:"))
 		b.WriteString("\n\n")
 		b.WriteString(m.apps.view())
 		b.WriteString("\n")
-		b.WriteString(style.Footer.Render(fmt.Sprintf(
-			"↑↓ muovi · Spazio seleziona · A tutte · → avanti · ← indietro · Esc esci    (%d selezionate)",
-			len(m.apps.chosen()),
-		)))
+		b.WriteString(style.Hints(
+			style.FootKey{Key: "↑↓"},
+			style.FootKey{Key: "Spazio", Desc: "seleziona"},
+			style.FootKey{Key: "A", Desc: "seleziona tutto"},
+			style.FootKey{Key: "Invio", Desc: "avanti"},
+			style.FootKey{Key: "Esc", Desc: "indietro"},
+			style.FootKey{Key: "Q", Desc: "esci"},
+		))
+		b.WriteString(style.Footer.Render(fmt.Sprintf("    (%d selezionate)", len(m.apps.chosen()))))
 	}
 	return style.Screen.Render(b.String())
 }
@@ -226,7 +231,10 @@ func (m Model) nextView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemDesc.Render("Il resto del wizard (font, terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
 	b.WriteString("\n\n")
-	b.WriteString(style.Footer.Render("← indietro · Esc esci"))
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "Esc", Desc: "indietro"},
+		style.FootKey{Key: "Q", Desc: "esci"},
+	))
 	return style.Screen.Render(b.String())
 }
 
@@ -238,6 +246,9 @@ func (m Model) confirmView() string {
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render("Le scelte fatte finora andranno perse."))
 	b.WriteString("\n\n")
-	b.WriteString(style.Footer.Render("S · esci    N o Esc · resta"))
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "S", Desc: "esci"},
+		style.FootKey{Key: "N", Desc: "resta"},
+	))
 	return style.Screen.Render(b.String())
 }

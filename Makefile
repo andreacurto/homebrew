@@ -1,6 +1,6 @@
 BINARY := dk
 
-.PHONY: build run test lint tidy clean
+.PHONY: build run run-setup test lint tidy clean fonts
 
 build: ## compila il binario in bin/
 	go build -o bin/$(BINARY) .
@@ -20,6 +20,9 @@ lint: ## formattazione + analisi statica
 
 tidy: ## sistema le dipendenze del modulo
 	go mod tidy
+
+fonts: ## rigenera config/fonts.list con tutti i Nerd Font (da Homebrew)
+	python3 scripts/gen-fonts.py
 
 clean: ## rimuove gli artefatti di build
 	rm -rf bin

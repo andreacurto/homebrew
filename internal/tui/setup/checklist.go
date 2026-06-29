@@ -87,9 +87,35 @@ func (c *checklist) handleKey(k string) pickerAction {
 	return pickStay
 }
 
+// visibleRows è il numero di voci mostrate a schermo; le altre scorrono.
+const visibleRows = 12
+
+// window calcola la finestra [start, end) di voci visibili attorno al cursore.
+func (c checklist) window() (int, int) {
+	n := len(c.items)
+	if n <= visibleRows {
+		return 0, n
+	}
+	start := c.cursor - visibleRows/2
+	if start < 0 {
+		start = 0
+	}
+	if start > n-visibleRows {
+		start = n - visibleRows
+	}
+	return start, start + visibleRows
+}
+
 func (c checklist) view() string {
 	var b strings.Builder
-	for i, e := range c.items {
+	start, end := c.window()
+
+	if start > 0 {
+		b.WriteString(style.ItemDesc.Render(fmt.Sprintf("  ↑ altri %d sopra", start)))
+		b.WriteString("\n")
+	}
+	for i := start; i < end; i++ {
+		e := c.items[i]
 		// Checkbox: ■ (selezionata, coral) / □ (no, ash).
 		box := style.ItemDesc.Render(style.SymCheckOff)
 		if c.selected[i] {
@@ -112,6 +138,10 @@ func (c checklist) view() string {
 		if e.Desc != "" {
 			b.WriteString(descStyle.Render(e.Desc))
 		}
+		b.WriteString("\n")
+	}
+	if end < len(c.items) {
+		b.WriteString(style.ItemDesc.Render(fmt.Sprintf("  ↓ altri %d sotto", len(c.items)-end)))
 		b.WriteString("\n")
 	}
 	return b.String()

@@ -1,6 +1,74 @@
-# Catalogo font di Donkey — una riga per font, formato "Etichetta|cask".
-# Selezione singola: il font scelto viene applicato al Terminale di sistema.
-# I Nerd Font servono per i temi del terminale (Oh My Posh).
-Meslo LG Nerd Font|font-meslo-lg-nerd-font
-Roboto Mono Nerd Font|font-roboto-mono-nerd-font
-Space Mono Nerd Font|font-space-mono-nerd-font
+# Catalogo font di Donkey — GENERATO da scripts/gen-fonts.py.
+# NON modificare a mano: rigenera con 'make fonts'.
+# Tutti i Nerd Font come cask Homebrew, formato "Etichetta|cask".
+0xProto|font-0xproto-nerd-font
+3270|font-3270-nerd-font
+AdwaitaMono|font-adwaita-mono-nerd-font
+Agave|font-agave-nerd-font
+AnonymicePro|font-anonymice-nerd-font
+Arimo|font-arimo-nerd-font
+AtkynsonMono|font-atkynson-mono-nerd-font
+AurulentSansM|font-aurulent-sans-mono-nerd-font
+BigBlueTerm|font-bigblue-terminal-nerd-font
+BitstromWera|font-bitstream-vera-sans-mono-nerd-font
+BlexMono|font-blex-mono-nerd-font
+CaskaydiaCove|font-caskaydia-cove-nerd-font
+CaskaydiaMono|font-caskaydia-mono-nerd-font
+CodeNewRoman|font-code-new-roman-nerd-font
+ComicShannsMono|font-comic-shanns-mono-nerd-font
+CommitMono|font-commit-mono-nerd-font
+Cousine|font-cousine-nerd-font
+D2CodingLigature|font-d2coding-nerd-font
+DaddyTimeMono|font-daddy-time-mono-nerd-font
+DejaVuSansM|font-dejavu-sans-mono-nerd-font
+DepartureMono|font-departure-mono-nerd-font
+DroidSansM|font-droid-sans-mono-nerd-font
+EnvyCodeR|font-envy-code-r-nerd-font
+FantasqueSansM|font-fantasque-sans-mono-nerd-font
+FiraCode|font-fira-code-nerd-font
+FiraMono|font-fira-mono-nerd-font
+GeistMono|font-geist-mono-nerd-font
+GohuFont|font-gohufont-nerd-font
+GoMono|font-go-mono-nerd-font
+Hack|font-hack-nerd-font
+Hasklug|font-hasklug-nerd-font
+HeavyData|font-heavy-data-nerd-font
+Hurmit|font-hurmit-nerd-font
+IMWriting|font-im-writing-nerd-font
+Inconsolata|font-inconsolata-nerd-font
+Inconsolata LGC|font-inconsolata-lgc-nerd-font
+InconsolataGo|font-inconsolata-go-nerd-font
+IntoneMono|font-intone-mono-nerd-font
+Iosevka|font-iosevka-nerd-font
+IosevkaTerm|font-iosevka-term-nerd-font
+IosevkaTermSlab|font-iosevka-term-slab-nerd-font
+JetBrainsMono|font-jetbrains-mono-nerd-font
+Lekton|font-lekton-nerd-font
+Lilex|font-lilex-nerd-font
+Literation|font-liberation-nerd-font
+M+|font-m+-nerd-font
+MartianMono|font-martian-mono-nerd-font
+MesloLG|font-meslo-lg-nerd-font
+Monaspice|font-monaspice-nerd-font
+Monocraft with Nerd glyphs|font-monocraft-nerd-font
+Monofur|font-monofur-nerd-font
+Monoid|font-monoid-nerd-font
+Mononoki|font-mononoki-nerd-font
+Noto|font-noto-nerd-font
+OpenDyslexic|font-opendyslexic-nerd-font
+Overpass|font-overpass-nerd-font
+ProFont|font-profont-nerd-font
+ProggyClean|font-proggy-clean-tt-nerd-font
+RecMono|font-recursive-mono-nerd-font
+RobotoMono|font-roboto-mono-nerd-font
+SauceCodePro|font-sauce-code-pro-nerd-font
+ShureTechMono|font-shure-tech-mono-nerd-font
+SpaceMono|font-space-mono-nerd-font
+Symbols|font-symbols-only-nerd-font
+Terminess|font-terminess-ttf-nerd-font
+Tinos|font-tinos-nerd-font
+Ubuntu|font-ubuntu-nerd-font
+UbuntuMono|font-ubuntu-mono-nerd-font
+UbuntuSans|font-ubuntu-sans-nerd-font
+VictorMono|font-victor-mono-nerd-font
+ZedMono|font-zed-mono-nerd-font

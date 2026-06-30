@@ -81,17 +81,15 @@ func TestSuggestToggle(t *testing.T) {
 	}
 }
 
-func TestAutoUpdateRows(t *testing.T) {
-	a := newAutoUpdate()
-	if !a.enabled || !a.weekly || !a.upgrade || !a.cleanup {
-		t.Fatal("default auto-update non corretti")
+func TestAutoToggle(t *testing.T) {
+	m := New()
+	if !m.auto {
+		t.Fatal("l'aggiornamento automatico dovrebbe essere attivo di default")
 	}
-	if a.rowCount() != 6 {
-		t.Fatalf("con master attivo rowCount = %d, atteso 6", a.rowCount())
-	}
-	a.change() // master off (cursor 0)
-	if a.enabled || a.rowCount() != 1 {
-		t.Fatalf("disattivando il master rowCount = %d, atteso 1", a.rowCount())
+	m.step = stepAuto
+	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeySpace})
+	if updated.(Model).auto {
+		t.Error("dopo Seleziona l'aggiornamento automatico dovrebbe essere disattivato")
 	}
 }
 

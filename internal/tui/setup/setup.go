@@ -39,7 +39,7 @@ type Model struct {
 	fonts       picker
 	theme       picker
 	suggest     bool // zsh-autosuggestions attivi (toggle dello step Terminale)
-	auto        autoUpdate
+	auto        bool // aggiornamento automatico in background (homebrew-autoupdate)
 	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting    bool
 }
@@ -55,11 +55,9 @@ func New() Model {
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
-	m.theme.desc = "Un tema di Oh My Posh dà stile al prompt del terminale: colori, icone\n" +
-		"e informazioni utili (cartella, branch git, stato). Dopo l'installazione\n" +
-		"il prompt avrà l'aspetto del tema che scegli qui."
+	m.theme.desc = "Un tema di Oh My Posh dà stile al tuo terminale: colori, icone e informazioni utili."
 	m.suggest = true // suggerimenti consigliati di default
-	m.auto = newAutoUpdate()
+	m.auto = true    // aggiornamento automatico consigliato di default
 	return m
 }
 
@@ -172,10 +170,12 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	case stepAuto:
-		switch m.auto.handleKey(k) {
-		case pickNext:
+		switch k {
+		case "left", "right", "h", "l", " ":
+			m.auto = !m.auto
+		case "enter":
 			m.step = stepNext
-		case pickBack:
+		case "esc":
 			m.step = stepSuggest
 		}
 
@@ -243,50 +243,46 @@ func (m Model) suggestView() string {
 			"premere la freccia a destra della tastiera."))
 	b.WriteString("\n\n")
 
-	yes, no := style.SymOff+" Sì", style.SymOff+" No"
-	if m.suggest {
-		yes = style.ItemTitleSel.Render(style.SymOn + " Sì")
-		no = style.ItemDesc.Render(no)
-	} else {
-		yes = style.ItemDesc.Render(yes)
-		no = style.ItemTitleSel.Render(style.SymOn + " No")
-	}
-	b.WriteString("  " + yes + "        " + no)
+	b.WriteString("  " + yesNoToggle(m.suggest))
 	b.WriteString("\n\n")
-	b.WriteString(style.Hints(
-		style.FootKey{Key: "← →", Desc: "Scegli"},
-		style.FootKey{Key: "Invio", Desc: "Avanti"},
-		style.FootKey{Key: "Esc", Desc: "Indietro"},
-		style.FootKey{Key: "Q", Desc: "Esci"},
-	))
+	b.WriteString(toggleHints())
 	return style.Screen.Render(b.String())
 }
 
 func (m Model) autoView() string {
 	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "Aggiornamenti"))
+	b.WriteString(style.Header("Setup", style.Heading, "Aggiornamenti automatici"))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render("Vuoi che Donkey tenga aggiornato tutto in automatico?"))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render(
-		"Homebrew controlla e installa gli aggiornamenti in background,\n" +
-			"senza che tu debba lanciare niente a mano."))
+		"Donkey una volta alla settimana, se il Mac è collegato alla\n" +
+			"corrente, controlla e installa automaticamente gli aggiornamenti\n" +
+			"delle app. Esegue anche la pulizia del sistema e tiene tutto in\n" +
+			"ordine senza che tu debba preoccupartene."))
 	b.WriteString("\n\n")
-	b.WriteString(m.auto.view())
+	b.WriteString("  " + yesNoToggle(m.auto))
 	b.WriteString("\n\n")
+	b.WriteString(toggleHints())
+	return style.Screen.Render(b.String())
+}
 
-	keys := []style.FootKey{}
-	if m.auto.rowCount() > 1 {
-		keys = append(keys, style.FootKey{Key: "↑ ↓"})
+// yesNoToggle disegna l'interruttore "● Sì   ○ No" con l'opzione attiva in coral.
+func yesNoToggle(yes bool) string {
+	if yes {
+		return style.ItemTitleSel.Render(style.SymOn+" Sì") + "        " + style.ItemDesc.Render(style.SymOff+" No")
 	}
-	keys = append(keys,
-		style.FootKey{Key: "← →", Desc: "Scegli"},
+	return style.ItemDesc.Render(style.SymOff+" Sì") + "        " + style.ItemTitleSel.Render(style.SymOn+" No")
+}
+
+// toggleHints è la barra comandi delle schermate a interruttore (Suggerimenti, Aggiornamenti).
+func toggleHints() string {
+	return style.Hints(
+		style.FootKey{Key: "Spazio", Desc: "Seleziona"},
 		style.FootKey{Key: "Invio", Desc: "Avanti"},
 		style.FootKey{Key: "Esc", Desc: "Indietro"},
 		style.FootKey{Key: "Q", Desc: "Esci"},
 	)
-	b.WriteString(style.Hints(keys...))
-	return style.Screen.Render(b.String())
 }
 
 func (m Model) nextView() string {
@@ -302,12 +298,8 @@ func (m Model) nextView() string {
 		sugg = "attivi"
 	}
 	au := "disattivato"
-	if m.auto.enabled {
-		freq := "1 settimana"
-		if !m.auto.weekly {
-			freq = "1 giorno"
-		}
-		au = "attivo (" + freq + ")"
+	if m.auto {
+		au = "attivo (1 volta a settimana)"
 	}
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
 		"Hai scelto %d app, %d font e %s. 👍",

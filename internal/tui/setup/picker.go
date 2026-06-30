@@ -222,6 +222,17 @@ func (p picker) selectedCount() int {
 	return n
 }
 
+// chosenLabels: etichette delle voci selezionate, nell'ordine della lista.
+func (p picker) chosenLabels() []string {
+	var out []string
+	for _, item := range p.list.Items() {
+		if it, ok := item.(entryItem); ok && p.selected[it.e.Value] {
+			out = append(out, it.e.Label)
+		}
+	}
+	return out
+}
+
 // selectionLabel: etichetta della voce sotto il cursore (per la scelta singola).
 func (p picker) selectionLabel() string {
 	if it, ok := p.list.SelectedItem().(entryItem); ok {

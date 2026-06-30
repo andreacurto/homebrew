@@ -2,7 +2,6 @@
 package setup
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -21,7 +20,8 @@ const (
 	stepTheme
 	stepSuggest
 	stepAuto
-	stepNext // placeholder: il resto del wizard arriva nei prossimi passi
+	stepSummary
+	stepInstall // placeholder: l'installazione vera arriva nel prossimo passo
 )
 
 // catalogMsg trasporta l'esito del download di un catalogo, instradato per nome.
@@ -174,14 +174,22 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "left", "right", "h", "l", " ":
 			m.auto = !m.auto
 		case "enter":
-			m.step = stepNext
+			m.step = stepSummary
 		case "esc":
 			m.step = stepSuggest
 		}
 
-	case stepNext:
-		if k == "esc" {
+	case stepSummary:
+		switch k {
+		case "enter":
+			m.step = stepInstall
+		case "esc":
 			m.step = stepAuto
+		}
+
+	case stepInstall:
+		if k == "esc" {
+			m.step = stepSummary
 		}
 	}
 	return m, nil
@@ -208,8 +216,10 @@ func (m Model) View() string {
 		return m.suggestView()
 	case stepAuto:
 		return m.autoView()
+	case stepSummary:
+		return m.summaryView()
 	default:
-		return m.nextView()
+		return m.installView()
 	}
 }
 
@@ -285,32 +295,15 @@ func toggleHints() string {
 	)
 }
 
-func (m Model) nextView() string {
+func (m Model) installView() string {
 	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, ""))
+	b.WriteString(style.Header("Setup", style.Heading, "Installazione"))
 	b.WriteString("\n\n")
-	themePart := "nessun tema"
-	if m.theme.selectionValue() != "" {
-		themePart = fmt.Sprintf("il tema \"%s\"", m.theme.selectionLabel())
-	}
-	sugg := "disattivati"
-	if m.suggest {
-		sugg = "attivi"
-	}
-	au := "disattivato"
-	if m.auto {
-		au = "attivo (1 volta a settimana)"
-	}
-	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
-		"Hai scelto %d app, %d font e %s. 👍",
-		m.apps.selectedCount(), m.fonts.selectedCount(), themePart,
-	)))
-	b.WriteString("\n")
-	b.WriteString(style.ItemDesc.Render(fmt.Sprintf("Suggerimenti automatici: %s.", sugg)))
-	b.WriteString("\n")
-	b.WriteString(style.ItemDesc.Render(fmt.Sprintf("Aggiornamento automatico: %s.", au)))
+	b.WriteString(style.ItemTitle.Render("Qui Donkey installerà tutto. 🐵"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Il resto del wizard (riepilogo, installazione)\narriva nei prossimi passi."))
+	b.WriteString(style.ItemDesc.Render(
+		"Lo step di installazione vero arriva nel prossimo passo:\n" +
+			"Homebrew, app, font, tema, suggerimenti e auto-update."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Esc", Desc: "Indietro"},

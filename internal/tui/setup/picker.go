@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -25,7 +24,7 @@ const (
 )
 
 // picker è una schermata di selezione su un catalogo live (App, Font, temi).
-// Si appoggia a bubbles/list per impaginazione, scorrimento e help.
+// Si appoggia a bubbles/list per voci e paginazione; il footer lo disegna Donkey.
 type picker struct {
 	catalog string // nome del catalogo (catalog.Apps, catalog.Fonts)
 	crumb   string // terzo livello dell'header (es. "App", "Font terminale")
@@ -69,9 +68,7 @@ func (p *picker) begin() tea.Cmd {
 
 func (p *picker) setSize(w, h int) {
 	p.width, p.height = w, h
-	if p.loaded {
-		p.list.SetSize(p.listW(), p.listH())
-	}
+	p.resize()
 }
 
 func (p picker) listW() int {
@@ -81,12 +78,29 @@ func (p picker) listW() int {
 	return 20
 }
 
-func (p picker) listH() int {
-	// Spazio per header, prompt, note e respiro attorno alla lista.
-	if h := p.height - 9; h > 4 {
-		return h
+// availableRows è lo spazio verticale per la lista (tolti header, prompt, footer…).
+func (p picker) availableRows() int {
+	if r := p.height - 11; r > 4 {
+		return r
 	}
 	return 4
+}
+
+// resize adatta la lista al contenuto: se le voci ci stanno tutte, niente
+// paginazione e altezza pari alle voci (così il footer non resta lontano);
+// altrimenti paginazione e altezza piena.
+func (p *picker) resize() {
+	if !p.loaded {
+		return
+	}
+	n := len(p.list.Items())
+	if avail := p.availableRows(); n <= avail {
+		p.list.SetShowPagination(false)
+		p.list.SetSize(p.listW(), max(n, 1))
+	} else {
+		p.list.SetShowPagination(true)
+		p.list.SetSize(p.listW(), avail)
+	}
 }
 
 // setResult registra l'esito del download e costruisce la lista bubbles.
@@ -107,38 +121,20 @@ func (p *picker) setResult(entries []catalog.Entry, err error) {
 	}
 	p.selected = make(map[string]bool, len(entries))
 
-	l := list.New(items, delegate{single: p.single, selected: p.selected, labelW: w + 2}, p.listW(), p.listH())
+	l := list.New(items, delegate{single: p.single, selected: p.selected, labelW: w + 2}, p.listW(), p.availableRows())
 	l.SetShowTitle(false)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.DisableQuitKeybindings()
-	l.SetShowHelp(true)
-	l.AdditionalShortHelpKeys = p.extraKeys
-	l.AdditionalFullHelpKeys = p.extraKeys
 	styleList(&l)
 
 	p.list = l
 	p.loaded = true
-}
-
-// extraKeys sono le scorciatoie specifiche di Donkey mostrate nell'help della lista.
-func (p picker) extraKeys() []key.Binding {
-	var ks []key.Binding
-	if !p.single {
-		ks = append(ks,
-			key.NewBinding(key.WithKeys(" "), key.WithHelp("spazio", "seleziona")),
-			key.NewBinding(key.WithKeys("a"), key.WithHelp("a", "tutte")),
-		)
-	}
-	return append(ks,
-		key.NewBinding(key.WithKeys("enter"), key.WithHelp("invio", "avanti")),
-		key.NewBinding(key.WithKeys("esc"), key.WithHelp("esc", "indietro")),
-		key.NewBinding(key.WithKeys("q"), key.WithHelp("q", "esci")),
-	)
+	p.resize()
 }
 
 // update gestisce l'input: intercetta le azioni Donkey, inoltra il resto alla
-// lista bubbles (navigazione, pagine, toggle help con "?").
+// lista bubbles (navigazione, pagine).
 func (p *picker) update(msg tea.Msg) (tea.Cmd, pickerAction) {
 	if p.loading || p.err != nil {
 		if k, ok := msg.(tea.KeyMsg); ok && k.String() == "esc" {
@@ -245,41 +241,49 @@ func (p picker) view(spin spinner.Model) string {
 			b.WriteString("\n")
 		}
 		b.WriteString("\n")
-		b.WriteString(p.list.View())
+		b.WriteString(strings.TrimRight(p.list.View(), "\n"))
+		b.WriteString("\n\n")
+		b.WriteString(p.footer())
 	}
 	return style.Screen.Render(b.String())
+}
+
+// footer compone la barra comandi nello stile Donkey. Le voci inutili (frecce
+// pagina su lista a pagina singola, seleziona su single) vengono omesse.
+func (p picker) footer() string {
+	keys := []style.FootKey{{Key: "↑ ↓"}}
+	if p.list.Paginator.TotalPages > 1 {
+		keys = append(keys, style.FootKey{Key: "← →", Desc: "Naviga pagine"})
+	}
+	if !p.single {
+		keys = append(keys,
+			style.FootKey{Key: "Spazio", Desc: "Seleziona"},
+			style.FootKey{Key: "A", Desc: "Seleziona tutto"},
+		)
+	}
+	keys = append(keys,
+		style.FootKey{Key: "Invio", Desc: "Avanti"},
+		style.FootKey{Key: "Esc", Desc: "Indietro"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
+	)
+	return style.Hints(keys...)
 }
 
 // backQuitHints è la barra comandi minima delle schermate di caricamento/errore.
 func backQuitHints() string {
 	return style.Hints(
-		style.FootKey{Key: "Esc", Desc: "indietro"},
-		style.FootKey{Key: "Q", Desc: "esci"},
+		style.FootKey{Key: "Esc", Desc: "Indietro"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
 	)
 }
 
-// styleList applica la palette Donkey e l'help in italiano alla lista bubbles.
+// styleList applica la palette Donkey alla lista: paginazione spaziata
+// (cheddar attiva, ash le altre) e help integrato spento (lo disegna Donkey).
 func styleList(l *list.Model) {
+	l.SetShowHelp(false)
 	l.Styles.PaginationStyle = lipgloss.NewStyle().PaddingLeft(2)
-	l.Styles.HelpStyle = lipgloss.NewStyle().PaddingLeft(2).PaddingTop(1)
-	l.Paginator.ActiveDot = lipgloss.NewStyle().Foreground(style.Coral).Render("●")
-	l.Paginator.InactiveDot = lipgloss.NewStyle().Foreground(style.Ash).Render("○")
-
-	hs := &l.Help.Styles
-	hs.ShortKey = lipgloss.NewStyle().Foreground(style.Cream)
-	hs.ShortDesc = lipgloss.NewStyle().Foreground(style.Ash)
-	hs.ShortSeparator = lipgloss.NewStyle().Foreground(style.Ash)
-	hs.FullKey = hs.ShortKey
-	hs.FullDesc = hs.ShortDesc
-	hs.FullSeparator = hs.ShortSeparator
-	hs.Ellipsis = lipgloss.NewStyle().Foreground(style.Ash)
-
-	l.KeyMap.CursorUp.SetHelp("↑", "su")
-	l.KeyMap.CursorDown.SetHelp("↓", "giù")
-	l.KeyMap.NextPage.SetHelp("→", "pagina")
-	l.KeyMap.PrevPage.SetHelp("←", "pagina")
-	l.KeyMap.GoToStart.SetHelp("g", "inizio")
-	l.KeyMap.GoToEnd.SetHelp("G", "fine")
-	l.KeyMap.ShowFullHelp.SetHelp("?", "più")
-	l.KeyMap.CloseFullHelp.SetHelp("?", "meno")
+	l.Paginator.ActiveDot = lipgloss.NewStyle().Foreground(style.Cheddar).Render("●") + " "
+	l.Paginator.InactiveDot = lipgloss.NewStyle().Foreground(style.Ash).Render("●") + " "
+	l.KeyMap.GoToStart.SetEnabled(false)
+	l.KeyMap.GoToEnd.SetEnabled(false)
 }

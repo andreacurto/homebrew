@@ -172,8 +172,8 @@ func (m Model) welcomeView() string {
 	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Invio", Desc: "inizia"},
-		style.FootKey{Key: "Q", Desc: "esci"},
+		style.FootKey{Key: "Invio", Desc: "Inizia"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
 	))
 	return style.Screen.Render(b.String())
 }
@@ -190,8 +190,8 @@ func (m Model) nextView() string {
 	b.WriteString(style.ItemDesc.Render("Il resto del wizard (terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Esc", Desc: "indietro"},
-		style.FootKey{Key: "Q", Desc: "esci"},
+		style.FootKey{Key: "Esc", Desc: "Indietro"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
 	))
 	return style.Screen.Render(b.String())
 }
@@ -205,8 +205,8 @@ func (m Model) confirmView() string {
 	b.WriteString(style.ItemDesc.Render("Le scelte fatte finora andranno perse."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Invio", Desc: "esci"},
-		style.FootKey{Key: "Esc", Desc: "resta"},
+		style.FootKey{Key: "Invio", Desc: "Esci"},
+		style.FootKey{Key: "Esc", Desc: "Resta"},
 	))
 	return style.Screen.Render(b.String())
 }

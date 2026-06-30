@@ -47,15 +47,6 @@ func newPicker(catalogName, crumb, prompt, note string, single bool) picker {
 	return picker{catalog: catalogName, crumb: crumb, prompt: prompt, note: note, single: single}
 }
 
-// typing indica se il corpo sta ricevendo testo (ricerca attiva): in tal caso
-// l'orchestratore non deve intercettare scorciatoie come Q.
-func (p picker) typing() bool {
-	if c, ok := p.body.(*checklist); ok {
-		return c.searchFocus
-	}
-	return false
-}
-
 // load scarica il catalogo associato; il messaggio è instradato per nome catalogo.
 func (p picker) load() tea.Cmd {
 	name := p.catalog

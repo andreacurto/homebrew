@@ -94,13 +94,8 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	// Mentre l'utente digita nella ricerca, le scorciatoie a tasto singolo (Q)
-	// non vanno intercettate: il testo deve arrivare al filtro.
-	typing := (m.step == stepApps && m.apps.typing()) ||
-		(m.step == stepFonts && m.fonts.typing())
-
 	// Q apre la conferma d'uscita da qualunque schermata.
-	if !typing && (k == "q" || k == "Q") {
+	if k == "q" || k == "Q" {
 		m.confirmQuit = true
 		return m, nil
 	}

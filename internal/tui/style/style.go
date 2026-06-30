@@ -30,7 +30,6 @@ const (
 	SymOn       = "●"
 	SymOff      = "○"
 	SymWarning  = "▲"
-	SymSearch   = "" //  lente (glifo Nerd Font)
 )
 
 // Assegnazione semantica: ruolo nella TUI → colore della palette.
@@ -50,14 +49,13 @@ var (
 	Cursor = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	Footer = lipgloss.NewStyle().Foreground(Ash)
 
-	// Campo di ricerca: box stile input col bordo sempre ash. A riposo il
-	// contenuto è ash (placeholder); col focus il testo digitato è bianco.
-	SearchBox  = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(Ash).Padding(0, 1).Width(56)
-	SearchText = lipgloss.NewStyle().Foreground(Cream)
-	SearchHint = lipgloss.NewStyle().Foreground(Ash)
-	Alert      = lipgloss.NewStyle().Foreground(Cheddar)
-	Error      = lipgloss.NewStyle().Foreground(Coral)
-	Screen     = lipgloss.NewStyle().Padding(1, 2)
+	// Scrollbar laterale delle liste lunghe: binario ash, cursore bianco.
+	ScrollTrack = lipgloss.NewStyle().Foreground(Ash)
+	ScrollThumb = lipgloss.NewStyle().Foreground(Cream)
+
+	Alert  = lipgloss.NewStyle().Foreground(Cheddar)
+	Error  = lipgloss.NewStyle().Foreground(Coral)
+	Screen = lipgloss.NewStyle().Padding(1, 2)
 )
 
 // MonkeySpinner è lo spinner brandizzato: tre scimmiette + la faccia.

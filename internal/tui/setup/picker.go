@@ -51,7 +51,7 @@ func newPicker(catalogName, crumb, prompt, note string, single bool) picker {
 // l'orchestratore non deve intercettare scorciatoie come Q.
 func (p picker) typing() bool {
 	if c, ok := p.body.(*checklist); ok {
-		return c.filtering
+		return c.searchFocus
 	}
 	return false
 }

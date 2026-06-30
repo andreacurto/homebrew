@@ -1,74 +1,73 @@
-# Catalogo font di Donkey — GENERATO da scripts/gen-fonts.py.
-# NON modificare a mano: rigenera con 'make fonts'.
-# Tutti i Nerd Font come cask Homebrew, formato "Etichetta|cask".
+# Catalogo di Donkey — GENERATO da scripts/gen-catalog.py, NON modificare a mano.
+# Tutti i Nerd Font come cask Homebrew. Rigenera con: make update-fonts
 0xProto|font-0xproto-nerd-font
-3270|font-3270-nerd-font
-AdwaitaMono|font-adwaita-mono-nerd-font
+Adwaita Mono|font-adwaita-mono-nerd-font
 Agave|font-agave-nerd-font
-AnonymicePro|font-anonymice-nerd-font
+Anonymous Pro|font-anonymice-nerd-font
 Arimo|font-arimo-nerd-font
-AtkynsonMono|font-atkynson-mono-nerd-font
-AurulentSansM|font-aurulent-sans-mono-nerd-font
-BigBlueTerm|font-bigblue-terminal-nerd-font
-BitstromWera|font-bitstream-vera-sans-mono-nerd-font
-BlexMono|font-blex-mono-nerd-font
-CaskaydiaCove|font-caskaydia-cove-nerd-font
-CaskaydiaMono|font-caskaydia-mono-nerd-font
-CodeNewRoman|font-code-new-roman-nerd-font
-ComicShannsMono|font-comic-shanns-mono-nerd-font
-CommitMono|font-commit-mono-nerd-font
+Atkinson Hyperlegible Mono|font-atkynson-mono-nerd-font
+Aurulent Sans Mono|font-aurulent-sans-mono-nerd-font
+BigBlue Terminal|font-bigblue-terminal-nerd-font
+Bitstream Vera Sans Mono|font-bitstream-vera-sans-mono-nerd-font
+Cascadia Code|font-caskaydia-cove-nerd-font
+Cascadia Mono|font-caskaydia-mono-nerd-font
+Code New Roman|font-code-new-roman-nerd-font
+Comic Shanns Mono|font-comic-shanns-mono-nerd-font
+Commit Mono|font-commit-mono-nerd-font
 Cousine|font-cousine-nerd-font
-D2CodingLigature|font-d2coding-nerd-font
+D2Coding|font-d2coding-nerd-font
 DaddyTimeMono|font-daddy-time-mono-nerd-font
-DejaVuSansM|font-dejavu-sans-mono-nerd-font
-DepartureMono|font-departure-mono-nerd-font
-DroidSansM|font-droid-sans-mono-nerd-font
-EnvyCodeR|font-envy-code-r-nerd-font
-FantasqueSansM|font-fantasque-sans-mono-nerd-font
-FiraCode|font-fira-code-nerd-font
-FiraMono|font-fira-mono-nerd-font
-GeistMono|font-geist-mono-nerd-font
-GohuFont|font-gohufont-nerd-font
-GoMono|font-go-mono-nerd-font
+DejaVu Sans Mono|font-dejavu-sans-mono-nerd-font
+Departure Mono|font-departure-mono-nerd-font
+Droid Sans Mono|font-droid-sans-mono-nerd-font
+Envy Code R|font-envy-code-r-nerd-font
+Fantasque Sans Mono|font-fantasque-sans-mono-nerd-font
+Fira|font-fira-mono-nerd-font
+Fira Code|font-fira-code-nerd-font
+Geist Mono|font-geist-mono-nerd-font
+Go Mono|font-go-mono-nerd-font
+Gohu|font-gohufont-nerd-font
 Hack|font-hack-nerd-font
-Hasklug|font-hasklug-nerd-font
-HeavyData|font-heavy-data-nerd-font
-Hurmit|font-hurmit-nerd-font
-IMWriting|font-im-writing-nerd-font
+Hasklig|font-hasklug-nerd-font
+Heavy Data|font-heavy-data-nerd-font
+Hermit|font-hurmit-nerd-font
+iA Writer|font-im-writing-nerd-font
+IBM 3270|font-3270-nerd-font
+IBM Plex Mono|font-blex-mono-nerd-font
 Inconsolata|font-inconsolata-nerd-font
 Inconsolata LGC|font-inconsolata-lgc-nerd-font
 InconsolataGo|font-inconsolata-go-nerd-font
-IntoneMono|font-intone-mono-nerd-font
+Intel One Mono|font-intone-mono-nerd-font
 Iosevka|font-iosevka-nerd-font
-IosevkaTerm|font-iosevka-term-nerd-font
-IosevkaTermSlab|font-iosevka-term-slab-nerd-font
-JetBrainsMono|font-jetbrains-mono-nerd-font
+Iosevka Term|font-iosevka-term-nerd-font
+Iosevka Term Slab|font-iosevka-term-slab-nerd-font
+JetBrains Mono|font-jetbrains-mono-nerd-font
 Lekton|font-lekton-nerd-font
+Liberation Mono|font-liberation-nerd-font
 Lilex|font-lilex-nerd-font
-Literation|font-liberation-nerd-font
-M+|font-m+-nerd-font
 MartianMono|font-martian-mono-nerd-font
-MesloLG|font-meslo-lg-nerd-font
-Monaspice|font-monaspice-nerd-font
+Meslo LG|font-meslo-lg-nerd-font
+Monaspace|font-monaspice-nerd-font
 Monocraft with Nerd glyphs|font-monocraft-nerd-font
 Monofur|font-monofur-nerd-font
 Monoid|font-monoid-nerd-font
 Mononoki|font-mononoki-nerd-font
+MPlus|font-m+-nerd-font
 Noto|font-noto-nerd-font
 OpenDyslexic|font-opendyslexic-nerd-font
 Overpass|font-overpass-nerd-font
 ProFont|font-profont-nerd-font
-ProggyClean|font-proggy-clean-tt-nerd-font
-RecMono|font-recursive-mono-nerd-font
-RobotoMono|font-roboto-mono-nerd-font
-SauceCodePro|font-sauce-code-pro-nerd-font
-ShureTechMono|font-shure-tech-mono-nerd-font
-SpaceMono|font-space-mono-nerd-font
-Symbols|font-symbols-only-nerd-font
-Terminess|font-terminess-ttf-nerd-font
+ProggyCleanTT|font-proggy-clean-tt-nerd-font
+Recursive Mono|font-recursive-mono-nerd-font
+Roboto Mono|font-roboto-mono-nerd-font
+Share Tech Mono|font-shure-tech-mono-nerd-font
+Source Code Pro|font-sauce-code-pro-nerd-font
+Space Mono|font-space-mono-nerd-font
+Symbols Only|font-symbols-only-nerd-font
+Terminus|font-terminess-ttf-nerd-font
 Tinos|font-tinos-nerd-font
 Ubuntu|font-ubuntu-nerd-font
-UbuntuMono|font-ubuntu-mono-nerd-font
-UbuntuSans|font-ubuntu-sans-nerd-font
-VictorMono|font-victor-mono-nerd-font
-ZedMono|font-zed-mono-nerd-font
+Ubuntu Mono|font-ubuntu-mono-nerd-font
+Ubuntu Sans|font-ubuntu-sans-nerd-font
+Victor Mono|font-victor-mono-nerd-font
+Zed Mono|font-zed-mono-nerd-font

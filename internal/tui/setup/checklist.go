@@ -13,15 +13,17 @@ import (
 // visibleRows è il numero di voci mostrate a schermo; le altre scorrono.
 const visibleRows = 12
 
-// checklist è una lista a selezione multipla con checkbox, scorrimento e filtro live.
+// checklist è una lista a selezione multipla con checkbox, scorrimento e
+// ricerca live. La barra di ricerca è sempre visibile; "/" le dà il focus,
+// Invio o ↓ riportano il focus alla lista per selezionare.
 type checklist struct {
-	items     []catalog.Entry
-	filtered  []int           // indici di items che passano il filtro corrente
-	cursor    int             // posizione in filtered
-	selected  map[string]bool // chiave: Value (stabile anche sotto filtro)
-	labelW    int             // larghezza colonna nomi: si adatta al nome più lungo
-	filtering bool            // modalità ricerca attiva
-	query     string          // testo della ricerca
+	items       []catalog.Entry
+	filtered    []int           // indici di items che passano il filtro corrente
+	cursor      int             // posizione in filtered
+	selected    map[string]bool // chiave: Value (stabile anche sotto filtro)
+	labelW      int             // larghezza colonna nomi: si adatta al nome più lungo
+	searchFocus bool            // il focus è sul campo di ricerca
+	query       string          // testo della ricerca
 }
 
 func newChecklist(items []catalog.Entry) *checklist {
@@ -110,8 +112,8 @@ func (c checklist) chosen() []catalog.Entry {
 }
 
 func (c *checklist) handleKey(k string) pickerAction {
-	if c.filtering {
-		return c.handleFilterKey(k)
+	if c.searchFocus {
+		return c.handleSearchKey(k)
 	}
 	switch k {
 	case "up", "k":
@@ -123,7 +125,7 @@ func (c *checklist) handleKey(k string) pickerAction {
 	case "a", "A":
 		c.toggleAll()
 	case "/":
-		c.filtering = true
+		c.searchFocus = true
 	case "enter":
 		return pickNext
 	case "esc":
@@ -132,27 +134,21 @@ func (c *checklist) handleKey(k string) pickerAction {
 	return pickStay
 }
 
-// handleFilterKey gestisce i tasti in modalità ricerca: le lettere compongono
-// la query, le frecce navigano, Esc annulla la ricerca.
-func (c *checklist) handleFilterKey(k string) pickerAction {
+// handleSearchKey gestisce i tasti col focus sul campo di ricerca: le lettere
+// compongono la query (filtro live), Invio/↓ tornano alla lista, Esc annulla.
+func (c *checklist) handleSearchKey(k string) pickerAction {
 	switch k {
 	case "esc":
-		c.filtering = false
+		c.searchFocus = false
 		c.query = ""
 		c.applyFilter()
-	case "enter":
-		return pickNext
+	case "enter", "down":
+		c.searchFocus = false
 	case "backspace":
 		if r := []rune(c.query); len(r) > 0 {
 			c.query = string(r[:len(r)-1])
 			c.applyFilter()
 		}
-	case "up":
-		c.up()
-	case "down":
-		c.down()
-	case " ":
-		c.toggle()
 	default:
 		// Un solo carattere stampabile: lo aggiungo alla ricerca.
 		if len([]rune(k)) == 1 {
@@ -179,15 +175,25 @@ func (c checklist) window() (int, int) {
 	return start, start + visibleRows
 }
 
+// searchView disegna il campo di ricerca, sempre visibile e stile input.
+func (c checklist) searchView() string {
+	var inner string
+	switch {
+	case c.searchFocus:
+		inner = style.SearchText.Render("Cerca: " + c.query + "▏")
+	case c.query != "":
+		inner = style.SearchText.Render("Cerca: " + c.query)
+	default:
+		inner = style.SearchHint.Render("Cerca…  ( / )")
+	}
+	return style.SearchBox.Render(inner)
+}
+
 func (c checklist) view() string {
 	var b strings.Builder
 
-	// Barra di ricerca (solo in modalità filtro).
-	if c.filtering {
-		b.WriteString(style.ItemTitle.Render("Cerca: "))
-		b.WriteString(style.ItemTitleSel.Render(c.query + "▏"))
-		b.WriteString("\n\n")
-	}
+	b.WriteString(c.searchView())
+	b.WriteString("\n\n")
 
 	if len(c.filtered) == 0 {
 		b.WriteString(style.ItemDesc.Render("  Nessun risultato."))
@@ -234,12 +240,11 @@ func (c checklist) view() string {
 }
 
 func (c checklist) hints() string {
-	if c.filtering {
+	if c.searchFocus {
 		return style.Hints(
-			style.FootKey{Key: "↑↓"},
-			style.FootKey{Key: "Spazio", Desc: "seleziona"},
-			style.FootKey{Key: "Invio", Desc: "avanti"},
-			style.FootKey{Key: "Esc", Desc: "annulla ricerca"},
+			style.FootKey{Key: "scrivi", Desc: "filtra"},
+			style.FootKey{Key: "Invio o ↓", Desc: "vai alla lista"},
+			style.FootKey{Key: "Esc", Desc: "annulla"},
 		)
 	}
 	return style.Hints(

@@ -1,5 +1,124 @@
-# Catalogo temi Oh My Posh di Donkey — una riga per tema, formato "Etichetta|file".
-Zash|zash
+# Catalogo di Donkey — GENERATO da scripts/gen-catalog.py, NON modificare a mano.
+# Tutti i temi di Oh My Posh. Rigenera con: make update-themes
+1 Shell|1_shell
+Agnoster|agnoster
+Agnoster Minimal|agnoster.minimal
+Agnosterplus|agnosterplus
+Aliens|aliens
+Amro|amro
+Atomic|atomic
+AtomicBit|atomicBit
+Avit|avit
+Blue Owl|blue-owl
+Blueish|blueish
+Bubbles|bubbles
+Bubblesextra|bubblesextra
+Bubblesline|bubblesline
+Capr4n|capr4n
+Catppuccin|catppuccin
+Catppuccin Frappe|catppuccin_frappe
+Catppuccin Latte|catppuccin_latte
+Catppuccin Macchiato|catppuccin_macchiato
+Catppuccin Mocha|catppuccin_mocha
+Cert|cert
+Chips|chips
+Cinnamon|cinnamon
+Clean Detailed|clean-detailed
+Cloud Context|cloud-context
+Cloud Native Azure|cloud-native-azure
+Cobalt2|cobalt2
+Craver|craver
+Darkblood|darkblood
+Di4am0nd|di4am0nd
+Dracula|dracula
+Easy Term|easy-term
+Emodipt|emodipt
+Emodipt Extend|emodipt-extend
+Fish|fish
+Free Ukraine|free-ukraine
+Froczh|froczh
+Gmay|gmay
+Grandpa Style|grandpa-style
+Gruvbox|gruvbox
+Half Life|half-life
+Honukai|honukai
+Hotstick Minimal|hotstick.minimal
+Hul10|hul10
+Hunk|hunk
+Huvix|huvix
+If Tea|if_tea
+Illusi0n|illusi0n
+Iterm2|iterm2
+Jandedobbeleer|jandedobbeleer
+Jblab 2021|jblab_2021
+Jonnychipz|jonnychipz
+Json|json
+Jtracey93|jtracey93
+Jv Sitecorian|jv_sitecorian
+Kali|kali
+Kushal|kushal
+Lambda|lambda
+Lambdageneration|lambdageneration
+Larserikfinholt|larserikfinholt
+Lightgreen|lightgreen
+M365Princess|M365Princess
+Marcduiker|marcduiker
+Markbull|markbull
 Material|material
-Robby Russell|robbyrussell
-ParaRussel|pararussel
+Microverse Power|microverse-power
+Mojada|mojada
+Montys|montys
+Mt|mt
+Multiverse Neon|multiverse-neon
+Negligible|negligible
+Neko|neko
+Night Owl|night-owl
+Nordtron|nordtron
+Nu4a|nu4a
+Onehalf Minimal|onehalf.minimal
+Paradox|paradox
+Pararussel|pararussel
+Patriksvensson|patriksvensson
+Peru|peru
+Pixelrobots|pixelrobots
+Plague|plague
+Poshmon|poshmon
+Powerlevel10k Classic|powerlevel10k_classic
+Powerlevel10k Lean|powerlevel10k_lean
+Powerlevel10k Modern|powerlevel10k_modern
+Powerlevel10k Rainbow|powerlevel10k_rainbow
+Powerline|powerline
+Probua Minimal|probua.minimal
+Pure|pure
+Quick Term|quick-term
+Remk|remk
+Robbyrussell|robbyrussell
+Rudolfs Dark|rudolfs-dark
+Rudolfs Light|rudolfs-light
+Sim Web|sim-web
+Slim|slim
+Slimfat|slimfat
+Smoothie|smoothie
+Sonicboom Dark|sonicboom_dark
+Sonicboom Light|sonicboom_light
+Sorin|sorin
+Space|space
+Spaceship|spaceship
+Star|star
+Stelbent Compact Minimal|stelbent-compact.minimal
+Stelbent Minimal|stelbent.minimal
+Takuya|takuya
+The Unnamed|the-unnamed
+Thecyberden|thecyberden
+Tiwahu|tiwahu
+Tokyo|tokyo
+Tokyonight Storm|tokyonight_storm
+Tonybaloney|tonybaloney
+Uew|uew
+Unicorn|unicorn
+Velvet|velvet
+Wholespace|wholespace
+Wopian|wopian
+Xtoys|xtoys
+Ys|ys
+Zash|zash

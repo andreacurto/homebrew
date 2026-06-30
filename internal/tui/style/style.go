@@ -48,9 +48,14 @@ var (
 
 	Cursor = lipgloss.NewStyle().Foreground(Coral).Bold(true)
 	Footer = lipgloss.NewStyle().Foreground(Ash)
-	Alert  = lipgloss.NewStyle().Foreground(Cheddar)
-	Error  = lipgloss.NewStyle().Foreground(Coral)
-	Screen = lipgloss.NewStyle().Padding(1, 2)
+
+	// Campo di ricerca: box stile input, bordo e testo cheddar.
+	SearchBox  = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(Cheddar).Padding(0, 1).Width(40)
+	SearchText = lipgloss.NewStyle().Foreground(Cheddar)
+	SearchHint = lipgloss.NewStyle().Foreground(Ash)
+	Alert      = lipgloss.NewStyle().Foreground(Cheddar)
+	Error      = lipgloss.NewStyle().Foreground(Coral)
+	Screen     = lipgloss.NewStyle().Padding(1, 2)
 )
 
 // MonkeySpinner è lo spinner brandizzato: tre scimmiette + la faccia.

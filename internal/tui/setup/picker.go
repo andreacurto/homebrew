@@ -29,7 +29,8 @@ type picker struct {
 	catalog   string // nome del catalogo (catalog.Apps, catalog.Fonts)
 	crumb     string // terzo livello dell'header (es. "App", "Font terminale")
 	prompt    string // testo sopra la lista
-	note      string // riga informativa sotto il prompt (ash); "" se assente
+	desc      string // descrizione multi-riga sotto il prompt (ash); "" se assente
+	note      string // riga informativa/link sotto la descrizione (ash); "" se assente
 	single    bool   // selezione singola (radio) anziché multipla (checkbox)
 	noneLabel string // se valorizzato, voce "nessuno" (Value "") in cima alla lista
 
@@ -79,9 +80,21 @@ func (p picker) listW() int {
 	return 20
 }
 
-// availableRows è lo spazio verticale per la lista (tolti header, prompt, footer…).
+// chrome stima le righe non-lista (header, prompt, descrizione, note, footer…).
+func (p picker) chrome() int {
+	c := 10
+	if p.note != "" {
+		c++
+	}
+	if p.desc != "" {
+		c += strings.Count(p.desc, "\n") + 1
+	}
+	return c
+}
+
+// availableRows è lo spazio verticale per la lista (tolto il "chrome").
 func (p picker) availableRows() int {
-	if r := p.height - 11; r > 4 {
+	if r := p.height - p.chrome(); r > 4 {
 		return r
 	}
 	return 4
@@ -252,6 +265,10 @@ func (p picker) view(spin spinner.Model) string {
 		}
 		b.WriteString(head)
 		b.WriteString("\n")
+		if p.desc != "" {
+			b.WriteString(style.ItemDesc.Render(p.desc))
+			b.WriteString("\n")
+		}
 		if p.note != "" {
 			b.WriteString(renderNote(p.note))
 			b.WriteString("\n")

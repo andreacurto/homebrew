@@ -53,7 +53,10 @@ func New() Model {
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
-	m.suggest = true                  // suggerimenti consigliati di default
+	m.theme.desc = "Un tema di Oh My Posh dà stile al prompt del terminale: colori, icone\n" +
+		"e informazioni utili (cartella, branch git, stato). Dopo l'installazione\n" +
+		"il prompt avrà l'aspetto del tema che scegli qui."
+	m.suggest = true // suggerimenti consigliati di default
 	return m
 }
 
@@ -217,13 +220,14 @@ func (m Model) welcomeView() string {
 
 func (m Model) suggestView() string {
 	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "Suggerimenti"))
+	b.WriteString(style.Header("Setup", style.Heading, "Suggerimenti terminale"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Vuoi i suggerimenti automatici del terminale?"))
+	b.WriteString(style.ItemTitle.Render("Vuoi abilitare i suggerimenti automatici del terminale?"))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render(
-		"Mentre digiti compare un completamento grigio dalla cronologia\n" +
-			"(stile Fish), che accetti con →. Leggero, nessun menù a comparsa."))
+		"Mentre digiti compare un completamento grigio in base alla\n" +
+			"cronologia dei tuoi comandi. Per accettare i suggerimenti basta\n" +
+			"premere la freccia a destra della tastiera."))
 	b.WriteString("\n\n")
 
 	yes, no := style.SymOff+" Sì", style.SymOff+" No"
@@ -237,7 +241,7 @@ func (m Model) suggestView() string {
 	b.WriteString("  " + yes + "        " + no)
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "← →", Desc: "Cambia"},
+		style.FootKey{Key: "← →", Desc: "Scegli"},
 		style.FootKey{Key: "Invio", Desc: "Avanti"},
 		style.FootKey{Key: "Esc", Desc: "Indietro"},
 		style.FootKey{Key: "Q", Desc: "Esci"},

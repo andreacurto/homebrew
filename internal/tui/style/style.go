@@ -102,17 +102,17 @@ var (
 )
 
 // Hints compone la barra comandi in fondo alle schermate. Il tasto risalta,
-// la descrizione (dopo un dash lungo) è muted, i comandi sono divisi da "│":
+// la descrizione (a un solo spazio) è muted, i comandi sono divisi da "•":
 //
-//	↑↓  │  Invio — avanti  │  Esc — indietro  │  Q — esci
+//	↑ ↓ • Invio Avanti • Esc Indietro • Q Esci
 func Hints(keys ...FootKey) string {
 	parts := make([]string, 0, len(keys))
 	for _, k := range keys {
 		s := footKeyStyle.Render(k.Key)
 		if k.Desc != "" {
-			s += footSepStyle.Render(" — " + k.Desc)
+			s += " " + footSepStyle.Render(k.Desc)
 		}
 		parts = append(parts, s)
 	}
-	return strings.Join(parts, footSepStyle.Render("  │  "))
+	return strings.Join(parts, footSepStyle.Render(" • "))
 }

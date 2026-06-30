@@ -13,6 +13,9 @@ import (
 // visibleRows è il numero di voci mostrate a schermo; le altre scorrono.
 const visibleRows = 12
 
+// maxQuery limita la lunghezza della ricerca per non far andare a capo il campo.
+const maxQuery = 48
+
 // checklist è una lista a selezione multipla con checkbox, scorrimento e
 // ricerca live. La barra di ricerca è sempre visibile; "/" le dà il focus,
 // Invio o ↓ riportano il focus alla lista per selezionare.
@@ -150,8 +153,8 @@ func (c *checklist) handleSearchKey(k string) pickerAction {
 			c.applyFilter()
 		}
 	default:
-		// Un solo carattere stampabile: lo aggiungo alla ricerca.
-		if len([]rune(k)) == 1 {
+		// Un solo carattere stampabile: lo aggiungo (entro il limite).
+		if len([]rune(k)) == 1 && len([]rune(c.query)) < maxQuery {
 			c.query += k
 			c.applyFilter()
 		}
@@ -176,15 +179,16 @@ func (c checklist) window() (int, int) {
 }
 
 // searchView disegna il campo di ricerca, sempre visibile e stile input.
+// A riposo è ash; col focus mostra la lente e il testo digitato in bianco.
 func (c checklist) searchView() string {
 	var inner string
 	switch {
 	case c.searchFocus:
-		inner = style.SearchText.Render("Cerca: " + c.query + "▏")
+		inner = style.SearchHint.Render(style.SymSearch+"  ") + style.SearchText.Render(c.query+"▏")
 	case c.query != "":
-		inner = style.SearchText.Render("Cerca: " + c.query)
+		inner = style.SearchHint.Render("Cerca: " + c.query)
 	default:
-		inner = style.SearchHint.Render("Cerca…  ( / )")
+		inner = style.SearchHint.Render("Cerca…")
 	}
 	return style.SearchBox.Render(inner)
 }

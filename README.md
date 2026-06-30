@@ -249,6 +249,12 @@ Per documentazione tecnica dettagliata (architettura, convenzioni, configurazion
 cp update.sh ~/.brew/update.sh && brew-update             # Update
 ```
 
+**Rigenerare i cataloghi (Donkey 2.0):** i cataloghi font e temi sono generati dalle sorgenti ufficiali (Homebrew / Oh My Posh) e committati nel repo. Non si scrivono a mano — si rigenerano con:
+```bash
+make update-fonts      # config/fonts.list — tutti i Nerd Font (da Homebrew)
+make update-themes     # config/themes.list — tutti i temi Oh My Posh (da GitHub)
+```
+
 **Link utili:** [Gum](https://github.com/charmbracelet/gum) · [Oh My Posh](https://ohmyposh.dev/docs/themes) · [Homebrew](https://docs.brew.sh/)
 
 ---

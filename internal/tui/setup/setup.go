@@ -18,6 +18,7 @@ const (
 	stepWelcome step = iota
 	stepApps
 	stepFonts
+	stepTheme
 	stepNext // placeholder: il resto del wizard arriva nei prossimi passi
 )
 
@@ -34,6 +35,7 @@ type Model struct {
 	spin        spinner.Model
 	apps        picker
 	fonts       picker
+	theme       picker
 	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting    bool
 }
@@ -45,6 +47,8 @@ func New() Model {
 		apps: newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
 		fonts: newPicker(catalog.Fonts, "Font terminale", "Scegli i font da installare:",
 			"Vedi la lista completa su https://www.nerdfonts.com/font-downloads", false),
+		theme: newPicker(catalog.Themes, "Tema terminale", "Scegli il tema del terminale:",
+			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
 }
 
@@ -59,6 +63,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.apps.setSize(msg.Width, msg.Height)
 		m.fonts.setSize(msg.Width, msg.Height)
+		m.theme.setSize(msg.Width, msg.Height)
 		return m, nil
 	case spinner.TickMsg:
 		var cmd tea.Cmd
@@ -70,6 +75,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.apps.setResult(msg.entries, msg.err)
 		case catalog.Fonts:
 			m.fonts.setResult(msg.entries, msg.err)
+		case catalog.Themes:
+			m.theme.setResult(msg.entries, msg.err)
 		}
 		return m, nil
 	case tea.KeyMsg:
@@ -126,15 +133,26 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		cmd, act := m.fonts.update(key)
 		switch act {
 		case pickNext:
-			m.step = stepNext
+			m.step = stepTheme
+			return m, m.theme.begin()
 		case pickBack:
 			m.step = stepApps
 		}
 		return m, cmd
 
+	case stepTheme:
+		cmd, act := m.theme.update(key)
+		switch act {
+		case pickNext:
+			m.step = stepNext
+		case pickBack:
+			m.step = stepFonts
+		}
+		return m, cmd
+
 	case stepNext:
 		if k == "esc" {
-			m.step = stepFonts
+			m.step = stepTheme
 		}
 	}
 	return m, nil
@@ -155,6 +173,8 @@ func (m Model) View() string {
 		return m.apps.view(m.spin)
 	case stepFonts:
 		return m.fonts.view(m.spin)
+	case stepTheme:
+		return m.theme.view(m.spin)
 	default:
 		return m.nextView()
 	}
@@ -183,11 +203,11 @@ func (m Model) nextView() string {
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
-		"Hai scelto %d app e %d font. 👍",
-		m.apps.selectedCount(), m.fonts.selectedCount(),
+		"Hai scelto %d app, %d font e il tema \"%s\". 👍",
+		m.apps.selectedCount(), m.fonts.selectedCount(), m.theme.selectionLabel(),
 	)))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Il resto del wizard (terminale, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
+	b.WriteString(style.ItemDesc.Render("Il resto del wizard (autocompletamento, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Esc", Desc: "Indietro"},

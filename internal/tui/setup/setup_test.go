@@ -49,6 +49,25 @@ func TestCatalogMsgLoadsFonts(t *testing.T) {
 	}
 }
 
+func TestCatalogMsgLoadsThemes(t *testing.T) {
+	m := New()
+	m.step = stepTheme
+	m.theme.loading = true
+
+	updated, _ := m.Update(catalogMsg{target: catalog.Themes, entries: []catalog.Entry{{Label: "Atomic", Value: "atomic"}}})
+	mm := updated.(Model)
+
+	if mm.theme.loading || !mm.theme.loaded {
+		t.Fatal("dopo catalogMsg lo stato del tema dovrebbe essere caricato")
+	}
+	if !strings.Contains(mm.View(), "Atomic") {
+		t.Error("la view Tema non mostra il tema caricato")
+	}
+	if mm.theme.selectionLabel() != "Atomic" {
+		t.Errorf("selezione singola = %q, attesa Atomic", mm.theme.selectionLabel())
+	}
+}
+
 func TestPickerToggle(t *testing.T) {
 	p := newPicker(catalog.Apps, "App", "x", "", false)
 	p.setResult([]catalog.Entry{{Label: "A", Value: "a"}, {Label: "B", Value: "b"}}, nil)

@@ -81,6 +81,20 @@ func TestSuggestToggle(t *testing.T) {
 	}
 }
 
+func TestAutoUpdateRows(t *testing.T) {
+	a := newAutoUpdate()
+	if !a.enabled || !a.weekly || !a.upgrade || !a.cleanup {
+		t.Fatal("default auto-update non corretti")
+	}
+	if a.rowCount() != 6 {
+		t.Fatalf("con master attivo rowCount = %d, atteso 6", a.rowCount())
+	}
+	a.change() // master off (cursor 0)
+	if a.enabled || a.rowCount() != 1 {
+		t.Fatalf("disattivando il master rowCount = %d, atteso 1", a.rowCount())
+	}
+}
+
 func TestPickerToggle(t *testing.T) {
 	p := newPicker(catalog.Apps, "App", "x", "", false)
 	p.setResult([]catalog.Entry{{Label: "A", Value: "a"}, {Label: "B", Value: "b"}}, nil)

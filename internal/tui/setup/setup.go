@@ -20,6 +20,7 @@ const (
 	stepFonts
 	stepTheme
 	stepSuggest
+	stepAuto
 	stepNext // placeholder: il resto del wizard arriva nei prossimi passi
 )
 
@@ -38,6 +39,7 @@ type Model struct {
 	fonts       picker
 	theme       picker
 	suggest     bool // zsh-autosuggestions attivi (toggle dello step Terminale)
+	auto        autoUpdate
 	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting    bool
 }
@@ -57,6 +59,7 @@ func New() Model {
 		"e informazioni utili (cartella, branch git, stato). Dopo l'installazione\n" +
 		"il prompt avrà l'aspetto del tema che scegli qui."
 	m.suggest = true // suggerimenti consigliati di default
+	m.auto = newAutoUpdate()
 	return m
 }
 
@@ -163,14 +166,22 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "left", "right", "h", "l", " ":
 			m.suggest = !m.suggest
 		case "enter":
-			m.step = stepNext
+			m.step = stepAuto
 		case "esc":
 			m.step = stepTheme
 		}
 
+	case stepAuto:
+		switch m.auto.handleKey(k) {
+		case pickNext:
+			m.step = stepNext
+		case pickBack:
+			m.step = stepSuggest
+		}
+
 	case stepNext:
 		if k == "esc" {
-			m.step = stepSuggest
+			m.step = stepAuto
 		}
 	}
 	return m, nil
@@ -195,6 +206,8 @@ func (m Model) View() string {
 		return m.theme.view(m.spin)
 	case stepSuggest:
 		return m.suggestView()
+	case stepAuto:
+		return m.autoView()
 	default:
 		return m.nextView()
 	}
@@ -249,6 +262,33 @@ func (m Model) suggestView() string {
 	return style.Screen.Render(b.String())
 }
 
+func (m Model) autoView() string {
+	var b strings.Builder
+	b.WriteString(style.Header("Setup", style.Heading, "Aggiornamenti"))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render("Vuoi che Donkey tenga aggiornato tutto in automatico?"))
+	b.WriteString("\n")
+	b.WriteString(style.ItemDesc.Render(
+		"Homebrew controlla e installa gli aggiornamenti in background,\n" +
+			"senza che tu debba lanciare niente a mano."))
+	b.WriteString("\n\n")
+	b.WriteString(m.auto.view())
+	b.WriteString("\n\n")
+
+	keys := []style.FootKey{}
+	if m.auto.rowCount() > 1 {
+		keys = append(keys, style.FootKey{Key: "↑ ↓"})
+	}
+	keys = append(keys,
+		style.FootKey{Key: "← →", Desc: "Scegli"},
+		style.FootKey{Key: "Invio", Desc: "Avanti"},
+		style.FootKey{Key: "Esc", Desc: "Indietro"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
+	)
+	b.WriteString(style.Hints(keys...))
+	return style.Screen.Render(b.String())
+}
+
 func (m Model) nextView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, ""))
@@ -261,14 +301,24 @@ func (m Model) nextView() string {
 	if m.suggest {
 		sugg = "attivi"
 	}
+	au := "disattivato"
+	if m.auto.enabled {
+		freq := "1 settimana"
+		if !m.auto.weekly {
+			freq = "1 giorno"
+		}
+		au = "attivo (" + freq + ")"
+	}
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
 		"Hai scelto %d app, %d font e %s. 👍",
 		m.apps.selectedCount(), m.fonts.selectedCount(), themePart,
 	)))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render(fmt.Sprintf("Suggerimenti automatici: %s.", sugg)))
+	b.WriteString("\n")
+	b.WriteString(style.ItemDesc.Render(fmt.Sprintf("Aggiornamento automatico: %s.", au)))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Il resto del wizard (auto-update, riepilogo,\ninstallazione) arriva nei prossimi passi."))
+	b.WriteString(style.ItemDesc.Render("Il resto del wizard (riepilogo, installazione)\narriva nei prossimi passi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Esc", Desc: "Indietro"},

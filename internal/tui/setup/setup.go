@@ -53,9 +53,13 @@ func (m Model) Init() tea.Cmd {
 	return m.spin.Tick
 }
 
-// Update gestisce input, animazioni e caricamento cataloghi.
+// Update gestisce input, animazioni, ridimensionamento e caricamento cataloghi.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.apps.setSize(msg.Width, msg.Height)
+		m.fonts.setSize(msg.Width, msg.Height)
+		return m, nil
 	case spinner.TickMsg:
 		var cmd tea.Cmd
 		m.spin, cmd = m.spin.Update(msg)
@@ -108,21 +112,25 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	case stepApps:
-		switch m.apps.handleKey(k) {
+		cmd, act := m.apps.update(key)
+		switch act {
 		case pickNext:
 			m.step = stepFonts
 			return m, m.fonts.begin()
 		case pickBack:
 			m.step = stepWelcome
 		}
+		return m, cmd
 
 	case stepFonts:
-		switch m.fonts.handleKey(k) {
+		cmd, act := m.fonts.update(key)
+		switch act {
 		case pickNext:
 			m.step = stepNext
 		case pickBack:
 			m.step = stepApps
 		}
+		return m, cmd
 
 	case stepNext:
 		if k == "esc" {

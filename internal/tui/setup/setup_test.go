@@ -69,6 +69,18 @@ func TestCatalogMsgLoadsThemes(t *testing.T) {
 	}
 }
 
+func TestSuggestToggle(t *testing.T) {
+	m := New()
+	if !m.suggest {
+		t.Fatal("i suggerimenti dovrebbero essere attivi di default")
+	}
+	m.step = stepSuggest
+	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyLeft})
+	if updated.(Model).suggest {
+		t.Error("dopo Cambia i suggerimenti dovrebbero essere disattivati")
+	}
+}
+
 func TestPickerToggle(t *testing.T) {
 	p := newPicker(catalog.Apps, "App", "x", "", false)
 	p.setResult([]catalog.Entry{{Label: "A", Value: "a"}, {Label: "B", Value: "b"}}, nil)

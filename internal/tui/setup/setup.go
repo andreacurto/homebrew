@@ -19,6 +19,7 @@ const (
 	stepApps
 	stepFonts
 	stepTheme
+	stepSuggest
 	stepNext // placeholder: il resto del wizard arriva nei prossimi passi
 )
 
@@ -36,6 +37,7 @@ type Model struct {
 	apps        picker
 	fonts       picker
 	theme       picker
+	suggest     bool // zsh-autosuggestions attivi (toggle dello step Terminale)
 	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting    bool
 }
@@ -51,6 +53,7 @@ func New() Model {
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
+	m.suggest = true                  // suggerimenti consigliati di default
 	return m
 }
 
@@ -146,15 +149,25 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		cmd, act := m.theme.update(key)
 		switch act {
 		case pickNext:
-			m.step = stepNext
+			m.step = stepSuggest
 		case pickBack:
 			m.step = stepFonts
 		}
 		return m, cmd
 
+	case stepSuggest:
+		switch k {
+		case "left", "right", "h", "l", " ":
+			m.suggest = !m.suggest
+		case "enter":
+			m.step = stepNext
+		case "esc":
+			m.step = stepTheme
+		}
+
 	case stepNext:
 		if k == "esc" {
-			m.step = stepTheme
+			m.step = stepSuggest
 		}
 	}
 	return m, nil
@@ -177,6 +190,8 @@ func (m Model) View() string {
 		return m.fonts.view(m.spin)
 	case stepTheme:
 		return m.theme.view(m.spin)
+	case stepSuggest:
+		return m.suggestView()
 	default:
 		return m.nextView()
 	}
@@ -200,6 +215,36 @@ func (m Model) welcomeView() string {
 	return style.Screen.Render(b.String())
 }
 
+func (m Model) suggestView() string {
+	var b strings.Builder
+	b.WriteString(style.Header("Setup", style.Heading, "Suggerimenti"))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render("Vuoi i suggerimenti automatici del terminale?"))
+	b.WriteString("\n")
+	b.WriteString(style.ItemDesc.Render(
+		"Mentre digiti compare un completamento grigio dalla cronologia\n" +
+			"(stile Fish), che accetti con →. Leggero, nessun menù a comparsa."))
+	b.WriteString("\n\n")
+
+	yes, no := style.SymOff+" Sì", style.SymOff+" No"
+	if m.suggest {
+		yes = style.ItemTitleSel.Render(style.SymOn + " Sì")
+		no = style.ItemDesc.Render(no)
+	} else {
+		yes = style.ItemDesc.Render(yes)
+		no = style.ItemTitleSel.Render(style.SymOn + " No")
+	}
+	b.WriteString("  " + yes + "        " + no)
+	b.WriteString("\n\n")
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "← →", Desc: "Cambia"},
+		style.FootKey{Key: "Invio", Desc: "Avanti"},
+		style.FootKey{Key: "Esc", Desc: "Indietro"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
+	))
+	return style.Screen.Render(b.String())
+}
+
 func (m Model) nextView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, ""))
@@ -208,12 +253,18 @@ func (m Model) nextView() string {
 	if m.theme.selectionValue() != "" {
 		themePart = fmt.Sprintf("il tema \"%s\"", m.theme.selectionLabel())
 	}
+	sugg := "disattivati"
+	if m.suggest {
+		sugg = "attivi"
+	}
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
 		"Hai scelto %d app, %d font e %s. 👍",
 		m.apps.selectedCount(), m.fonts.selectedCount(), themePart,
 	)))
+	b.WriteString("\n")
+	b.WriteString(style.ItemDesc.Render(fmt.Sprintf("Suggerimenti automatici: %s.", sugg)))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Il resto del wizard (autocompletamento, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))
+	b.WriteString(style.ItemDesc.Render("Il resto del wizard (auto-update, riepilogo,\ninstallazione) arriva nei prossimi passi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Esc", Desc: "Indietro"},

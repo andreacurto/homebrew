@@ -46,7 +46,7 @@ func New() Model {
 		spin: style.NewSpinner(),
 		apps: newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
 		fonts: newPicker(catalog.Fonts, "Font terminale", "Scegli i font da installare:",
-			"Vedi la lista completa su https://www.nerdfonts.com/font-downloads", false),
+			"Vedi tutti i fonts su https://www.nerdfonts.com/font-downloads", false),
 		theme: newPicker(catalog.Themes, "Tema terminale", "Scegli il tema del terminale:",
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
@@ -204,9 +204,13 @@ func (m Model) nextView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, ""))
 	b.WriteString("\n\n")
+	themePart := "nessun tema"
+	if m.theme.selectionValue() != "" {
+		themePart = fmt.Sprintf("il tema \"%s\"", m.theme.selectionLabel())
+	}
 	b.WriteString(style.ItemTitle.Render(fmt.Sprintf(
-		"Hai scelto %d app, %d font e il tema \"%s\". 👍",
-		m.apps.selectedCount(), m.fonts.selectedCount(), m.theme.selectionLabel(),
+		"Hai scelto %d app, %d font e %s. 👍",
+		m.apps.selectedCount(), m.fonts.selectedCount(), themePart,
 	)))
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemDesc.Render("Il resto del wizard (autocompletamento, auto-update,\nriepilogo, installazione) arriva nei prossimi passi."))

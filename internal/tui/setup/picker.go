@@ -217,6 +217,14 @@ func (p picker) selectionLabel() string {
 	return ""
 }
 
+// selectionValue: valore della voce sotto il cursore ("" per la voce "nessuno").
+func (p picker) selectionValue() string {
+	if it, ok := p.list.SelectedItem().(entryItem); ok {
+		return it.e.Value
+	}
+	return ""
+}
+
 func (p picker) view(spin spinner.Model) string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, p.crumb))

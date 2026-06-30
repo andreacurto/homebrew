@@ -35,6 +35,7 @@ type picker struct {
 	catalog string // nome del catalogo (catalog.Apps, catalog.Fonts)
 	crumb   string // terzo livello dell'header (es. "App", "Font terminale")
 	prompt  string // testo sopra la lista
+	note    string // riga informativa sotto il prompt (ash); "" se assente
 	single  bool   // selezione singola (radio) anziché multipla (checkbox)
 	loaded  bool
 	loading bool
@@ -42,8 +43,17 @@ type picker struct {
 	body    listBody
 }
 
-func newPicker(catalogName, crumb, prompt string, single bool) picker {
-	return picker{catalog: catalogName, crumb: crumb, prompt: prompt, single: single}
+func newPicker(catalogName, crumb, prompt, note string, single bool) picker {
+	return picker{catalog: catalogName, crumb: crumb, prompt: prompt, note: note, single: single}
+}
+
+// typing indica se il corpo sta ricevendo testo (ricerca attiva): in tal caso
+// l'orchestratore non deve intercettare scorciatoie come Q.
+func (p picker) typing() bool {
+	if c, ok := p.body.(*checklist); ok {
+		return c.filtering
+	}
+	return false
 }
 
 // load scarica il catalogo associato; il messaggio è instradato per nome catalogo.
@@ -110,7 +120,12 @@ func (p picker) view(spin spinner.Model) string {
 
 	default:
 		b.WriteString(style.ItemTitle.Render(p.prompt))
-		b.WriteString("\n\n")
+		b.WriteString("\n")
+		if p.note != "" {
+			b.WriteString(style.URL.Render(p.note))
+			b.WriteString("\n")
+		}
+		b.WriteString("\n")
 		b.WriteString(p.body.view())
 		b.WriteString("\n")
 		b.WriteString(p.body.hints())

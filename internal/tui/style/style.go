@@ -38,6 +38,7 @@ var (
 	Bullet  = lipgloss.NewStyle().Foreground(Ash)                   // il "•" tra nome e slogan/schermata
 	Tagline = lipgloss.NewStyle().Foreground(Cheddar)               // slogan
 	URL     = lipgloss.NewStyle().Foreground(Ash)                   // info secondaria
+	Link    = lipgloss.NewStyle().Foreground(Ash).Underline(true)   // URL (sottolineato)
 	Heading = lipgloss.NewStyle().Foreground(Aquamarine).Bold(true) // nome del comando/vista aperta
 
 	// Voci di menù/liste: il titolo passa da base a selezione; la descrizione da muted a base.
@@ -86,7 +87,7 @@ func Header(second string, secondStyle lipgloss.Style, third string) string {
 	if third != "" {
 		line += Bullet.Render(" • ") + URL.Render(third)
 	}
-	return line + "\n" + URL.Render(RepoURL)
+	return line + "\n" + Link.Render(RepoURL)
 }
 
 // FootKey è una voce della barra comandi: un tasto con descrizione opzionale.

@@ -26,11 +26,12 @@ const (
 // picker è una schermata di selezione su un catalogo live (App, Font, temi).
 // Si appoggia a bubbles/list per voci e paginazione; il footer lo disegna Donkey.
 type picker struct {
-	catalog string // nome del catalogo (catalog.Apps, catalog.Fonts)
-	crumb   string // terzo livello dell'header (es. "App", "Font terminale")
-	prompt  string // testo sopra la lista
-	note    string // riga informativa sotto il prompt (ash); "" se assente
-	single  bool   // selezione singola (radio) anziché multipla (checkbox)
+	catalog   string // nome del catalogo (catalog.Apps, catalog.Fonts)
+	crumb     string // terzo livello dell'header (es. "App", "Font terminale")
+	prompt    string // testo sopra la lista
+	note      string // riga informativa sotto il prompt (ash); "" se assente
+	single    bool   // selezione singola (radio) anziché multipla (checkbox)
+	noneLabel string // se valorizzato, voce "nessuno" (Value "") in cima alla lista
 
 	width, height int
 	loaded        bool
@@ -109,6 +110,11 @@ func (p *picker) setResult(entries []catalog.Entry, err error) {
 	p.err = err
 	if err != nil {
 		return
+	}
+
+	// Voce "nessuno" in cima (es. "Nessun tema"), selezionata di default.
+	if p.noneLabel != "" {
+		entries = append([]catalog.Entry{{Label: p.noneLabel}}, entries...)
 	}
 
 	items := make([]list.Item, len(entries))
@@ -231,13 +237,15 @@ func (p picker) view(spin spinner.Model) string {
 
 	default:
 		head := style.ItemTitle.Render(p.prompt)
-		if !p.single {
+		if p.single {
+			head += "   " + style.Footer.Render(fmt.Sprintf("(%s selezionato)", p.selectionLabel()))
+		} else {
 			head += "   " + style.Footer.Render(fmt.Sprintf("(%d selezionate)", p.selectedCount()))
 		}
 		b.WriteString(head)
 		b.WriteString("\n")
 		if p.note != "" {
-			b.WriteString(style.URL.Render(p.note))
+			b.WriteString(renderNote(p.note))
 			b.WriteString("\n")
 		}
 		b.WriteString("\n")
@@ -267,6 +275,14 @@ func (p picker) footer() string {
 		style.FootKey{Key: "Q", Desc: "Esci"},
 	)
 	return style.Hints(keys...)
+}
+
+// renderNote disegna la nota sotto il prompt sottolineando la sola parte URL.
+func renderNote(note string) string {
+	if i := strings.Index(note, "http"); i >= 0 {
+		return style.URL.Render(note[:i]) + style.Link.Render(note[i:])
+	}
+	return style.URL.Render(note)
 }
 
 // backQuitHints è la barra comandi minima delle schermate di caricamento/errore.

@@ -60,11 +60,12 @@ func TestCatalogMsgLoadsThemes(t *testing.T) {
 	if mm.theme.loading || !mm.theme.loaded {
 		t.Fatal("dopo catalogMsg lo stato del tema dovrebbe essere caricato")
 	}
-	if !strings.Contains(mm.View(), "Atomic") {
-		t.Error("la view Tema non mostra il tema caricato")
+	v := mm.View()
+	if !strings.Contains(v, "Atomic") || !strings.Contains(v, "Nessun tema") {
+		t.Error("la view Tema deve mostrare il tema caricato e la voce 'Nessun tema'")
 	}
-	if mm.theme.selectionLabel() != "Atomic" {
-		t.Errorf("selezione singola = %q, attesa Atomic", mm.theme.selectionLabel())
+	if mm.theme.selectionLabel() != "Nessun tema" {
+		t.Errorf("default = %q, atteso 'Nessun tema' (prima voce)", mm.theme.selectionLabel())
 	}
 }
 

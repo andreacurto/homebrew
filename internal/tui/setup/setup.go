@@ -42,7 +42,7 @@ type Model struct {
 
 // New crea il modello del wizard.
 func New() Model {
-	return Model{
+	m := Model{
 		spin: style.NewSpinner(),
 		apps: newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
 		fonts: newPicker(catalog.Fonts, "Font terminale", "Scegli i font da installare:",
@@ -50,6 +50,8 @@ func New() Model {
 		theme: newPicker(catalog.Themes, "Tema terminale", "Scegli il tema del terminale:",
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
+	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
+	return m
 }
 
 // Init avvia lo spinner.

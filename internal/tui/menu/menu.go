@@ -116,7 +116,7 @@ func (m Model) menuView() string {
 			descStyle = style.ItemDescSel
 		}
 		b.WriteString(style.Cursor.Render(marker))
-		b.WriteString(titleStyle.Width(28).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
+		b.WriteString(titleStyle.Width(32).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
 		b.WriteString(descStyle.Render(e.desc))
 		b.WriteString("\n")
 	}

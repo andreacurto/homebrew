@@ -58,8 +58,10 @@ func (m Model) summaryView() string {
 	}
 	b.WriteString("\n")
 	cmd := lipgloss.NewStyle().Foreground(style.Cheddar).Bold(true)
-	b.WriteString(style.ItemDesc.Render("Al termine dell'installazione potrai personalizzare in qualsiasi\nmomento Donkey lanciando il comando ") +
-		cmd.Render("dk") +
+	b.WriteString(style.ItemDesc.Render("Al termine dell'installazione potrai personalizzare in qualsiasi"))
+	b.WriteString("\n")
+	b.WriteString(style.ItemDesc.Render("momento Donkey lanciando il comando ") +
+		cmd.Render("'dk'") +
 		style.ItemDesc.Render(" da terminale."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(

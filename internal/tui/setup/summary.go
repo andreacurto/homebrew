@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -8,20 +9,12 @@ import (
 	"github.com/andreacurto/donkey/internal/tui/style"
 )
 
-// Larghezze delle due colonne del riepilogo.
-const (
-	sumLabelW = 18
-	sumValueW = 58
-)
+// maxSummaryNames: oltre questa soglia il riepilogo mostra il conteggio invece
+// dell'elenco, così la tabella resta compatta anche con molte selezioni.
+const maxSummaryNames = 8
 
 // summaryView mostra una tabella pulita di tutte le scelte fatte nel wizard.
 func (m Model) summaryView() string {
-	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "Riepilogo"))
-	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Ecco cosa Donkey farà sul tuo Mac:"))
-	b.WriteString("\n\n")
-
 	theme := "Nessuno"
 	if m.theme.selectionValue() != "" {
 		theme = m.theme.selectionLabel()
@@ -31,14 +24,42 @@ func (m Model) summaryView() string {
 		auto = "Sì · 1 volta a settimana"
 	}
 
-	b.WriteString(summaryRow("App", joinOrNone(m.apps.chosenLabels(), "Nessuna")))
-	b.WriteString(summaryRow("Font terminale", joinOrNone(m.fonts.chosenLabels(), "Nessuno")))
-	b.WriteString(summaryRow("Tema terminale", theme))
-	b.WriteString(summaryRow("Suggerimenti", yesNo(m.suggest)))
-	b.WriteString(summaryRow("Aggiornamenti", auto))
+	rows := [][2]string{
+		{"App da installare", summaryList(m.apps.chosenLabels(), "Nessuna", "app selezionate")},
+		{"Font terminale", summaryList(m.fonts.chosenLabels(), "Nessuno", "font selezionati")},
+		{"Tema terminale", theme},
+		{"Suggerimenti automatici terminale", yesNo(m.suggest)},
+		{"Aggiornamenti automatici", auto},
+	}
 
+	labelW := 0
+	for _, r := range rows {
+		if l := lipgloss.Width(r[0]); l > labelW {
+			labelW = l
+		}
+	}
+	labelW += 3
+	width := m.width
+	if width == 0 {
+		width = 90
+	}
+	valueW := width - labelW - 6
+	if valueW < 20 {
+		valueW = 20
+	}
+
+	var b strings.Builder
+	b.WriteString(style.Header("Setup", style.Heading, "Riepilogo"))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render("Ecco cosa farà Donkey sul tuo Mac:"))
+	b.WriteString("\n\n")
+	for _, r := range rows {
+		b.WriteString(summaryRow(r[0], r[1], labelW, valueW))
+	}
 	b.WriteString("\n")
-	b.WriteString(style.ItemDesc.Render("Premi Invio per installare, o torna indietro per modificare."))
+	b.WriteString(style.ItemDesc.Render("Avrai anche il comando ") +
+		style.Heading.Render("donkey (dk)") +
+		style.ItemDesc.Render(" per personalizzare Donkey quando vuoi."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Invio", Desc: "Installa"},
@@ -50,11 +71,11 @@ func (m Model) summaryView() string {
 
 // summaryRow disegna una riga della tabella: etichetta (ash) a sinistra e
 // valore (crema) a destra, con a-capo a rientro sotto la colonna del valore.
-func summaryRow(label, value string) string {
-	wrapped := lipgloss.NewStyle().Width(sumValueW).Render(value)
+func summaryRow(label, value string, labelW, valueW int) string {
+	wrapped := lipgloss.NewStyle().Width(valueW).Render(value)
 	lines := strings.Split(wrapped, "\n")
-	labelCell := style.ItemDesc.Width(sumLabelW).Render(label)
-	pad := strings.Repeat(" ", sumLabelW)
+	labelCell := style.ItemDesc.Width(labelW).Render(label)
+	pad := strings.Repeat(" ", labelW)
 
 	var b strings.Builder
 	for i, ln := range lines {
@@ -68,11 +89,16 @@ func summaryRow(label, value string) string {
 	return b.String()
 }
 
-func joinOrNone(labels []string, none string) string {
-	if len(labels) == 0 {
+// summaryList: elenco per nome se le voci sono poche, altrimenti conteggio.
+func summaryList(labels []string, none, plural string) string {
+	switch n := len(labels); {
+	case n == 0:
 		return none
+	case n <= maxSummaryNames:
+		return strings.Join(labels, " · ")
+	default:
+		return fmt.Sprintf("%d %s", n, plural)
 	}
-	return strings.Join(labels, " · ")
 }
 
 func yesNo(v bool) string {

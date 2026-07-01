@@ -33,15 +33,16 @@ type catalogMsg struct {
 
 // Model è lo stato del wizard di setup.
 type Model struct {
-	step        step
-	spin        spinner.Model
-	apps        picker
-	fonts       picker
-	theme       picker
-	suggest     bool // zsh-autosuggestions attivi (toggle dello step Terminale)
-	auto        bool // aggiornamento automatico in background (homebrew-autoupdate)
-	confirmQuit bool // mostra la conferma d'uscita (Q da qualunque schermata)
-	quitting    bool
+	step          step
+	spin          spinner.Model
+	width, height int
+	apps          picker
+	fonts         picker
+	theme         picker
+	suggest       bool // zsh-autosuggestions attivi (toggle dello step Terminale)
+	auto          bool // aggiornamento automatico in background (homebrew-autoupdate)
+	confirmQuit   bool // mostra la conferma d'uscita (Q da qualunque schermata)
+	quitting      bool
 }
 
 // New crea il modello del wizard.
@@ -70,6 +71,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		m.width, m.height = msg.Width, msg.Height
 		m.apps.setSize(msg.Width, msg.Height)
 		m.fonts.setSize(msg.Width, msg.Height)
 		m.theme.setSize(msg.Width, msg.Height)

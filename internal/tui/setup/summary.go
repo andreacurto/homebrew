@@ -57,9 +57,12 @@ func (m Model) summaryView() string {
 		b.WriteString(summaryRow(r[0], r[1], labelW, valueW))
 	}
 	b.WriteString("\n")
-	b.WriteString(style.ItemDesc.Render("Avrai anche il comando ") +
-		style.Heading.Render("donkey (dk)") +
-		style.ItemDesc.Render(" per personalizzare Donkey quando vuoi."))
+	cmd := lipgloss.NewStyle().Foreground(style.Cheddar).Bold(true)
+	b.WriteString(style.ItemDesc.Render("Dopo l'installazione, utilizzando il comando ") +
+		cmd.Render("donkey") +
+		style.ItemDesc.Render(" (o ") +
+		cmd.Render("dk") +
+		style.ItemDesc.Render(" in forma\nabbreviata) potrai personalizzare Donkey in qualsiasi momento."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Invio", Desc: "Installa"},

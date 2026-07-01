@@ -56,7 +56,7 @@ func New() Model {
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
-	m.theme.desc = "Un tema di Oh My Posh dà stile al tuo terminale: colori, icone e informazioni utili."
+	m.theme.desc = "Un tema Oh My Posh dà stile al tuo terminale: colori, icone e informazioni utili."
 	m.suggest = true // suggerimenti consigliati di default
 	m.auto = true    // aggiornamento automatico consigliato di default
 	return m
@@ -232,9 +232,7 @@ func (m Model) welcomeView() string {
 	b.WriteString(style.ItemTitle.Render(
 		"Donkey si prende cura del tuo Mac in un attimo.\n" +
 			"Installa le app che vuoi, personalizza il terminale e mantiene tutto aggiornato.\n" +
-			"Tu decidi, lui fa tutto il resto."))
-	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render("Quando sei pronto premi Invio per iniziare 🐒"))
+			"Tu scegli, lui fa tutto il resto 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Invio", Desc: "Inizia"},
@@ -265,13 +263,11 @@ func (m Model) autoView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Aggiornamenti automatici"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Vuoi che Donkey tenga aggiornato tutto in automatico?"))
+	b.WriteString(style.ItemTitle.Render("Vuoi che Donkey tenga tutto aggiornato in automatico?"))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render(
-		"Donkey una volta alla settimana, se il Mac è collegato alla\n" +
-			"corrente, controlla e installa automaticamente gli aggiornamenti\n" +
-			"delle app. Esegue anche la pulizia del sistema e tiene tutto in\n" +
-			"ordine senza che tu debba preoccupartene."))
+		"Una volta alla settimana, solo con il Mac in carica, Donkey\n" +
+			"aggiorna le app e pulisce il sistema da solo."))
 	b.WriteString("\n\n")
 	b.WriteString("  " + yesNoToggle(m.auto))
 	b.WriteString("\n\n")

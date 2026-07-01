@@ -34,12 +34,12 @@ const (
 
 // Assegnazione semantica: ruolo nella TUI → colore della palette.
 var (
-	Logo    = lipgloss.NewStyle().Foreground(Coral).Bold(true)      // brand "Donkey"
-	Bullet  = lipgloss.NewStyle().Foreground(Ash)                   // il "•" tra nome e slogan/schermata
-	Tagline = lipgloss.NewStyle().Foreground(Cheddar)               // slogan
-	URL     = lipgloss.NewStyle().Foreground(Ash)                   // info secondaria
-	Link    = lipgloss.NewStyle().Foreground(Ash).Underline(true)   // URL (sottolineato)
-	Heading = lipgloss.NewStyle().Foreground(Aquamarine).Bold(true) // nome del comando/vista aperta
+	Logo    = lipgloss.NewStyle().Foreground(Coral).Bold(true)    // brand "Donkey"
+	Bullet  = lipgloss.NewStyle().Foreground(Ash)                 // il "•" tra nome e slogan/schermata
+	Tagline = lipgloss.NewStyle().Foreground(Cheddar)             // slogan
+	URL     = lipgloss.NewStyle().Foreground(Ash)                 // info secondaria
+	Link    = lipgloss.NewStyle().Foreground(Ash).Underline(true) // URL (sottolineato)
+	Heading = lipgloss.NewStyle().Foreground(Cheddar).Bold(true)  // breadcrumb (secondo livello header)
 
 	// Voci di menù/liste: il titolo passa da base a selezione; la descrizione da muted a base.
 	ItemTitle    = lipgloss.NewStyle().Foreground(Cream)

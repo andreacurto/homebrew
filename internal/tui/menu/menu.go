@@ -20,8 +20,8 @@ type entry struct {
 var entries = []entry{
 	{"App", "Installa o disinstalla singole app"},
 	{"Terminale", "Personalizza il terminale con tema, font e autocompletamento"},
-	{"Update manuale", "Aggiorna ora app e librerie"},
-	{"Update automatico", "Gestisci l'aggiornamento automatico di app e librerie"},
+	{"Aggiornamento manuale", "Aggiorna ora le app e pulisci il Mac"},
+	{"Aggiornamento automatico", "Gestisci l'aggiornamento automatico"},
 	{"Status", "Lo stato di Donkey a colpo d'occhio"},
 }
 
@@ -116,7 +116,7 @@ func (m Model) menuView() string {
 			descStyle = style.ItemDescSel
 		}
 		b.WriteString(style.Cursor.Render(marker))
-		b.WriteString(titleStyle.Width(24).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
+		b.WriteString(titleStyle.Width(28).Render(fmt.Sprintf("%d. %s", i+1, e.title)))
 		b.WriteString(descStyle.Render(e.desc))
 		b.WriteString("\n")
 	}
@@ -124,10 +124,10 @@ func (m Model) menuView() string {
 	b.WriteString("\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "↑↓"},
-		style.FootKey{Key: "Invio", Desc: "apri"},
-		style.FootKey{Key: "U", Desc: "disinstalla"},
-		style.FootKey{Key: "V", Desc: "versione"},
-		style.FootKey{Key: "Q", Desc: "esci"},
+		style.FootKey{Key: "Invio", Desc: "Apri"},
+		style.FootKey{Key: "U", Desc: "Disinstalla"},
+		style.FootKey{Key: "V", Desc: "Versione"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
 	))
 	return style.Screen.Render(b.String())
 }
@@ -141,8 +141,8 @@ func (m Model) placeholderView() string {
 	b.WriteString(style.ItemDesc.Render("Questa vista arriverà presto."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Esc", Desc: "torna al menù"},
-		style.FootKey{Key: "Q", Desc: "esci"},
+		style.FootKey{Key: "Esc", Desc: "Torna al menù"},
+		style.FootKey{Key: "Q", Desc: "Esci"},
 	))
 	return style.Screen.Render(b.String())
 }

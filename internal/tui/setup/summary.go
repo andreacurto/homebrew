@@ -21,7 +21,7 @@ func (m Model) summaryView() string {
 	}
 	auto := "No"
 	if m.auto {
-		auto = "Sì · 1 volta a settimana"
+		auto = "Sì"
 	}
 
 	rows := [][2]string{
@@ -57,11 +57,11 @@ func (m Model) summaryView() string {
 		b.WriteString(summaryRow(r[0], r[1], labelW, valueW))
 	}
 	b.WriteString("\n")
-	cmd := lipgloss.NewStyle().Foreground(style.Cheddar).Bold(true)
+	cmd := lipgloss.NewStyle().Foreground(style.Aquamarine).Bold(true)
 	b.WriteString(style.ItemDesc.Render("Al termine dell'installazione potrai personalizzare in qualsiasi"))
 	b.WriteString("\n")
 	b.WriteString(style.ItemDesc.Render("momento Donkey lanciando il comando ") +
-		cmd.Render("'dk'") +
+		cmd.Render("dk") +
 		style.ItemDesc.Render(" da terminale."))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(

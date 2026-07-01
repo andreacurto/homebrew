@@ -261,7 +261,7 @@ func (p picker) view(spin spinner.Model) string {
 		b.WriteString(backQuitHints())
 
 	case p.err != nil:
-		b.WriteString(style.Error.Render(style.SymError + " Impossibile caricare il catalogo."))
+		b.WriteString(style.Error.Render("Impossibile caricare il catalogo."))
 		b.WriteString("\n")
 		b.WriteString(style.ItemDesc.Render(p.err.Error()))
 		b.WriteString("\n\n")

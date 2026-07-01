@@ -103,7 +103,7 @@ func (m Model) View() string {
 
 func (m Model) menuView() string {
 	var b strings.Builder
-	b.WriteString(style.Header("Il tuo Mac, pronto all'uso senza pensieri.", style.Tagline, ""))
+	b.WriteString(style.Header("Il tuo Mac pronto all'uso, senza pensieri.", style.Tagline, ""))
 	b.WriteString("\n\n")
 
 	for i, e := range entries {

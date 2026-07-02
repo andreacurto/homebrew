@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 )
@@ -97,10 +96,8 @@ func Parse(r io.Reader) ([]Entry, error) {
 		}
 		out = append(out, Entry{Label: label, Value: value, Desc: desc})
 	}
-	// Ordinamento alfabetico (case-insensitive) garantito a prescindere dalla
-	// sorgente: le liste mostrate all'utente sono sempre ordinate.
-	sort.SliceStable(out, func(i, j int) bool {
-		return strings.ToLower(out[i].Label) < strings.ToLower(out[j].Label)
-	})
+	// Nessun ordinamento a runtime: le voci restano nell'ordine del file.
+	// App e strumenti sono ordinati a mano; font e temi sono già alfabetici
+	// perché li ordina il generatore (scripts/gen-catalog.py).
 	return out, sc.Err()
 }

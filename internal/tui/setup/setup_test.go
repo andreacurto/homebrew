@@ -105,9 +105,12 @@ func TestInstallSimulationRunsToDone(t *testing.T) {
 	m.step = stepInstall
 	m.inst = newInstaller(m) // Homebrew + Configurazione terminale + Auto-update (default)
 
-	// La schermata di avanzamento mostra le fasi sempre presenti.
+	// La schermata di avanzamento mostra le fasi base (mai "Homebrew": è tutto Donkey).
 	v := m.View()
-	if !strings.Contains(v, "Homebrew") || !strings.Contains(v, "Configurazione terminale") {
+	if strings.Contains(v, "Homebrew") {
+		t.Error("la view Installazione non deve citare Homebrew")
+	}
+	if !strings.Contains(v, "Preparazione dell'ambiente") || !strings.Contains(v, "Configurazione terminale") {
 		t.Error("la view Installazione non elenca le fasi base")
 	}
 	if m.inst.done {

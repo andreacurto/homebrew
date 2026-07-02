@@ -131,8 +131,12 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	// Q apre la conferma d'uscita da qualunque schermata.
+	// Q apre la conferma d'uscita da qualunque schermata, tranne mentre
+	// l'installazione è in corso: lì non c'è un ritorno indietro pulito.
 	if k == "q" || k == "Q" {
+		if m.step == stepInstall && !m.inst.done {
+			return m, nil
+		}
 		m.confirmQuit = true
 		return m, nil
 	}
@@ -303,13 +307,9 @@ func (m Model) installView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Installazione"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Installo tutto sul tuo Mac, un attimo di pazienza… 🐵"))
+	b.WriteString(style.ItemTitle.Render("Ci penso io. Il tuo Mac sarà pronto tra un momento."))
 	b.WriteString("\n\n")
 	b.WriteString(m.inst.render(m.spin))
-	b.WriteString("\n\n")
-	b.WriteString(style.Hints(
-		style.FootKey{Key: "Q", Desc: "Esci"},
-	))
 	return style.Screen.Render(b.String())
 }
 

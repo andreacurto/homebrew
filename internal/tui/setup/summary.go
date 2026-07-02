@@ -9,10 +9,6 @@ import (
 	"github.com/andreacurto/donkey/internal/tui/style"
 )
 
-// maxSummaryNames: oltre questa soglia il riepilogo mostra il conteggio invece
-// dell'elenco, così la tabella resta compatta anche con molte selezioni.
-const maxSummaryNames = 8
-
 // summaryView mostra una tabella pulita di tutte le scelte fatte nel wizard.
 func (m Model) summaryView() string {
 	theme := "Nessuno"
@@ -25,9 +21,9 @@ func (m Model) summaryView() string {
 	}
 
 	rows := [][2]string{
-		{"App da installare", summaryList(m.apps.chosenLabels(), "Nessuna", "app selezionate")},
-		{"Strumenti terminale", summaryList(m.tools.chosenLabels(), "Nessuno", "strumenti selezionati")},
-		{"Font terminale", summaryList(m.fonts.chosenLabels(), "Nessuno", "font selezionati")},
+		{"App da installare", summaryCount(m.apps.selectedCount(), "Nessuna", "app selezionate")},
+		{"Strumenti terminale", summaryCount(m.tools.selectedCount(), "Nessuno", "strumenti selezionati")},
+		{"Font terminale", summaryCount(m.fonts.selectedCount(), "Nessuno", "font selezionati")},
 		{"Tema terminale", theme},
 		{"Aggiornamenti automatici", auto},
 	}
@@ -84,24 +80,21 @@ func summaryRow(label, value string, labelW, valueW int) string {
 	for i, ln := range lines {
 		ln = style.ItemTitle.Render(strings.TrimRight(ln, " "))
 		if i == 0 {
-			b.WriteString("  " + labelCell + ln + "\n")
+			b.WriteString(labelCell + ln + "\n")
 		} else {
-			b.WriteString("  " + pad + ln + "\n")
+			b.WriteString(pad + ln + "\n")
 		}
 	}
 	return b.String()
 }
 
-// summaryList: elenco per nome se le voci sono poche, altrimenti conteggio.
-func summaryList(labels []string, none, plural string) string {
-	switch n := len(labels); {
-	case n == 0:
+// summaryCount mostra sempre e solo il conteggio (mai l'elenco per nome), o la
+// dicitura "nessuno/a" se non è stato selezionato niente.
+func summaryCount(n int, none, plural string) string {
+	if n == 0 {
 		return none
-	case n <= maxSummaryNames:
-		return strings.Join(labels, " · ")
-	default:
-		return fmt.Sprintf("%d %s", n, plural)
 	}
+	return fmt.Sprintf("%d %s", n, plural)
 }
 
 func yesNo(v bool) string {

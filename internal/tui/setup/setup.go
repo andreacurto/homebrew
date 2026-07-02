@@ -307,7 +307,7 @@ func (m Model) installView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Installazione"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Ok, iniziamo! Il tuo Mac sarà pronto tra un momento."))
+	b.WriteString(style.ItemTitle.Render("Ok, iniziamo! Il tuo Mac sarà pronto tra un momento 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(m.inst.render(m.spin))
 	return style.Screen.Render(b.String())

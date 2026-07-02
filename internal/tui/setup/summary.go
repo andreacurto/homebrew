@@ -21,9 +21,9 @@ func (m Model) summaryView() string {
 	}
 
 	rows := [][2]string{
-		{"App da installare", summaryCount(m.apps.selectedCount(), "Nessuna", "app selezionate")},
-		{"Strumenti terminale", summaryCount(m.tools.selectedCount(), "Nessuno", "strumenti selezionati")},
-		{"Font terminale", summaryCount(m.fonts.selectedCount(), "Nessuno", "font selezionati")},
+		{"App da installare", summaryCount(m.apps.selectedCount(), "Nessuna", "selezionate")},
+		{"Strumenti terminale", summaryCount(m.tools.selectedCount(), "Nessuno", "selezionati")},
+		{"Font terminale", summaryCount(m.fonts.selectedCount(), "Nessuno", "selezionati")},
 		{"Tema terminale", theme},
 		{"Aggiornamenti automatici", auto},
 	}

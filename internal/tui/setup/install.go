@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -129,32 +128,20 @@ func (in installer) stateOf(p int) instState {
 	}
 }
 
-// render disegna la checklist: una riga per fase con marcatore e nome. Solo la
-// fase in corso mostra una percentuale crescente; a fase conclusa (qualunque
-// esito) la percentuale sparisce.
-//   - ✓ aquamarine + nome crema           = fatto
-//   - ▲ cheddar    + nome crema           = fatto con avviso
-//   - spinner      + nome coral + "NN%"   = in lavorazione
-//   - ○ ash        + nome ash             = in attesa
+// render disegna la checklist: una riga per fase con marcatore e nome. Niente
+// percentuali: la fase in corso è lo spinner, l'esito è ✓/▲.
+//   - ✓ aquamarine + nome crema = fatto
+//   - ▲ cheddar    + nome crema = fatto con avviso
+//   - spinner      + nome coral = in lavorazione
+//   - ○ ash        + nome ash   = in attesa
 func (in installer) render(spin spinner.Model) string {
-	nameW := 0
-	for _, ph := range in.phases {
-		if w := lipgloss.Width(ph.name); w > nameW {
-			nameW = w
-		}
-	}
-
 	var b strings.Builder
 	for i, ph := range in.phases {
-		st := in.stateOf(i)
-
-		switch st {
+		switch in.stateOf(i) {
 		case instRunning:
 			marker := lipgloss.NewStyle().Width(2).Render(spin.View())
-			name := lipgloss.NewStyle().Foreground(style.Coral).Bold(true).Width(nameW).Render(ph.name)
-			pct := int(float64(in.prog)/float64(ph.ticks)*100 + 0.5)
-			perc := style.ItemDesc.Render(fmt.Sprintf("%d%%", pct))
-			b.WriteString("  " + marker + " " + name + "   " + perc + "\n")
+			name := lipgloss.NewStyle().Foreground(style.Coral).Bold(true).Render(ph.name)
+			b.WriteString("  " + marker + " " + name + "\n")
 		case instDone:
 			sym, col := style.SymSuccess, style.Aquamarine
 			if ph.warn {

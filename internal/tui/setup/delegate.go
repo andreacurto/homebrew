@@ -23,6 +23,7 @@ type delegate struct {
 	single   bool
 	selected map[string]bool
 	labelW   int
+	descMax  int // limite caratteri della descrizione inline (0 = solo larghezza lista)
 }
 
 func (d delegate) Height() int                         { return 1 }
@@ -60,9 +61,13 @@ func (d delegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 
 	row := style.Cursor.Render(marker) + box + " " + labelStyle.Width(d.labelW).Render(it.e.Label)
 	if it.e.Desc != "" {
-		// La descrizione inline non deve mai sforare la larghezza della lista:
-		// la taglio (con …); quella completa la mostra il riquadro dettaglio.
-		if avail := m.Width() - d.labelW - 5; avail > 4 {
+		// Descrizione su una riga: tagliata con … al limite caratteri (descMax)
+		// e comunque mai oltre la larghezza della lista.
+		avail := m.Width() - d.labelW - 5
+		if d.descMax > 0 && d.descMax < avail {
+			avail = d.descMax
+		}
+		if avail > 4 {
 			row += descStyle.Render(clip(it.e.Desc, avail))
 		}
 	}

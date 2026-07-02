@@ -100,6 +100,40 @@ func TestAutoToggle(t *testing.T) {
 	}
 }
 
+func TestInstallSimulationRunsToDone(t *testing.T) {
+	m := New()
+	m.step = stepInstall
+	m.inst = newInstaller(m) // Homebrew + Configurazione terminale + Auto-update (default)
+
+	// La schermata di avanzamento mostra le fasi sempre presenti.
+	v := m.View()
+	if !strings.Contains(v, "Homebrew") || !strings.Contains(v, "Configurazione terminale") {
+		t.Error("la view Installazione non elenca le fasi base")
+	}
+	if m.inst.done {
+		t.Fatal("l'installazione non dovrebbe essere già conclusa")
+	}
+
+	// Avanza con i tick simulati finché non è tutto completato (guard anti-loop).
+	var model tea.Model = m
+	for i := 0; i < 100 && !model.(Model).inst.done; i++ {
+		model, _ = model.Update(installTickMsg{})
+	}
+	mm := model.(Model)
+	if !mm.inst.done {
+		t.Fatal("dopo i tick l'installazione dovrebbe essere conclusa")
+	}
+	if !strings.Contains(mm.View(), "Tutto pronto") {
+		t.Error("la schermata finale non mostra il messaggio di completamento")
+	}
+
+	// A installazione conclusa, Invio chiude il wizard.
+	_, cmd := mm.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	if cmd == nil {
+		t.Error("Invio sulla schermata 'Fatto' dovrebbe uscire dal wizard")
+	}
+}
+
 func TestPickerToggle(t *testing.T) {
 	p := newPicker(catalog.Apps, "App", "x", "", false)
 	p.setResult([]catalog.Entry{{Label: "A", Value: "a"}, {Label: "B", Value: "b"}}, nil)

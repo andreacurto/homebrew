@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/andreacurto/donkey/internal/catalog"
 	"github.com/andreacurto/donkey/internal/tui/style"
@@ -40,8 +41,9 @@ type Model struct {
 	tools         picker
 	fonts         picker
 	theme         picker
-	auto          bool // aggiornamento automatico in background (homebrew-autoupdate)
-	confirmQuit   bool // mostra la conferma d'uscita (Q da qualunque schermata)
+	auto          bool      // aggiornamento automatico in background (homebrew-autoupdate)
+	inst          installer // checklist di installazione (per ora simulata)
+	confirmQuit   bool      // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting      bool
 }
 
@@ -97,6 +99,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.theme.setResult(msg.entries, msg.err)
 		}
 		return m, nil
+	case installTickMsg:
+		m.inst.advance()
+		if m.inst.done {
+			return m, nil
+		}
+		return m, m.inst.tick()
 	case tea.KeyMsg:
 		return m.handleKey(msg)
 	}
@@ -193,13 +201,18 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		switch k {
 		case "enter":
 			m.step = stepInstall
+			m.inst = newInstaller(m)
+			return m, m.inst.tick()
 		case "esc":
 			m.step = stepAuto
 		}
 
 	case stepInstall:
-		if k == "esc" {
-			m.step = stepSummary
+		// A installazione conclusa, Invio chiude il wizard; mentre installa
+		// non si torna indietro (solo Q, gestita sopra, con conferma).
+		if m.inst.done && k == "enter" {
+			m.quitting = true
+			return m, tea.Quit
 		}
 	}
 	return m, nil
@@ -284,18 +297,35 @@ func toggleHints() string {
 }
 
 func (m Model) installView() string {
+	if m.inst.done {
+		return m.doneView()
+	}
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Installazione"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Qui Donkey installerà tutto. 🐵"))
+	b.WriteString(style.ItemTitle.Render("Installo tutto sul tuo Mac, un attimo di pazienza… 🐵"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemDesc.Render(
-		"Lo step di installazione vero arriva nel prossimo passo:\n" +
-			"Homebrew, app, font, tema, suggerimenti e auto-update."))
+	b.WriteString(m.inst.render(m.spin))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Esc", Desc: "Indietro"},
 		style.FootKey{Key: "Q", Desc: "Esci"},
+	))
+	return style.Screen.Render(b.String())
+}
+
+// doneView è la schermata finale: installazione conclusa, invito a usare dk.
+func (m Model) doneView() string {
+	cmd := lipgloss.NewStyle().Foreground(style.Aquamarine).Bold(true)
+	var b strings.Builder
+	b.WriteString(style.Header("Setup", style.Heading, "Fatto"))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render(style.SymSuccess + " Tutto pronto! Il tuo Mac è pronto all'uso. 🐵"))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render("Lancia ") + cmd.Render("dk") +
+		style.ItemTitle.Render(" da terminale quando vuoi per personalizzare Donkey."))
+	b.WriteString("\n\n")
+	b.WriteString(style.Hints(
+		style.FootKey{Key: "Invio", Desc: "Esci"},
 	))
 	return style.Screen.Render(b.String())
 }

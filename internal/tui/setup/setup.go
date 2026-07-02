@@ -16,9 +16,9 @@ type step int
 const (
 	stepWelcome step = iota
 	stepApps
+	stepTools
 	stepFonts
 	stepTheme
-	stepSuggest
 	stepAuto
 	stepSummary
 	stepInstall // placeholder: l'installazione vera arriva nel prossimo passo
@@ -37,9 +37,9 @@ type Model struct {
 	spin          spinner.Model
 	width, height int
 	apps          picker
+	tools         picker
 	fonts         picker
 	theme         picker
-	suggest       bool // zsh-autosuggestions attivi (toggle dello step Terminale)
 	auto          bool // aggiornamento automatico in background (homebrew-autoupdate)
 	confirmQuit   bool // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting      bool
@@ -48,17 +48,19 @@ type Model struct {
 // New crea il modello del wizard.
 func New() Model {
 	m := Model{
-		spin: style.NewSpinner(),
-		apps: newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
+		spin:  style.NewSpinner(),
+		apps:  newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
+		tools: newPicker(catalog.Tools, "Strumenti terminale", "Scegli gli strumenti terminale da installare:", "", false),
 		fonts: newPicker(catalog.Fonts, "Font terminale", "Scegli i font da installare:",
 			"Vedi tutti i fonts su https://www.nerdfonts.com/font-downloads", false),
 		theme: newPicker(catalog.Themes, "Tema terminale", "Scegli il tema del terminale:",
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
+	m.tools.countWord = "selezionati" // gli strumenti (m.), le app (f.)
+	m.fonts.countWord = "selezionati" // i font (m.)
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default
 	m.theme.desc = "Un tema Oh My Posh dà stile al tuo terminale: colori, icone e informazioni utili."
-	m.suggest = true // suggerimenti consigliati di default
-	m.auto = true    // aggiornamento automatico consigliato di default
+	m.auto = true // aggiornamento automatico consigliato di default
 	return m
 }
 
@@ -73,6 +75,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.apps.setSize(msg.Width, msg.Height)
+		m.tools.setSize(msg.Width, msg.Height)
 		m.fonts.setSize(msg.Width, msg.Height)
 		m.theme.setSize(msg.Width, msg.Height)
 		return m, nil
@@ -84,6 +87,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.target {
 		case catalog.Apps:
 			m.apps.setResult(msg.entries, msg.err)
+		case catalog.Tools:
+			m.tools.setResult(msg.entries, msg.err)
 		case catalog.Fonts:
 			m.fonts.setResult(msg.entries, msg.err)
 		case catalog.Themes:
@@ -133,10 +138,21 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		cmd, act := m.apps.update(key)
 		switch act {
 		case pickNext:
+			m.step = stepTools
+			return m, m.tools.begin()
+		case pickBack:
+			m.step = stepWelcome
+		}
+		return m, cmd
+
+	case stepTools:
+		cmd, act := m.tools.update(key)
+		switch act {
+		case pickNext:
 			m.step = stepFonts
 			return m, m.fonts.begin()
 		case pickBack:
-			m.step = stepWelcome
+			m.step = stepApps
 		}
 		return m, cmd
 
@@ -147,7 +163,7 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.step = stepTheme
 			return m, m.theme.begin()
 		case pickBack:
-			m.step = stepApps
+			m.step = stepTools
 		}
 		return m, cmd
 
@@ -155,21 +171,11 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		cmd, act := m.theme.update(key)
 		switch act {
 		case pickNext:
-			m.step = stepSuggest
+			m.step = stepAuto
 		case pickBack:
 			m.step = stepFonts
 		}
 		return m, cmd
-
-	case stepSuggest:
-		switch k {
-		case "left", "right", "h", "l", " ":
-			m.suggest = !m.suggest
-		case "enter":
-			m.step = stepAuto
-		case "esc":
-			m.step = stepTheme
-		}
 
 	case stepAuto:
 		switch k {
@@ -178,7 +184,7 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "enter":
 			m.step = stepSummary
 		case "esc":
-			m.step = stepSuggest
+			m.step = stepTheme
 		}
 
 	case stepSummary:
@@ -210,12 +216,12 @@ func (m Model) View() string {
 		return m.welcomeView()
 	case stepApps:
 		return m.apps.view(m.spin)
+	case stepTools:
+		return m.tools.view(m.spin)
 	case stepFonts:
 		return m.fonts.view(m.spin)
 	case stepTheme:
 		return m.theme.view(m.spin)
-	case stepSuggest:
-		return m.suggestView()
 	case stepAuto:
 		return m.autoView()
 	case stepSummary:
@@ -238,24 +244,6 @@ func (m Model) welcomeView() string {
 		style.FootKey{Key: "Invio", Desc: "Inizia"},
 		style.FootKey{Key: "Q", Desc: "Esci"},
 	))
-	return style.Screen.Render(b.String())
-}
-
-func (m Model) suggestView() string {
-	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "Suggerimenti terminale"))
-	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Vuoi abilitare i suggerimenti automatici del terminale?"))
-	b.WriteString("\n")
-	b.WriteString(style.ItemDesc.Render(
-		"Mentre digiti compare un completamento grigio in base alla\n" +
-			"cronologia dei tuoi comandi. Per accettare i suggerimenti basta\n" +
-			"premere la freccia a destra della tastiera."))
-	b.WriteString("\n\n")
-
-	b.WriteString("  " + yesNoToggle(m.suggest))
-	b.WriteString("\n\n")
-	b.WriteString(toggleHints())
 	return style.Screen.Render(b.String())
 }
 

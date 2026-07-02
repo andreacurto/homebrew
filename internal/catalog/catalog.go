@@ -25,6 +25,7 @@ type Entry struct {
 // Nomi dei cataloghi nel repo.
 const (
 	Apps   = "apps.list"
+	Tools  = "tools.list"
 	Fonts  = "fonts.list"
 	Themes = "themes.list"
 )

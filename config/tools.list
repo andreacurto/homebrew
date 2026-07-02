@@ -1,0 +1,8 @@
+# Catalogo strumenti terminale di Donkey — formato "Etichetta|nome|descrizione".
+# La descrizione è opzionale. Formule e cask convivono: brew install capisce da solo.
+Claude Code|claude-code|Assistente AI da terminale (Anthropic)
+Codex|codex|Agente AI da terminale (OpenAI)
+GitHub CLI|gh|GitHub da terminale
+Node.js|node|Esegue JavaScript, richiesto da molti strumenti
+Suggerimenti automatici|zsh-autosuggestions|Completamento grigio dalla cronologia, si accetta con →
+Autocompletamento avanzato|zsh-autocomplete|Menù di completamento in tempo reale mentre digiti

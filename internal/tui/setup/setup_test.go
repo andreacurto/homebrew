@@ -69,15 +69,22 @@ func TestCatalogMsgLoadsThemes(t *testing.T) {
 	}
 }
 
-func TestSuggestToggle(t *testing.T) {
+func TestCatalogMsgLoadsTools(t *testing.T) {
 	m := New()
-	if !m.suggest {
-		t.Fatal("i suggerimenti dovrebbero essere attivi di default")
+	m.step = stepTools
+	m.tools.loading = true
+
+	updated, _ := m.Update(catalogMsg{target: catalog.Tools, entries: []catalog.Entry{{Label: "GitHub CLI", Value: "gh"}}})
+	mm := updated.(Model)
+
+	if mm.tools.loading || !mm.tools.loaded {
+		t.Fatal("dopo catalogMsg lo stato degli strumenti dovrebbe essere caricato")
 	}
-	m.step = stepSuggest
-	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyLeft})
-	if updated.(Model).suggest {
-		t.Error("dopo Cambia i suggerimenti dovrebbero essere disattivati")
+	if !strings.Contains(mm.View(), "GitHub CLI") {
+		t.Error("la view Strumenti non mostra lo strumento caricato")
+	}
+	if len(mm.tools.chosenLabels()) != 0 {
+		t.Error("nessuno strumento deve essere preselezionato")
 	}
 }
 

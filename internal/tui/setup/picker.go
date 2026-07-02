@@ -33,6 +33,7 @@ type picker struct {
 	note      string // riga informativa/link sotto la descrizione (ash); "" se assente
 	single    bool   // selezione singola (radio) anziché multipla (checkbox)
 	noneLabel string // se valorizzato, voce "nessuno" (Value "") in cima alla lista
+	countWord string // parola del contatore: "selezionate" (default) o "selezionati"
 
 	width, height int
 	loaded        bool
@@ -272,7 +273,11 @@ func (p picker) view(spin spinner.Model) string {
 		if p.single {
 			head += "   " + style.Footer.Render(fmt.Sprintf("(%s selezionato)", p.selectionLabel()))
 		} else {
-			head += "   " + style.Footer.Render(fmt.Sprintf("(%d selezionate)", p.selectedCount()))
+			word := p.countWord
+			if word == "" {
+				word = "selezionate"
+			}
+			head += "   " + style.Footer.Render(fmt.Sprintf("(%d %s)", p.selectedCount(), word))
 		}
 		b.WriteString(head)
 		b.WriteString("\n")

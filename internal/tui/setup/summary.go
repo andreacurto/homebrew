@@ -26,9 +26,9 @@ func (m Model) summaryView() string {
 
 	rows := [][2]string{
 		{"App da installare", summaryList(m.apps.chosenLabels(), "Nessuna", "app selezionate")},
+		{"Strumenti terminale", summaryList(m.tools.chosenLabels(), "Nessuno", "strumenti selezionati")},
 		{"Font terminale", summaryList(m.fonts.chosenLabels(), "Nessuno", "font selezionati")},
 		{"Tema terminale", theme},
-		{"Suggerimenti automatici terminale", yesNo(m.suggest)},
 		{"Aggiornamenti automatici", auto},
 	}
 

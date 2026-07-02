@@ -110,7 +110,7 @@ func TestInstallSimulationRunsToDone(t *testing.T) {
 	if strings.Contains(v, "Homebrew") {
 		t.Error("la view Installazione non deve citare Homebrew")
 	}
-	if !strings.Contains(v, "Preparazione dell'ambiente") || !strings.Contains(v, "Configurazione terminale") {
+	if !strings.Contains(v, "Installazione Donkey") || !strings.Contains(v, "Configurazione terminale") {
 		t.Error("la view Installazione non elenca le fasi base")
 	}
 	if m.inst.done {

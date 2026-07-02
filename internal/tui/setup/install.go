@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -23,7 +24,6 @@ const (
 	collectionDelay = 120 * time.Millisecond
 	singletonTicks  = 6
 	singletonDelay  = 90 * time.Millisecond
-	barWidth        = 20
 )
 
 // simulateFontWarning è un aggancio TEMPORANEO di sola simulazione: fa concludere
@@ -69,7 +69,7 @@ func newInstaller(m Model) installer {
 		return instPhase{name: name, ticks: n, delay: collectionDelay}
 	}
 
-	ph := []instPhase{single("Preparazione dell'ambiente")}
+	ph := []instPhase{single("Installazione Donkey")}
 	if n := len(m.apps.chosenLabels()); n > 0 {
 		ph = append(ph, collection("Installazione App", n))
 	}
@@ -86,7 +86,7 @@ func newInstaller(m Model) installer {
 	}
 	ph = append(ph, single("Configurazione terminale"))
 	if m.auto {
-		ph = append(ph, single("Attivazione aggiornamenti automatici"))
+		ph = append(ph, single("Configurazione aggiornamenti automatici"))
 	}
 	return installer{phases: ph}
 }
@@ -129,11 +129,13 @@ func (in installer) stateOf(p int) instState {
 	}
 }
 
-// render disegna la checklist: una riga per fase con marcatore, nome e barra.
-//   - ✓ aquamarine + nome crema  = fatto
-//   - ▲ cheddar   + nome crema   = fatto con avviso
-//   - spinner     + nome coral   = in lavorazione (barra parziale)
-//   - ○ ash       + nome ash     = in attesa
+// render disegna la checklist: una riga per fase con marcatore e nome. Solo la
+// fase in corso mostra una percentuale crescente; a fase conclusa (qualunque
+// esito) la percentuale sparisce.
+//   - ✓ aquamarine + nome crema           = fatto
+//   - ▲ cheddar    + nome crema           = fatto con avviso
+//   - spinner      + nome coral + "NN%"   = in lavorazione
+//   - ○ ash        + nome ash             = in attesa
 func (in installer) render(spin spinner.Model) string {
 	nameW := 0
 	for _, ph := range in.phases {
@@ -146,30 +148,24 @@ func (in installer) render(spin spinner.Model) string {
 	for i, ph := range in.phases {
 		st := in.stateOf(i)
 
-		var marker, bar string
-		var nameStyle lipgloss.Style
 		switch st {
-		case instDone:
-			if ph.warn {
-				marker = markerCell(style.SymWarning, style.Cheddar)
-				bar = progressBar(1, style.Cheddar)
-			} else {
-				marker = markerCell(style.SymSuccess, style.Aquamarine)
-				bar = progressBar(1, style.Aquamarine)
-			}
-			nameStyle = lipgloss.NewStyle().Foreground(style.Cream)
 		case instRunning:
-			marker = lipgloss.NewStyle().Width(2).Render(spin.View())
-			bar = progressBar(float64(in.prog)/float64(ph.ticks), style.Coral)
-			nameStyle = lipgloss.NewStyle().Foreground(style.Coral).Bold(true)
+			marker := lipgloss.NewStyle().Width(2).Render(spin.View())
+			name := lipgloss.NewStyle().Foreground(style.Coral).Bold(true).Width(nameW).Render(ph.name)
+			pct := int(float64(in.prog)/float64(ph.ticks)*100 + 0.5)
+			perc := style.ItemDesc.Render(fmt.Sprintf("%d%%", pct))
+			b.WriteString("  " + marker + " " + name + "   " + perc + "\n")
+		case instDone:
+			sym, col := style.SymSuccess, style.Aquamarine
+			if ph.warn {
+				sym, col = style.SymWarning, style.Cheddar
+			}
+			name := lipgloss.NewStyle().Foreground(style.Cream).Render(ph.name)
+			b.WriteString("  " + markerCell(sym, col) + " " + name + "\n")
 		default:
-			marker = markerCell(style.SymOff, style.Ash)
-			bar = progressBar(0, style.Ash)
-			nameStyle = lipgloss.NewStyle().Foreground(style.Ash)
+			name := lipgloss.NewStyle().Foreground(style.Ash).Render(ph.name)
+			b.WriteString("  " + markerCell(style.SymOff, style.Ash) + " " + name + "\n")
 		}
-
-		name := nameStyle.Width(nameW).Render(ph.name)
-		b.WriteString("  " + marker + " " + name + "   " + bar + "\n")
 	}
 	return strings.TrimRight(b.String(), "\n")
 }
@@ -178,16 +174,4 @@ func (in installer) render(spin spinner.Model) string {
 // (✓ ○ ▲) restano allineati con lo spinner (emoji largo 2).
 func markerCell(sym string, col lipgloss.Color) string {
 	return lipgloss.NewStyle().Foreground(col).Width(2).Render(sym)
-}
-
-// progressBar disegna una barra piena/vuota larga barWidth: la parte piena nel
-// colore passato, il binario in ash.
-func progressBar(pct float64, fill lipgloss.Color) string {
-	n := int(pct*float64(barWidth) + 0.5)
-	if n > barWidth {
-		n = barWidth
-	}
-	filled := lipgloss.NewStyle().Foreground(fill).Render(strings.Repeat("█", n))
-	track := lipgloss.NewStyle().Foreground(style.Ash).Render(strings.Repeat("░", barWidth-n))
-	return filled + track
 }

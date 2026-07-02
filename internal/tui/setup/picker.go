@@ -26,14 +26,15 @@ const (
 // picker è una schermata di selezione su un catalogo live (App, Font, temi).
 // Si appoggia a bubbles/list per voci e paginazione; il footer lo disegna Donkey.
 type picker struct {
-	catalog   string // nome del catalogo (catalog.Apps, catalog.Fonts)
-	crumb     string // terzo livello dell'header (es. "App", "Font terminale")
-	prompt    string // testo sopra la lista
-	desc      string // descrizione multi-riga sotto il prompt (ash); "" se assente
-	note      string // riga informativa/link sotto la descrizione (ash); "" se assente
-	single    bool   // selezione singola (radio) anziché multipla (checkbox)
-	noneLabel string // se valorizzato, voce "nessuno" (Value "") in cima alla lista
-	countWord string // parola del contatore: "selezionate" (default) o "selezionati"
+	catalog    string // nome del catalogo (catalog.Apps, catalog.Fonts)
+	crumb      string // terzo livello dell'header (es. "App", "Font terminale")
+	prompt     string // testo sopra la lista
+	desc       string // descrizione multi-riga sotto il prompt (ash); "" se assente
+	note       string // riga informativa/link sotto la descrizione (ash); "" se assente
+	single     bool   // selezione singola (radio) anziché multipla (checkbox)
+	noneLabel  string // se valorizzato, voce "nessuno" (Value "") in cima alla lista
+	countWord  string // parola del contatore: "selezionate" (default) o "selezionati"
+	showDetail bool   // riquadro con la descrizione completa della voce evidenziata
 
 	width, height int
 	loaded        bool
@@ -81,7 +82,10 @@ func (p picker) listW() int {
 	return 20
 }
 
-// chrome stima le righe non-lista (header, prompt, descrizione, note, footer…).
+// detailLines è l'altezza fissa riservata al riquadro dettaglio.
+const detailLines = 3
+
+// chrome stima le righe non-lista (header, prompt, descrizione, note, dettaglio, footer…).
 func (p picker) chrome() int {
 	c := 10
 	if p.note != "" {
@@ -89,6 +93,9 @@ func (p picker) chrome() int {
 	}
 	if p.desc != "" {
 		c += strings.Count(p.desc, "\n") + 1
+	}
+	if p.showDetail {
+		c += detailLines + 1 // riga vuota + riquadro
 	}
 	return c
 }
@@ -291,10 +298,39 @@ func (p picker) view(spin spinner.Model) string {
 		}
 		b.WriteString("\n")
 		b.WriteString(strings.TrimRight(p.list.View(), "\n"))
+		if p.showDetail {
+			b.WriteString("\n\n")
+			b.WriteString(p.detailView())
+		}
 		b.WriteString("\n\n")
 		b.WriteString(p.footer())
 	}
 	return style.Screen.Render(b.String())
+}
+
+// detailView è il riquadro (altezza fissa) con la descrizione completa della
+// voce evidenziata; le righe mancanti restano vuote per non muovere il footer.
+func (p picker) detailView() string {
+	desc := ""
+	if it, ok := p.list.SelectedItem().(entryItem); ok {
+		desc = it.e.Desc
+	}
+	width := p.listW() - 2
+	if width < 10 {
+		width = 10
+	}
+	lines := strings.Split(lipgloss.NewStyle().Width(width).Render(desc), "\n")
+
+	var b strings.Builder
+	for i := 0; i < detailLines; i++ {
+		if i > 0 {
+			b.WriteString("\n")
+		}
+		if i < len(lines) {
+			b.WriteString("  " + style.ItemDesc.Render(strings.TrimRight(lines[i], " ")))
+		}
+	}
+	return b.String()
 }
 
 // footer compone la barra comandi nello stile Donkey. Le voci inutili (frecce

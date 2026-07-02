@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/andreacurto/donkey/internal/catalog"
 	"github.com/andreacurto/donkey/internal/tui/style"
@@ -59,7 +60,26 @@ func (d delegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 
 	row := style.Cursor.Render(marker) + box + " " + labelStyle.Width(d.labelW).Render(it.e.Label)
 	if it.e.Desc != "" {
-		row += descStyle.Render(it.e.Desc)
+		// La descrizione inline non deve mai sforare la larghezza della lista:
+		// la taglio (con …); quella completa la mostra il riquadro dettaglio.
+		if avail := m.Width() - d.labelW - 5; avail > 4 {
+			row += descStyle.Render(clip(it.e.Desc, avail))
+		}
 	}
 	fmt.Fprint(w, row)
+}
+
+// clip taglia s a max celle, aggiungendo … se necessario.
+func clip(s string, max int) string {
+	if max <= 0 {
+		return ""
+	}
+	if lipgloss.Width(s) <= max {
+		return s
+	}
+	r := []rune(s)
+	for len(r) > 1 && lipgloss.Width(string(r))+1 > max {
+		r = r[:len(r)-1]
+	}
+	return string(r) + "…"
 }

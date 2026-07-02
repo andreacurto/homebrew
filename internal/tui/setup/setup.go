@@ -56,6 +56,8 @@ func New() Model {
 		theme: newPicker(catalog.Themes, "Tema terminale", "Scegli il tema del terminale:",
 			"Vedi tutti i temi su https://ohmyposh.dev/docs/themes", true),
 	}
+	m.apps.showDetail = true          // riquadro descrizione sotto la lista
+	m.tools.showDetail = true         // idem per gli strumenti
 	m.tools.countWord = "selezionati" // gli strumenti (m.), le app (f.)
 	m.fonts.countWord = "selezionati" // i font (m.)
 	m.theme.noneLabel = "Nessun tema" // prima voce, selezionata di default

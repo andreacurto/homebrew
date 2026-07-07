@@ -307,7 +307,7 @@ func (m Model) installView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Installazione"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Ok, iniziamo! Il tuo Mac sarà pronto tra un momento 🐒"))
+	b.WriteString(style.ItemTitle.Render("Ok, iniziamo! Il tuo Mac sarà pronto a momenti 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(m.inst.render(m.spin))
 	return style.Screen.Render(b.String())
@@ -321,7 +321,7 @@ func (m Model) doneView() string {
 	var b strings.Builder
 	b.WriteString(style.Header("Setup", style.Heading, "Installazione completata"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Ci siamo! Donkey ha finito di sistemare il tuo Mac 🐵"))
+	b.WriteString(style.ItemTitle.Render("Ci siamo! Installazione Donkey terminata. 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(m.inst.recapTable())
 	b.WriteString("\n\n")
@@ -331,13 +331,13 @@ func (m Model) doneView() string {
 	}
 	b.WriteString(style.ItemTitle.Render("Riavvia il terminale per applicare tutte le modifiche."))
 	b.WriteString("\n")
-	b.WriteString(style.ItemTitle.Render("Lancia ") + dk.Render("dk") +
-		style.ItemTitle.Render(" quando vuoi per personalizzare Donkey."))
-	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Il tuo Mac è in ottime zampe. A presto! 🐒"))
+	b.WriteString(style.ItemTitle.Render("Dopo il riavvio, lancia il comando ") + dk.Render("dk") +
+		style.ItemTitle.Render(" per personalizzare Donkey"))
+	b.WriteString("\n")
+	b.WriteString(style.ItemTitle.Render("in qualsiasi momento. Enjoy 🍌"))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
-		style.FootKey{Key: "Invio", Desc: "Esci"},
+		style.FootKey{Key: "Invio", Desc: "Termina setup"},
 	))
 	return style.Screen.Render(b.String())
 }

@@ -59,11 +59,13 @@ const (
 //   - items: etichette degli elementi (vuoto per le fasi singole)
 //   - failed: elementi non installati (sottoinsieme di items); per una fase singola,
 //     se non vuoto la fase è considerata fallita
+//   - config: fase di configurazione (non installazione) → esito "Configurazione …"
 type instPhase struct {
 	name   string
 	recap  string
 	items  []string
 	failed []string
+	config bool
 	ticks  int
 	delay  time.Duration
 }
@@ -99,7 +101,7 @@ func newInstaller(m Model) installer {
 		return instPhase{name: name, recap: recap, items: items, ticks: len(items), delay: collectionDelay}
 	}
 
-	ph := []instPhase{single("Installazione Donkey", "Donkey")}
+	ph := []instPhase{single("Installazione Donkey core", "Donkey core")}
 	if items := m.apps.chosenLabels(); len(items) > 0 {
 		ph = append(ph, collection("Installazione App", "App", items))
 	}
@@ -117,12 +119,15 @@ func newInstaller(m Model) installer {
 		}
 		ph = append(ph, fonts)
 	}
-	if m.theme.selectionValue() != "" {
-		ph = append(ph, single("Configurazione tema", "Tema terminale"))
-	}
-	ph = append(ph, single("Configurazione terminale", "Terminale"))
+	// La configurazione del terminale (zshrc: autocompletamento, alias e, se scelto,
+	// il tema) è sempre presente. Il tema non è più una fase a sé.
+	term := single("Configurazione terminale", "Configurazione terminale")
+	term.config = true
+	ph = append(ph, term)
 	if m.auto {
-		ph = append(ph, single("Configurazione aggiornamenti automatici", "Aggiornamenti automatici"))
+		au := single("Configurazione aggiornamenti automatici", "Aggiornamenti automatici")
+		au.config = true
+		ph = append(ph, au)
 	}
 	return installer{phases: ph}
 }
@@ -207,7 +212,7 @@ func (in installer) recapTable() string {
 	for _, ph := range in.phases {
 		o := ph.outcome()
 		sym, col := outcomeMarker(o)
-		esito := lipgloss.NewStyle().Foreground(col).Render(sym + " " + outcomeText(o))
+		esito := lipgloss.NewStyle().Foreground(col).Render(sym + " " + outcomeText(o, ph.config))
 		label := style.ItemDesc.Width(labelW).Render(ph.recap)
 		b.WriteString(label + esito + "\n")
 	}
@@ -215,28 +220,42 @@ func (in installer) recapTable() string {
 }
 
 // recapDetails elenca, per ogni fase non riuscita del tutto o in parte, cosa
-// esattamente non è stato installato. Avvisi in cheddar, errori in coral.
-// Stringa vuota se è filato tutto liscio.
+// esattamente non è stato installato, in forma stringata:
+//
+//	Font terminale: installazione 'Zed Mono' non riuscita
+//
+// Avvisi in cheddar, errori in coral. Stringa vuota se è filato tutto liscio.
 func (in installer) recapDetails() string {
 	var lines []string
 	for _, ph := range in.phases {
 		switch ph.outcome() {
 		case outWarning:
 			lines = append(lines, style.Alert.Render(fmt.Sprintf(
-				"%s %s — non è stato possibile installare: %s",
-				style.SymWarning, ph.recap, strings.Join(ph.failed, ", "))))
+				"%s: installazione %s non riuscita", ph.recap, quotedList(ph.failed))))
 		case outError:
 			if len(ph.items) > 0 {
 				lines = append(lines, style.Error.Render(fmt.Sprintf(
-					"%s %s — non è stato possibile installare: %s",
-					style.SymError, ph.recap, strings.Join(ph.failed, ", "))))
+					"%s: installazione %s non riuscita", ph.recap, quotedList(ph.failed))))
 			} else {
+				noun := "installazione"
+				if ph.config {
+					noun = "configurazione"
+				}
 				lines = append(lines, style.Error.Render(fmt.Sprintf(
-					"%s %s — operazione non riuscita", style.SymError, ph.recap)))
+					"%s: %s non riuscita", ph.recap, noun)))
 			}
 		}
 	}
 	return strings.Join(lines, "\n")
+}
+
+// quotedList formatta gli elementi tra apici, separati da virgola: 'A', 'B'.
+func quotedList(items []string) string {
+	q := make([]string, len(items))
+	for i, it := range items {
+		q[i] = "'" + it + "'"
+	}
+	return strings.Join(q, ", ")
 }
 
 // outcomeMarker: simbolo e colore dell'esito.
@@ -251,15 +270,23 @@ func outcomeMarker(o instOutcome) (string, lipgloss.Color) {
 	}
 }
 
-// outcomeText: la dicitura di esito mostrata nella tabella finale.
-func outcomeText(o instOutcome) string {
+// outcomeText: la dicitura di esito mostrata nella tabella finale. Le fasi di
+// configurazione (terminale, aggiornamenti) usano "Configurazione …".
+func outcomeText(o instOutcome, config bool) string {
+	noun := "Installazione"
+	if config {
+		noun = "Configurazione"
+	}
 	switch o {
 	case outWarning:
-		return "Installazione completata con avvisi"
+		return noun + " completata con avvisi"
 	case outError:
+		if config {
+			return "Impossibile completare la configurazione"
+		}
 		return "Impossibile completare l'installazione"
 	default:
-		return "Installazione completata"
+		return noun + " completata"
 	}
 }
 

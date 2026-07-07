@@ -126,14 +126,49 @@ func TestInstallSimulationRunsToDone(t *testing.T) {
 	if !mm.inst.done {
 		t.Fatal("dopo i tick l'installazione dovrebbe essere conclusa")
 	}
-	if !strings.Contains(mm.View(), "Tutto pronto") {
-		t.Error("la schermata finale non mostra il messaggio di completamento")
+	if !strings.Contains(mm.View(), "Installazione completata") {
+		t.Error("la schermata finale non mostra il riepilogo di completamento")
 	}
 
 	// A installazione conclusa, Invio chiude il wizard.
 	_, cmd := mm.Update(tea.KeyMsg{Type: tea.KeyEnter})
 	if cmd == nil {
 		t.Error("Invio sulla schermata 'Fatto' dovrebbe uscire dal wizard")
+	}
+}
+
+func TestInstallerOutcomeAndDetails(t *testing.T) {
+	in := installer{phases: []instPhase{
+		{recap: "App", items: []string{"1Password", "Spotify"}},                                     // tutto ok
+		{recap: "Font terminale", items: []string{"Fira Code", "Meslo"}, failed: []string{"Meslo"}}, // parziale → avviso
+		{recap: "Strumenti terminale", items: []string{"gh"}, failed: []string{"gh"}},               // tutta fallita → errore
+		{recap: "Terminale"}, // fase singola ok
+	}}
+
+	if got := in.phases[0].outcome(); got != outSuccess {
+		t.Errorf("App: esito = %d, atteso success", got)
+	}
+	if got := in.phases[1].outcome(); got != outWarning {
+		t.Errorf("Font: esito = %d, atteso warning", got)
+	}
+	if got := in.phases[2].outcome(); got != outError {
+		t.Errorf("Strumenti: esito = %d, atteso error", got)
+	}
+
+	det := in.recapDetails()
+	if !strings.Contains(det, "Meslo") {
+		t.Error("il dettaglio deve nominare il font non installato (Meslo)")
+	}
+	if !strings.Contains(det, "gh") {
+		t.Error("il dettaglio deve nominare lo strumento non installato (gh)")
+	}
+
+	table := in.recapTable()
+	if !strings.Contains(table, "Installazione completata con avvisi") {
+		t.Error("la tabella deve riportare l'esito con avvisi per i font")
+	}
+	if !strings.Contains(table, "Impossibile completare l'installazione") {
+		t.Error("la tabella deve riportare l'esito di errore per gli strumenti")
 	}
 }
 

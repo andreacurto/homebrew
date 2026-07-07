@@ -313,16 +313,28 @@ func (m Model) installView() string {
 	return style.Screen.Render(b.String())
 }
 
-// doneView è la schermata finale: installazione conclusa, invito a usare dk.
+// doneView è il riepilogo post-installazione, stessa struttura del pre-installazione:
+// descrizione, tabella degli esiti per fase, dettaglio di avvisi/errori, e infine
+// le indicazioni sempre presenti (riavvia il terminale, usa dk) più un saluto.
 func (m Model) doneView() string {
-	cmd := lipgloss.NewStyle().Foreground(style.Aquamarine).Bold(true)
+	dk := lipgloss.NewStyle().Foreground(style.Aquamarine).Bold(true)
 	var b strings.Builder
-	b.WriteString(style.Header("Setup", style.Heading, "Fatto"))
+	b.WriteString(style.Header("Setup", style.Heading, "Installazione completata"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render(style.SymSuccess + " Tutto pronto! Il tuo Mac è pronto all'uso. 🐵"))
+	b.WriteString(style.ItemTitle.Render("Ci siamo! Donkey ha finito di sistemare il tuo Mac 🐵"))
 	b.WriteString("\n\n")
-	b.WriteString(style.ItemTitle.Render("Lancia ") + cmd.Render("dk") +
-		style.ItemTitle.Render(" da terminale quando vuoi per personalizzare Donkey."))
+	b.WriteString(m.inst.recapTable())
+	b.WriteString("\n\n")
+	if d := m.inst.recapDetails(); d != "" {
+		b.WriteString(d)
+		b.WriteString("\n\n")
+	}
+	b.WriteString(style.ItemTitle.Render("Riavvia il terminale per applicare tutte le modifiche."))
+	b.WriteString("\n")
+	b.WriteString(style.ItemTitle.Render("Lancia ") + dk.Render("dk") +
+		style.ItemTitle.Render(" quando vuoi per personalizzare Donkey."))
+	b.WriteString("\n\n")
+	b.WriteString(style.ItemTitle.Render("Il tuo Mac è in ottime zampe. A presto! 🐒"))
 	b.WriteString("\n\n")
 	b.WriteString(style.Hints(
 		style.FootKey{Key: "Invio", Desc: "Esci"},

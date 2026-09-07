@@ -220,14 +220,11 @@ In ogni caso: niente `rm -rf` "creativi", e **zero residui** dopo la pulizia tot
 ---
 
 ## 8. Workflow di sviluppo (git)
-1. **Piano di rilascio** prima di toccare codice: nome branch, commit previsti, versione target → attendere OK.
-2. **Branch**: `feature/<nome>` (MINOR), `fix/<nome>` (PATCH). Mai `dev/`.
-3. **Sviluppo autonomo**: commit + push automatici dopo l'OK.
-4. **Review pre-merge**: chiedere **sempre** conferma prima del merge su `master`.
-5. **Squash merge** su `master`: un solo commit (titolo + `Versione: X → Y` + `Modifiche:`). Mai rebase su master né merge `--no-ff`.
-6. **Tag** `vX.Y.Z` (prefisso `v` obbligatorio) + cleanup del branch.
+Rami, commit, merge e rilasci sono definiti in **`WORKFLOW.md`**, che è la fonte di verità: in caso
+di contraddizione con qualsiasi altro documento, vince quello.
 
-Convenzioni: [Conventional Commits](https://www.conventionalcommits.org/) con prefisso maiuscolo (`Feat`, `Fix`, `Docs`, `Refactor`, `Style`, `Chore`); italiano per descrizioni e messaggi UI.
+In sintesi: `main` stabile, `develop` di integrazione, una attività per ramo `feature/`/`fix/` che
+parte da `develop`, squash merge in `develop` previa approvazione. **Nessun tag fino alla v2.0.0.**
 
 ---
 

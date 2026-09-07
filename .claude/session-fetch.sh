@@ -21,7 +21,9 @@ if [ -z "$remote_ref" ]; then
     if git rev-parse --verify "origin/$branch" >/dev/null 2>&1; then
         remote_ref="origin/$branch"
     else
-        remote_ref="origin/master"
+        # Ramo nuovo non ancora pushato: il confronto sensato è con develop,
+        # da cui nascono tutte le attività (vedi WORKFLOW.md).
+        remote_ref="origin/develop"
     fi
 fi
 
@@ -48,12 +50,15 @@ $commits
 ISTRUZIONE PER CLAUDE: riassumi all'utente cosa è cambiato sul remoto e CHIEDI esplicitamente se vuole fare 'git pull' per allinearsi oppure mantenere lo stato attuale. NON eseguire il pull senza conferma."
 elif [ "$ahead" -gt 0 ] && [ "$behind" -eq 0 ]; then
     # Locale AVANTI rispetto al remoto
-    if [ "$branch" = "master" ]; then
+    if [ "$branch" = "main" ]; then
         summary="$summary
-Il branch master locale è AVANTI di $ahead commit non pushati rispetto al remoto. Per convenzione di progetto master deve restare allineato al remoto. ISTRUZIONE PER CLAUDE: segnala la cosa all'utente e chiedi se vuole pushare o sistemare la situazione."
+Il branch main locale è AVANTI di $ahead commit non pushati rispetto al remoto. main è il ramo stabile pubblicato: non ci si sviluppa e deve restare allineato al remoto (vedi WORKFLOW.md). ISTRUZIONE PER CLAUDE: segnala la cosa all'utente e chiedi come vuole sistemare la situazione. Non pushare su main senza conferma esplicita."
+    elif [ "$branch" = "develop" ]; then
+        summary="$summary
+Il branch develop locale è AVANTI di $ahead commit non pushati rispetto al remoto: probabilmente è un'attività appena chiusa con squash merge e non ancora pushata. ISTRUZIONE PER CLAUDE: segnala lo stato all'utente e chiedi se vuole pushare."
     else
         summary="$summary
-Il branch '$branch' è AVANTI di $ahead commit rispetto al remoto: probabilmente è una feature in corso su un ramo dedicato, è normale. ISTRUZIONE PER CLAUDE: segnala solo brevemente lo stato, nessuna azione necessaria."
+Il branch '$branch' è AVANTI di $ahead commit rispetto al remoto: probabilmente è un'attività in corso su un ramo dedicato, è normale. ISTRUZIONE PER CLAUDE: segnala solo brevemente lo stato, nessuna azione necessaria."
     fi
 else
     # Storie DIVERGENTI

@@ -19,12 +19,24 @@ cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null)
 # Considera solo la prima invocazione 'git tag ...', fermandosi ai separatori
 after=$(printf '%s' "$cmd" | sed -nE 's/.*git[[:space:]]+tag[[:space:]]+(.*)/\1/p')
 [ -z "$after" ] && exit 0
-after=$(printf '%s' "$after" | sed -E 's/[[:space:]]*(&&|\|\||;).*//')
+# Si ferma al primo separatore, pipe singola inclusa: 'git tag | wc -l'
+# elenca, non crea, e non deve essere bloccato.
+after=$(printf '%s' "$after" | sed -E 's/[[:space:]]*(&&|\||;|>).*//')
 
-# Cancellazione/elenco tag: non è una creazione, lascia passare
-case " $after " in
-    *" -d "*|*" --delete "*|*" -l "*|*" --list "*) exit 0 ;;
-esac
+# Cancellazione ed elenco non sono creazioni: lascia passare.
+# Basta che compaia una di queste opzioni di sola lettura — diverse di esse
+# vogliono un valore ('--contains develop') che altrimenti verrebbe scambiato
+# per il nome del tag da creare.
+for tok in $after; do
+    case "$tok" in
+        -d|--delete|-l|--list|-n|-n[0-9]*|-i|--ignore-case|--column|--omit-empty)
+            exit 0 ;;
+        --contains|--no-contains|--points-at|--merged|--no-merged)
+            exit 0 ;;
+        --sort|--sort=*|--format|--format=*)
+            exit 0 ;;
+    esac
+done
 
 # Primo token non-flag = nome del tag
 tag=""

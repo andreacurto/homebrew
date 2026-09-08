@@ -65,6 +65,13 @@ var MonkeySpinner = spinner.Spinner{
 	FPS:    time.Second / 5,
 }
 
+// Notice compone un'annotazione informativa "◆ testo" in cheddar: serve agli
+// stati dell'app che l'utente deve notare senza allarmarsi (es. la modalità
+// prova). Non è un errore né un avviso su un'operazione: è un contesto.
+func Notice(text string) string {
+	return Alert.Render(SymInfo + " " + text)
+}
+
 // NewSpinner crea uno spinner già impostato sullo stile Donkey.
 func NewSpinner() spinner.Model {
 	s := spinner.New()

@@ -315,3 +315,34 @@ func TestPhaseResultOverridesDeducedOutcome(t *testing.T) {
 		t.Errorf("il dettaglio non deve stampare un elenco vuoto:\n%s", det)
 	}
 }
+
+func TestDryRunBadge(t *testing.T) {
+	const badge = "Modalità prova"
+
+	// In modalità prova l'avviso compare ovunque si parli di installazione.
+	m := NewWith(Deps{Brew: brew.NewDry(true), Store: state.New(t.TempDir())})
+	m.step = stepSummary
+	if v := m.summaryView(); !strings.Contains(v, badge) {
+		t.Error("il riepilogo non avvisa che è una prova")
+	}
+
+	m.step = stepInstall
+	m.inst = newInstaller(m)
+	if v := m.installView(); !strings.Contains(v, badge) {
+		t.Error("la schermata di installazione non avvisa che è una prova")
+	}
+
+	mm := driveInstall(t, m)
+	if v := mm.View(); !strings.Contains(v, badge) {
+		t.Error("la schermata finale non avvisa che è una prova: il riepilogo verrebbe preso per buono")
+	}
+
+	// Con i comandi reali l'avviso non deve comparire da nessuna parte.
+	r := NewWith(Deps{Brew: brew.New(&coreRunner{present: true}), Store: state.New(t.TempDir())})
+	r.step = stepInstall
+	r.inst = newInstaller(r)
+	rr := driveInstall(t, r)
+	if v := rr.summaryView() + rr.View(); strings.Contains(v, badge) {
+		t.Error("fuori dalla modalità prova l'avviso non deve comparire")
+	}
+}

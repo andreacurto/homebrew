@@ -147,6 +147,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// dryBadge è l'avviso di modalità prova, stringa vuota se non è attiva. Va
+// mostrato ovunque si parli di installazione: senza, una prova si scambia per
+// un'installazione vera — e, peggio, il contrario.
+func (m Model) dryBadge() string {
+	if m.deps.Brew == nil || !m.deps.Brew.DryRun() {
+		return ""
+	}
+	return style.Notice("Modalità prova: nessun comando viene eseguito.") + "\n\n"
+}
+
 // pumpInstall programma il passo successivo dell'installazione, o si ferma se
 // è tutto concluso.
 func (m Model) pumpInstall() (tea.Model, tea.Cmd) {
@@ -354,6 +364,7 @@ func (m Model) installView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render("Ok, iniziamo! Il tuo Mac sarà pronto a momenti 🐒"))
 	b.WriteString("\n\n")
+	b.WriteString(m.dryBadge())
 	b.WriteString(m.inst.render(m.spin))
 	return style.Screen.Render(b.String())
 }
@@ -368,6 +379,7 @@ func (m Model) doneView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render("Ci siamo! Installazione Donkey terminata. 🐒"))
 	b.WriteString("\n\n")
+	b.WriteString(m.dryBadge())
 	b.WriteString(m.inst.recapTable())
 	b.WriteString("\n\n")
 	if d := m.inst.recapDetails(); d != "" {

@@ -50,6 +50,7 @@ func (m Model) summaryView() string {
 	b.WriteString("\n\n")
 	b.WriteString(style.ItemTitle.Render("Ecco cosa farà Donkey sul tuo Mac:"))
 	b.WriteString("\n\n")
+	b.WriteString(m.dryBadge())
 	for _, r := range rows {
 		b.WriteString(summaryRow(r[0], r[1], labelW, valueW))
 	}

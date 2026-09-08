@@ -17,8 +17,8 @@ Com'è fatto il codice e come ci si lavora. È il documento da aprire quando si 
 main.go                        entry point: instrada a sottocomando o menù
 internal/
 ├── catalog/catalog.go         scarica e parsa i cataloghi (nessuna cache)
-├── brew/brew.go               wrapper su Homebrew (NON ancora usato da nessuno)
-├── state/state.go             registro ~/.donkey/ (NON ancora usato da nessuno)
+├── brew/brew.go               wrapper su Homebrew + modalità prova
+├── state/state.go             registro ~/.donkey/
 └── tui/
     ├── style/style.go         palette, simboli, header, footer — unica fonte del look
     ├── menu/menu.go           menù principale (le voci sono segnaposto)
@@ -27,7 +27,8 @@ internal/
         ├── picker.go          schermata di selezione su un catalogo
         ├── delegate.go        disegno di una riga di lista (checkbox/radio)
         ├── summary.go         riepilogo pre-installazione
-        └── install.go         checklist di installazione + esiti
+        ├── install.go         checklist di installazione + esiti
+        └── core.go            fase reale: installa Donkey core e lo annota
 config/*.list                  cataloghi: apps, tools, fonts, themes
 scripts/gen-catalog.py         rigenera fonts.list e themes.list
 ```
@@ -75,6 +76,7 @@ cartella locale.
 | `make build` | Compila il binario in `bin/dk` |
 | `make run` | Avvia il menù principale |
 | `make run-setup` | Avvia il wizard **usando i cataloghi locali** — è il comando da usare per provare |
+| `make run-dry` | Come sopra ma in **modalità prova**: flusso reale, nessun comando eseguito. Aggiungi `DONKEY_DRY_RUN=present` per un Mac che ha già il core |
 | `make test` | Esegue i test |
 | `make lint` | `gofmt -l .` + `go vet ./...` |
 | `make tidy` | Sistema le dipendenze |
@@ -86,7 +88,8 @@ cartella locale.
 | Variabile | Effetto |
 |---|---|
 | `DONKEY_CATALOG_URL` | Sorgente dei cataloghi: un URL oppure un percorso locale |
-| `DONKEY_HOME` | Cartella del registro (default `~/.donkey`) — utile nei test |
+| `DONKEY_HOME` | Cartella del registro (default `~/.donkey`) — utile nei test e per isolare le prove |
+| `DONKEY_DRY_RUN` | **Modalità prova**: `1`/`true`/`on` immagina un Mac senza il core, `present` uno che ce l'ha già. Qualsiasi altro valore (o assente) = comandi reali |
 
 ---
 
@@ -95,6 +98,8 @@ cartella locale.
 - Si eseguono con `make test`; devono essere **verdi prima di ogni commit**, insieme a `make lint`.
 - La logica (cataloghi, Homebrew, registro) si testa in isolamento. Per Homebrew si inietta un
   esecutore finto, quindi **i test non installano mai nulla davvero**.
+- Anche il wizard si testa così: `setup.NewWith(setup.Deps{...})` accetta un client Homebrew e un
+  registro espliciti. `setup.New()` costruisce quelli reali ed è riservato a `main.go`.
 - L'interfaccia si testa "senza schermo": si costruisce il modello, si chiama `View()` e si
   verificano i testi, guidando le transizioni con messaggi passati a `Update()`.
 - Per *vedere* l'app serve un terminale vero: `make run-setup`.

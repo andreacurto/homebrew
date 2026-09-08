@@ -25,9 +25,10 @@ scorciatoia **`dk`**.
 
 ## ⚠️ Lo stato di oggi, in una riga
 
-**L'installazione è interamente simulata: nessun comando reale viene eseguito, il Mac non viene
-toccato.** Prima di scrivere codice, leggi [`docs/MIGRATION.md`](docs/MIGRATION.md) per sapere cosa
-funziona davvero.
+**L'installazione è reale solo per "Donkey core": tutto il resto — App, Strumenti, Font,
+terminale, aggiornamenti — è ancora simulato.** Per lavorare senza toccare il Mac c'è la modalità
+prova: `make run-dry`. Prima di scrivere codice, leggi
+[`docs/MIGRATION.md`](docs/MIGRATION.md) per sapere cosa funziona davvero.
 
 ---
 

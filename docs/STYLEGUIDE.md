@@ -79,6 +79,12 @@ In fondo, la barra comandi composta da `style.Hints`, con i comandi divisi da `�
 | `■` / `□` | `SymCheckOn` / `SymCheckOff` | checkbox multi-selezione |
 | `●` / `○` | `SymOn` / `SymOff` | acceso/spento, installato/non installato |
 
+### Note informative
+
+`style.Notice("…")` compone un'annotazione `◆ testo` in cheddar. Serve agli **stati dell'app** che
+l'utente deve notare senza allarmarsi — non a un errore né all'esito di un'operazione, che hanno già
+✗ e ▲. Oggi la usa l'avviso di modalità prova nelle schermate di installazione.
+
 ---
 
 ## Animazioni

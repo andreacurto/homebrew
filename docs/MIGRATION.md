@@ -49,12 +49,34 @@ Questa sezione va tenuta aggiornata: è la prima cosa che serve sapere prima di 
 |---|---|
 | Menù principale (`dk`) | Navigabile, ma tutte e 5 le voci mostrano un segnaposto |
 | Wizard (`dk setup`) | **Interfaccia completa** e rifinita, da benvenuto a riepilogo finale |
-| Installazione vera | ❌ **Interamente simulata** |
-| `internal/brew`, `internal/state` | Scritti e testati, ma **non ancora usati da nessuno** |
+| Installazione di **Donkey core** | ✅ **Reale**: verifica, installa se manca, annota nel registro |
+| Installazione di App, Strumenti, Font | ❌ Simulata |
+| Configurazione terminale e aggiornamenti | ❌ Simulata |
+| `internal/brew`, `internal/state` | Usati dal wizard nella fase core |
 
-**Come è fatta la simulazione:** `install.go` fa avanzare la checklist con un timer (`tea.Tick`) e
-ritardi inventati. Gli esiti ✓/▲/✗ vengono dalle costanti `simulateFontWarning` e
-`simulateToolsError`. **Nessun comando reale viene eseguito**: il Mac non viene toccato.
+**Come convivono il vero e il finto:** ogni fase della checklist porta con sé il proprio motore. Se
+ha un comando (campo `run` di `instPhase`) è **reale**: parte il comando, torna l'esito, la fase si
+chiude tutta insieme. Se non ce l'ha è **simulata**: avanza a sotto-passi con un timer (`tea.Tick`)
+e ritardi inventati. Oggi solo la fase core ha un comando; le altre lo riceveranno una alla volta,
+senza toccare l'impalcatura.
+
+Resta un aggancio finto: `simulateFontWarning` in `install.go`, che fa fallire un font per mostrare
+l'esito ▲. Va via quando i font si installeranno davvero.
+
+### La modalità prova
+
+Isolare Homebrew su macOS è oneroso (il perché è in [`TODO.md`](TODO.md)), quindi per sviluppare
+senza toccare il Mac c'è una **modalità prova**: il flusso è quello vero, ma i comandi non vengono
+eseguiti — un esecutore finto immagina il Mac al posto loro. È attiva a schermo, con un avviso
+visibile su riepilogo, installazione e schermata finale.
+
+```bash
+make run-dry                          # Mac immaginato senza il core
+make run-dry DONKEY_DRY_RUN=present   # Mac immaginato che ce l'ha già
+```
+
+Il secondo caso è il più frequente sui Mac veri, ed è l'unico ramo collaudabile su una macchina che
+Homebrew ce l'ha già.
 
 ---
 
@@ -67,7 +89,7 @@ c'è solo l'ordine in cui si costruisce.
 |---|---|---|
 | 1 | **Scheletro** — progetto Go + Bubble Tea, menù, `style/`, `internal/catalog/` | ✅ fatto |
 | 2 | **Onboarding** — interfaccia del wizard S1→S8 | ✅ fatto |
-| 3 | **Installazione vera** — collegare i comandi reali, partendo dal solo core | ⏳ in corso |
+| 3 | **Installazione vera** — collegare i comandi reali, partendo dal solo core | ⏳ in corso — core fatto |
 | 4 | **App** — il catalogo: installa e disinstalla | |
 | 5 | **Terminale** — tema, font, suggerimenti | |
 | 6 | **Aggiornamento** manuale e automatico | |

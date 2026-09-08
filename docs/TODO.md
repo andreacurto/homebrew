@@ -33,11 +33,25 @@ secondo account utente **non** isola Homebrew, che è condiviso in `/opt/homebre
 prefisso di Homebrew è sconsigliato da Homebrew stesso (su Apple Silicon comporterebbe la
 compilazione da sorgente di ogni pacchetto).
 
-Nel frattempo bastano: la **modalità prova** per lo sviluppo quotidiano, e — per la verifica reale —
-il fatto che Donkey **salti ciò che è già installato** e annoti **solo ciò che aggiunge**, così una
-prova sul Mac vero ha un raggio d'azione limitato alle poche voci nuove selezionate.
+Nel frattempo bastano: la **modalità prova** (`make run-dry`, variabile `DONKEY_DRY_RUN`) per lo
+sviluppo quotidiano, e — per la verifica reale — il fatto che Donkey **salti ciò che è già
+installato** e annoti **solo ciò che aggiunge**, così una prova sul Mac vero ha un raggio d'azione
+limitato alle poche voci nuove selezionate.
 
 Da riprendere se/quando servirà un collaudo end-to-end completo e ripetibile.
+
+### Comandi reali senza timeout né annullamento
+
+**Cosa:** `internal/brew` esegue i comandi con `CombinedOutput()`, che è bloccante e non accetta un
+`context`: non c'è modo di interrompere un comando né di fissargli un tempo massimo. Di
+conseguenza, durante l'installazione il tasto `Q` resta disattivato e l'unica uscita è `Ctrl-C`, che
+lascia a metà ciò che stava succedendo.
+
+**Perché è rimandato:** è una decisione presa, non una svista — in questa fase si registra l'esito e
+si prosegue, senza annullamento. Serve anche a non dover rispondere subito alla domanda difficile:
+cosa fare di ciò che è già stato installato quando si interrompe. Da riprendere **dopo aver misurato
+i tempi reali** di installazione, insieme alla voce sul feedback per singolo elemento qui sopra: è
+la stessa condizione, e le due cose si progettano meglio insieme.
 
 ---
 

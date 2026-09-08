@@ -77,7 +77,7 @@ Al **primo avvio** parte automaticamente il **Setup**, un wizard navigabile, una
 | S5 | **Tema terminale** | Selezione singola del tema Oh My Posh. |
 | S6 | **Auto-update** | Toggle "tieni tutto aggiornato da solo". |
 | S7 | **Riepilogo** | "Ecco cosa farò": elenco del selezionato. `Conferma e installa` / `Indietro`. |
-| S8 | **Installazione** | Avanzamento live, raggruppato per fase, con esito per fase. |
+| S8 | **Installazione** | Avanzamento live, raggruppato per fase, con esito per fase. Il core viene **saltato se già presente** ("Già presente, nessuna modifica"): Donkey non reinstalla ciò che c'è. |
 
 Il Setup **non è una voce del menù** `dk`: resta come comando `dk setup` (lo usa l'installer) e il
 primo avvio lo propone se il Mac non è configurato.

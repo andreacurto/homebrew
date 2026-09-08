@@ -86,3 +86,67 @@ func TestInstallHomebrew(t *testing.T) {
 		t.Error("lo script di Homebrew deve girare in modo non interattivo")
 	}
 }
+
+// In modalità prova la pausa serve solo a far vedere lo spinner: nei test la
+// azzeriamo, altrimenti ogni comando costerebbe mezzo secondo.
+func init() { dryDelay = 0 }
+
+func TestDryRunNeverExecutes(t *testing.T) {
+	c := NewDry(false) // Mac immaginato senza il core
+
+	if !c.DryRun() {
+		t.Error("NewDry deve segnalarsi come modalità prova")
+	}
+	if c.Present() {
+		t.Error("senza core, Present() deve essere falso")
+	}
+	if !c.InstallHomebrew().Ok() {
+		t.Fatal("l'installazione del core in prova deve riuscire")
+	}
+	if !c.Present() {
+		t.Error("dopo l'installazione, Present() deve essere vero")
+	}
+	if c.Installed("spotify") {
+		t.Error("in prova nessun pacchetto risulta installato")
+	}
+	if r := c.Install("spotify"); !r.Ok() || !strings.Contains(r.Output, "modalità prova") {
+		t.Errorf("l'installazione in prova deve riuscire e dichiararsi tale: %+v", r)
+	}
+}
+
+func TestDryRunCorePresent(t *testing.T) {
+	c := NewDry(true) // Mac immaginato col core già installato
+
+	if !c.Present() {
+		t.Error("con corePresent, Present() deve essere vero senza installare nulla")
+	}
+}
+
+func TestFromEnv(t *testing.T) {
+	cases := []struct {
+		env     string
+		dry     bool
+		present bool
+	}{
+		{"1", true, false},
+		{"true", true, false},
+		{"ON", true, false},
+		{"present", true, true},
+		{"", false, false},
+		{"boh", false, false},
+	}
+
+	for _, tc := range cases {
+		t.Run("DONKEY_DRY_RUN="+tc.env, func(t *testing.T) {
+			t.Setenv(dryEnv, tc.env)
+			c := FromEnv()
+			if c.DryRun() != tc.dry {
+				t.Fatalf("DryRun() = %v, atteso %v", c.DryRun(), tc.dry)
+			}
+			// Present() si interroga solo in prova: sul runner reale eseguirebbe brew.
+			if tc.dry && c.Present() != tc.present {
+				t.Errorf("Present() = %v, atteso %v", c.Present(), tc.present)
+			}
+		})
+	}
+}

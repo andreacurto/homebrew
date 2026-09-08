@@ -5,10 +5,15 @@
 package brew
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
+
+// dryEnv è la variabile d'ambiente che attiva la modalità prova.
+const dryEnv = "DONKEY_DRY_RUN"
 
 // Result è l'esito di un comando: output combinato (stdout+stderr, utile per il
 // pannello errori) ed eventuale errore.
@@ -28,6 +33,7 @@ type Runner interface {
 // Client è il wrapper su brew.
 type Client struct {
 	run Runner
+	dry bool // modalità prova: nessun comando viene eseguito davvero
 }
 
 // New crea un Client con un Runner esplicito (usato nei test).
@@ -35,6 +41,34 @@ func New(r Runner) *Client { return &Client{run: r} }
 
 // NewDefault crea un Client che esegue davvero i comandi via os/exec.
 func NewDefault() *Client { return New(execRunner{}) }
+
+// NewDry crea un Client in modalità prova: il Mac non viene toccato.
+// corePresent decide lo stato di partenza del Mac immaginato.
+func NewDry(corePresent bool) *Client {
+	return &Client{run: &dryRunner{core: corePresent}, dry: true}
+}
+
+// FromEnv crea il Client adatto all'ambiente, leggendo DONKEY_DRY_RUN:
+//
+//	1 | true | on → prova, Mac senza il core
+//	present       → prova, Mac col core già presente
+//	altro o vuoto → comandi reali
+//
+// Serve a sviluppare e collaudare il flusso senza installare nulla.
+func FromEnv() *Client {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv(dryEnv))) {
+	case "1", "true", "on", "yes":
+		return NewDry(false)
+	case "present":
+		return NewDry(true)
+	default:
+		return NewDefault()
+	}
+}
+
+// DryRun indica se il Client è in modalità prova: la TUI lo segnala a schermo,
+// così una prova non viene scambiata per un'installazione vera.
+func (c *Client) DryRun() bool { return c.dry }
 
 // Present indica se Homebrew è disponibile (comando eseguibile).
 func (c *Client) Present() bool {
@@ -100,4 +134,39 @@ func brewEnv() []string {
 		out = append(out, e)
 	}
 	return append(out, "PATH="+path, "HOMEBREW_NO_AUTO_UPDATE=1")
+}
+
+// dryDelay è la pausa per comando in modalità prova: senza, le fasi lampeggiano
+// e non si vede nulla. È una var e non una const così i test la azzerano.
+var dryDelay = 500 * time.Millisecond
+
+// errDryAbsent è l'errore con cui la modalità prova risponde "non c'è".
+var errDryAbsent = errors.New("modalità prova: non installato")
+
+// dryRunner è il Runner della modalità prova: immagina un Mac invece di
+// toccarlo. Nessun comando viene eseguito.
+//   - `brew --version` fallisce finché il core non è stato "installato"
+//   - lo script del core lo installa nel Mac immaginato
+//   - `brew list` dice sempre che manca, così si percorrono i rami d'installazione
+//   - tutto il resto riesce
+type dryRunner struct{ core bool }
+
+func (d *dryRunner) Run(name string, args ...string) Result {
+	time.Sleep(dryDelay)
+
+	cmd := strings.TrimSpace(name + " " + strings.Join(args, " "))
+	out := "modalità prova: " + cmd
+
+	switch {
+	case name != "brew": // lo script d'installazione del core
+		d.core = true
+		return Result{Output: out}
+	case len(args) > 0 && args[0] == "--version":
+		if !d.core {
+			return Result{Output: out, Err: errDryAbsent}
+		}
+	case len(args) > 0 && args[0] == "list":
+		return Result{Output: out, Err: errDryAbsent}
+	}
+	return Result{Output: out}
 }

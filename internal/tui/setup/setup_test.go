@@ -7,7 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/andreacurto/donkey/internal/brew"
 	"github.com/andreacurto/donkey/internal/catalog"
+	"github.com/andreacurto/donkey/internal/state"
 	"github.com/andreacurto/donkey/internal/tui/style"
 )
 
@@ -101,10 +103,33 @@ func TestAutoToggle(t *testing.T) {
 	}
 }
 
-func TestInstallSimulationRunsToDone(t *testing.T) {
-	m := New()
+// driveInstall porta l'installazione a termine: esegue il comando delle fasi
+// reali e salta il timer di quelle simulate, così il test non paga i ritardi.
+func driveInstall(t *testing.T, m Model) Model {
+	t.Helper()
+
+	for i := 0; i < 100 && !m.inst.done; i++ {
+		var msg tea.Msg = installStepMsg{}
+		if m.inst.realNow() {
+			msg = m.inst.next()() // esegue il comando e ne raccoglie l'esito
+		}
+		updated, _ := m.Update(msg)
+		m = updated.(Model)
+	}
+	if !m.inst.done {
+		t.Fatal("l'installazione non si è conclusa entro il limite di passi")
+	}
+	return m
+}
+
+func TestInstallRunsToDoneWithRealCore(t *testing.T) {
+	// Core già presente: nessun comando d'installazione, nessuna scrittura.
+	m := NewWith(Deps{
+		Brew:  brew.New(&coreRunner{present: true}),
+		Store: state.New(t.TempDir()),
+	})
 	m.step = stepInstall
-	m.inst = newInstaller(m) // Homebrew + Configurazione terminale + Auto-update (default)
+	m.inst = newInstaller(m) // core + Configurazione terminale + Auto-update (default)
 
 	// La schermata di avanzamento mostra le fasi base (mai "Homebrew": è tutto Donkey).
 	v := m.View()
@@ -118,23 +143,43 @@ func TestInstallSimulationRunsToDone(t *testing.T) {
 		t.Fatal("l'installazione non dovrebbe essere già conclusa")
 	}
 
-	// Avanza con i passi simulati finché non è tutto completato (guard anti-loop).
-	var model tea.Model = m
-	for i := 0; i < 100 && !model.(Model).inst.done; i++ {
-		model, _ = model.Update(installStepMsg{})
-	}
-	mm := model.(Model)
-	if !mm.inst.done {
-		t.Fatal("dopo i tick l'installazione dovrebbe essere conclusa")
-	}
-	if !strings.Contains(mm.View(), "Installazione completata") {
+	mm := driveInstall(t, m)
+
+	done := mm.View()
+	if !strings.Contains(done, "Installazione completata") {
 		t.Error("la schermata finale non mostra il riepilogo di completamento")
+	}
+	if !strings.Contains(done, "Già presente") {
+		t.Error("con il core già presente la tabella deve dirlo, non fingere un'installazione")
+	}
+	if strings.Contains(done, "Homebrew") {
+		t.Error("la schermata finale non deve citare Homebrew")
 	}
 
 	// A installazione conclusa, Invio chiude il wizard.
 	_, cmd := mm.Update(tea.KeyMsg{Type: tea.KeyEnter})
 	if cmd == nil {
 		t.Error("Invio sulla schermata 'Fatto' dovrebbe uscire dal wizard")
+	}
+}
+
+func TestInstallFailedCoreNeverNamesHomebrew(t *testing.T) {
+	// Il core non si installa: l'errore va mostrato, ma senza nominarlo.
+	m := NewWith(Deps{
+		Brew:  brew.New(&coreRunner{installFails: true, output: "Error: Homebrew install failed"}),
+		Store: state.New(t.TempDir()),
+	})
+	m.step = stepInstall
+	m.inst = newInstaller(m)
+
+	mm := driveInstall(t, m)
+
+	done := mm.View()
+	if !strings.Contains(done, "Impossibile completare l'installazione") {
+		t.Errorf("la schermata finale non riporta il fallimento del core:\n%s", done)
+	}
+	if strings.Contains(strings.ToLower(done), "brew") {
+		t.Errorf("la schermata finale cita il core per nome:\n%s", done)
 	}
 }
 

@@ -8,7 +8,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/andreacurto/donkey/internal/brew"
 	"github.com/andreacurto/donkey/internal/catalog"
+	"github.com/andreacurto/donkey/internal/state"
 	"github.com/andreacurto/donkey/internal/tui/style"
 )
 
@@ -22,8 +24,16 @@ const (
 	stepTheme
 	stepAuto
 	stepSummary
-	stepInstall // placeholder: l'installazione vera arriva nel prossimo passo
+	stepInstall // reale per il core, ancora simulata per il resto
 )
+
+// Deps sono le dipendenze di sistema del wizard: il confine verso i comandi
+// reali e verso il registro locale. Sono iniettabili, così i test girano senza
+// toccare il Mac.
+type Deps struct {
+	Brew  *brew.Client
+	Store *state.Store
+}
 
 // catalogMsg trasporta l'esito del download di un catalogo, instradato per nome.
 type catalogMsg struct {
@@ -42,14 +52,30 @@ type Model struct {
 	fonts         picker
 	theme         picker
 	auto          bool      // aggiornamento automatico in background (homebrew-autoupdate)
-	inst          installer // checklist di installazione (per ora simulata)
+	inst          installer // checklist di installazione (reale solo per il core)
+	deps          Deps      // comandi di sistema e registro locale
 	confirmQuit   bool      // mostra la conferma d'uscita (Q da qualunque schermata)
 	quitting      bool
 }
 
-// New crea il modello del wizard.
-func New() Model {
+// New crea il modello del wizard con le dipendenze reali (modalità prova
+// compresa, se attiva).
+func New() Model { return NewWith(defaultDeps()) }
+
+// defaultDeps costruisce le dipendenze reali. Se il registro non è raggiungibile
+// si prosegue senza: installare conta più che annotare, e l'esito lo dirà.
+func defaultDeps() Deps {
+	d := Deps{Brew: brew.FromEnv()}
+	if s, err := state.Default(); err == nil {
+		d.Store = s
+	}
+	return d
+}
+
+// NewWith crea il modello del wizard con dipendenze esplicite: lo usano i test.
+func NewWith(d Deps) Model {
 	m := Model{
+		deps:  d,
 		spin:  style.NewSpinner(),
 		apps:  newPicker(catalog.Apps, "App", "Scegli le app da installare:", "", false),
 		tools: newPicker(catalog.Tools, "Strumenti terminale", "Scegli gli strumenti terminale da installare:", "", false),

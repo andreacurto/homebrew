@@ -131,7 +131,11 @@ func newInstaller(m Model) installer {
 		return instPhase{name: name, recap: recap, items: items, ticks: len(items), delay: collectionDelay}
 	}
 
-	ph := []instPhase{single("Installazione Donkey core", "Donkey core")}
+	// La fase core è l'unica reale: esegue comandi veri e ne riporta l'esito.
+	core := single("Installazione Donkey core", coreRecap)
+	core.run = func(i int) tea.Cmd { return runCore(m.deps, i) }
+
+	ph := []instPhase{core}
 	if items := m.apps.chosenLabels(); len(items) > 0 {
 		ph = append(ph, collection("Installazione App", "App", items))
 	}

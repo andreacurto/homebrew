@@ -99,16 +99,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.theme.setResult(msg.entries, msg.err)
 		}
 		return m, nil
-	case installTickMsg:
-		m.inst.advance()
-		if m.inst.done {
+	case installStepMsg:
+		// Tick della simulazione: non compete a una fase reale, che si conclude
+		// col proprio messaggio d'esito.
+		if m.step != stepInstall || m.inst.done || m.inst.realNow() {
 			return m, nil
 		}
-		return m, m.inst.tick()
+		m.inst.advance()
+		return m.pumpInstall()
+	case installPhaseDoneMsg:
+		// Esito di una fase reale. Un messaggio riferito a una fase già chiusa
+		// è in ritardo: si scarta.
+		if m.step != stepInstall || m.inst.done || msg.index != m.inst.pi {
+			return m, nil
+		}
+		m.inst.complete(msg.res)
+		return m.pumpInstall()
 	case tea.KeyMsg:
 		return m.handleKey(msg)
 	}
 	return m, nil
+}
+
+// pumpInstall programma il passo successivo dell'installazione, o si ferma se
+// è tutto concluso.
+func (m Model) pumpInstall() (tea.Model, tea.Cmd) {
+	if m.inst.done {
+		return m, nil
+	}
+	return m, m.inst.next()
 }
 
 func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -206,7 +225,7 @@ func (m Model) handleKey(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "enter":
 			m.step = stepInstall
 			m.inst = newInstaller(m)
-			return m, m.inst.tick()
+			return m, m.inst.next()
 		case "esc":
 			m.step = stepAuto
 		}

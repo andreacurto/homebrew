@@ -3,6 +3,7 @@ package setup
 import (
 	"strings"
 	"testing"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -117,10 +118,10 @@ func TestInstallSimulationRunsToDone(t *testing.T) {
 		t.Fatal("l'installazione non dovrebbe essere già conclusa")
 	}
 
-	// Avanza con i tick simulati finché non è tutto completato (guard anti-loop).
+	// Avanza con i passi simulati finché non è tutto completato (guard anti-loop).
 	var model tea.Model = m
 	for i := 0; i < 100 && !model.(Model).inst.done; i++ {
-		model, _ = model.Update(installTickMsg{})
+		model, _ = model.Update(installStepMsg{})
 	}
 	mm := model.(Model)
 	if !mm.inst.done {
@@ -186,5 +187,86 @@ func TestPickerToggle(t *testing.T) {
 	p.update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("a")}) // seleziona tutte
 	if p.selectedCount() != 2 {
 		t.Fatalf("dopo 'seleziona tutto' = %d, atteso 2", p.selectedCount())
+	}
+}
+
+// --- meccanismo delle fasi reali -------------------------------------------
+
+// realPhase costruisce una fase reale che restituisce subito l'esito dato.
+func realPhase(name string, res phaseResult) instPhase {
+	return instPhase{
+		name: name, recap: name,
+		run: func(i int) tea.Cmd {
+			return func() tea.Msg { return installPhaseDoneMsg{index: i, res: res} }
+		},
+	}
+}
+
+func TestInstallIgnoresStalePhaseMessage(t *testing.T) {
+	m := New()
+	m.step = stepInstall
+	m.inst = installer{phases: []instPhase{
+		realPhase("Prima", phaseResult{outcome: outSuccess}),
+		realPhase("Seconda", phaseResult{outcome: outSuccess}),
+	}}
+
+	// Un esito riferito a una fase che non è quella corrente è in ritardo.
+	updated, _ := m.Update(installPhaseDoneMsg{index: 99, res: phaseResult{}})
+	if got := updated.(Model).inst.pi; got != 0 {
+		t.Errorf("un messaggio in ritardo ha fatto avanzare l'installer a %d", got)
+	}
+	if updated.(Model).inst.done {
+		t.Error("un messaggio in ritardo non deve concludere l'installazione")
+	}
+}
+
+func TestInstallIgnoresStepMessageDuringRealPhase(t *testing.T) {
+	m := New()
+	m.step = stepInstall
+	m.inst = installer{phases: []instPhase{
+		realPhase("Reale", phaseResult{outcome: outSuccess}),
+		{name: "Simulata", recap: "Simulata", ticks: 2, delay: time.Millisecond},
+	}}
+
+	// Il tick della simulazione non compete alla fase reale in corso.
+	updated, _ := m.Update(installStepMsg{})
+	mm := updated.(Model)
+	if mm.inst.pi != 0 || mm.inst.prog != 0 {
+		t.Errorf("un tick simulato ha mosso una fase reale: pi=%d prog=%d", mm.inst.pi, mm.inst.prog)
+	}
+
+	// L'esito della fase reale invece la chiude tutta insieme.
+	updated, _ = mm.Update(installPhaseDoneMsg{index: 0, res: phaseResult{outcome: outSuccess}})
+	if got := updated.(Model).inst.pi; got != 1 {
+		t.Errorf("dopo l'esito reale la fase corrente = %d, attesa 1", got)
+	}
+}
+
+func TestPhaseResultOverridesDeducedOutcome(t *testing.T) {
+	// Una fase singola con elementi falliti verrebbe dedotta come errore: l'esito
+	// dichiarato dal comando deve vincere, con la sua dicitura e il suo dettaglio.
+	in := installer{phases: []instPhase{{
+		recap:  "Donkey core",
+		failed: []string{"Donkey core"},
+		res: &phaseResult{
+			outcome: outWarning,
+			failed:  []string{"Donkey core"},
+			text:    "Installazione completata, registro non aggiornato",
+			detail:  "Donkey core: installato, ma il registro locale non è stato aggiornato",
+		},
+	}}}
+
+	if got := in.phases[0].outcome(); got != outWarning {
+		t.Errorf("esito = %d, atteso warning: l'esito reale deve vincere sulla deduzione", got)
+	}
+	if table := in.recapTable(); !strings.Contains(table, "registro non aggiornato") {
+		t.Errorf("la tabella deve usare la dicitura della fase reale:\n%s", table)
+	}
+	det := in.recapDetails()
+	if !strings.Contains(det, "il registro locale non è stato aggiornato") {
+		t.Errorf("il dettaglio deve essere quello della fase reale:\n%s", det)
+	}
+	if strings.Contains(det, "''") {
+		t.Errorf("il dettaglio non deve stampare un elenco vuoto:\n%s", det)
 	}
 }

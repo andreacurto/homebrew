@@ -3,9 +3,9 @@ description: Avvia un'attività — crea il ramo feature/ o fix/ a partire da de
 argument-hint: [descrizione dell'attività]
 ---
 
-Stai avviando una nuova attività su Donkey 2.0. Segui `WORKFLOW.md`, sezione "Il ciclo di una
-modifica", passi 1 e 2. `WORKFLOW.md` è la fonte di verità: se qualcosa qui contraddice quel file,
-vince `WORKFLOW.md`.
+Stai avviando una nuova attività. Segui `docs/WORKFLOW.md`, sezione "Il ciclo di
+una modifica", passi 1 e 2. `docs/WORKFLOW.md` è la fonte di verità: se qualcosa qui contraddice
+quel file, vince `docs/WORKFLOW.md`.
 
 Descrizione dell'attività richiesta dall'utente: $ARGUMENTS
 
@@ -30,12 +30,16 @@ Descrizione dell'attività richiesta dall'utente: $ARGUMENTS
 3. **Presenta il piano** all'utente e **attendi approvazione** prima di toccare codice:
    - **Nome del ramo** proposto
    - **Elenco dei passi previsti**, uno per commit
+   - **Quali documenti andranno aggiornati**, se l'attività tocca mappa del codice, comandi, look,
+     comportamento del prodotto o stato di avanzamento: l'aggiornamento fa parte dell'attività, non
+     è un "dopo". La tabella "se hai cambiato X aggiorna Y" è in `docs/WORKFLOW.md`, sezione
+     "Allineamento della documentazione"
    - **Cosa resta fuori** dall'attività, se c'è ambiguità sul confine
 
    Un ramo = un'attività: se il lavoro si allarga troppo, proponi di spezzarlo in più rami.
 
-   ⚠️ **Niente versioni, niente tag.** Durante lo sviluppo della 2.0 non si bumpano versioni e non
-   si creano tag: quel meccanismo apparteneva alla 1.x e non vale più.
+   ⚠️ **Niente versioni, niente tag.** Non si bumpano versioni e non si creano tag: il perché è in
+   `docs/MIGRATION.md`.
 
 4. **Dopo l'OK dell'utente**, crea il ramo a partire da `develop` aggiornato:
    ```bash

@@ -16,7 +16,7 @@ type entry struct {
 	desc  string
 }
 
-// Le voci del menù principale (vedi AGENTS.md §2.2).
+// Le voci del menù principale (vedi docs/PRODUCT.md §2.2).
 var entries = []entry{
 	{"App", "Installa o disinstalla singole app"},
 	{"Terminale", "Personalizza il terminale con tema, font e autocompletamento"},

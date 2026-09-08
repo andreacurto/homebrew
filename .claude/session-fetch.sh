@@ -22,7 +22,7 @@ if [ -z "$remote_ref" ]; then
         remote_ref="origin/$branch"
     else
         # Ramo nuovo non ancora pushato: il confronto sensato è con develop,
-        # da cui nascono tutte le attività (vedi WORKFLOW.md).
+        # da cui nascono tutte le attività (vedi docs/WORKFLOW.md).
         remote_ref="origin/develop"
     fi
 fi
@@ -52,7 +52,7 @@ elif [ "$ahead" -gt 0 ] && [ "$behind" -eq 0 ]; then
     # Locale AVANTI rispetto al remoto
     if [ "$branch" = "main" ]; then
         summary="$summary
-Il branch main locale è AVANTI di $ahead commit non pushati rispetto al remoto. main è il ramo stabile pubblicato: non ci si sviluppa e deve restare allineato al remoto (vedi WORKFLOW.md). ISTRUZIONE PER CLAUDE: segnala la cosa all'utente e chiedi come vuole sistemare la situazione. Non pushare su main senza conferma esplicita."
+Il branch main locale è AVANTI di $ahead commit non pushati rispetto al remoto. main è il ramo stabile pubblicato: non ci si sviluppa e deve restare allineato al remoto (vedi docs/WORKFLOW.md). ISTRUZIONE PER CLAUDE: segnala la cosa all'utente e chiedi come vuole sistemare la situazione. Non pushare su main senza conferma esplicita."
     elif [ "$branch" = "develop" ]; then
         summary="$summary
 Il branch develop locale è AVANTI di $ahead commit non pushati rispetto al remoto: probabilmente è un'attività appena chiusa con squash merge e non ancora pushata. ISTRUZIONE PER CLAUDE: segnala lo stato all'utente e chiedi se vuole pushare."

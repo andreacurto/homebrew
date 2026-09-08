@@ -6,7 +6,7 @@
 # (permissionDecision "deny").
 #
 # Motivo: durante lo sviluppo di Donkey 2.0 non si creano tag (vedi
-# WORKFLOW.md). Gli utenti della 1.x ricevono gli aggiornamenti proprio
+# docs/WORKFLOW.md). Gli utenti della 1.x ricevono gli aggiornamenti proprio
 # tramite i tag: crearne uno per sbaglio consegnerebbe loro codice incompleto.
 #
 # Elencare e cancellare tag resta permesso.
@@ -48,7 +48,7 @@ for tok in $after; do
 done
 [ -z "$tag" ] && exit 0   # 'git tag' senza argomenti: elenca, non crea
 
-reason="Creazione del tag '$tag' bloccata. Durante lo sviluppo di Donkey 2.0 non si creano tag: gli utenti della 1.x ricevono gli aggiornamenti tramite i tag, quindi un tag li raggiungerebbe con codice incompleto (vedi WORKFLOW.md). Il primo tag sarà v2.0.0, in un'attività dedicata e con approvazione esplicita di Andrea."
+reason="Creazione del tag '$tag' bloccata. Durante lo sviluppo di Donkey 2.0 non si creano tag: gli utenti della 1.x ricevono gli aggiornamenti tramite i tag, quindi un tag li raggiungerebbe con codice incompleto (vedi docs/WORKFLOW.md). Il primo tag sarà v2.0.0, in un'attività dedicata e con approvazione esplicita di Andrea."
 
 jq -n --arg r "$reason" \
     '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"deny",permissionDecisionReason:$r}}'

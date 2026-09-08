@@ -59,6 +59,44 @@ gestire il passaggio 1.x → 2.0 sul ramo stabile, per non lasciare gli utenti a
 il repo si chiama ancora `homebrew`. Il ramo `main` invece adesso c'è, dopo la normalizzazione.
 
 **Perché è rimandato:** dipende da una decisione non ancora presa — la rinomina del repository
-(`homebrew` → `donkey`, prevista in roadmap). In sviluppo il problema non si vede perché
+(`homebrew` → `donkey`, prevista in `MIGRATION.md`). In sviluppo il problema non si vede perché
 `make run-setup` legge i cataloghi dalla cartella locale. **Va sistemato prima di qualsiasi
 distribuzione**, altrimenti i cataloghi non si scaricano.
+
+---
+
+## Automazioni e regole
+
+### Controlli veri sul rispetto delle regole git
+
+**Cosa:** far rispettare le regole di `WORKFLOW.md` con controlli **lato git**, non solo lato
+agente. Oggi l'unico controllo è `.claude/check-release-tag.sh`, un gancio di Claude Code: blocca
+Claude quando prova a creare un tag, ma non impedisce nulla a chi digita `git tag` in un terminale,
+non vale per un altro agente e si aggira disattivando il gancio. Le regole più importanti (non
+sviluppare su `develop`/`main`, niente tag, niente merge in `main`) restano quindi affidate alla
+buona volontà.
+
+Le strade possibili sono due, complementari:
+- **Ganci git versionati** — una cartella di hook nel repo, attivata con `core.hooksPath`, che vale
+  per chiunque cloni. Copre `pre-commit` e `pre-push`, ma restano disattivabili in locale.
+- **Regole lato GitHub** — protezione dei rami o *rulesets*, che nessuno può aggirare dal proprio
+  computer perché il rifiuto arriva dal server.
+
+**Perché è rimandato:** è una decisione da prendere insieme, non un dettaglio implementativo. Tocca
+la configurazione della repository su GitHub, che richiede approvazione esplicita (`WORKFLOW.md`,
+"Chi decide cosa"), e si incastra con la revisione dei comandi qui sotto: ha senso deciderle in una
+volta sola, per non riscrivere due volte le stesse automazioni.
+
+### Revisione dei comandi in `.claude/`
+
+**Cosa:** ripensare l'insieme dei comandi (oggi `/branch` e `/chiudi-attivita`). Due problemi
+distinti:
+- **I nomi non convincono.** Sono anche incoerenti fra loro — uno in inglese, uno in italiano — e
+  `chiudi-attivita` viola la regola sulla lingua dei nomi di file (`AGENTS.md`, regola 2), che
+  chiede l'inglese.
+- **Sono solo istruzioni, non barriere.** Un comando descrive il processo corretto, ma nulla
+  garantisce che venga usato: chi non lo invoca non incontra nessun controllo.
+
+**Perché è rimandato:** rinominare i comandi è facile, ma ha senso farlo insieme alla decisione sui
+controlli git qui sopra — altrimenti si rinomina ora e si riscrive tutto dopo. Da riprendere come
+attività unica.

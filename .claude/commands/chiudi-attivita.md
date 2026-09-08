@@ -3,11 +3,11 @@ description: Chiude l'attività corrente — squash merge del ramo in develop, d
 ---
 
 Stai chiudendo l'attività sviluppata sul ramo corrente, portandola dentro `develop`. Segui
-`WORKFLOW.md`, sezione "Il ciclo di una modifica", passi 5 e 6. `WORKFLOW.md` è la fonte di verità:
-se qualcosa qui contraddice quel file, vince `WORKFLOW.md`.
+`docs/WORKFLOW.md`, sezione "Il ciclo di una modifica", passi 5 e 6. `docs/WORKFLOW.md` è la fonte
+di verità: se qualcosa qui contraddice quel file, vince `docs/WORKFLOW.md`.
 
-⚠️ **Questo comando non tocca mai `main` e non crea mai tag.** Il merge in `main` e la creazione di
-tag avvengono solo alla v2.0.0, in un'attività dedicata e con approvazione esplicita di Andrea.
+⚠️ **Questo comando non tocca mai `main` e non crea mai tag.** Entrambi richiedono un'attività
+dedicata e l'approvazione esplicita di Andrea (vedi `docs/MIGRATION.md`).
 
 ## Passi da eseguire
 
@@ -24,7 +24,21 @@ tag avvengono solo alla v2.0.0, in un'attività dedicata e con approvazione espl
    git status
    ```
 
-3. **Review pre-merge.** Mostra all'utente cosa entrerà in `develop` e **chiedi conferma
+3. **Verifica l'allineamento della documentazione.** Vedi `docs/WORKFLOW.md`, sezione "Allineamento
+   della documentazione". Guarda cosa ha toccato l'attività:
+   ```bash
+   git diff develop...HEAD --stat
+   ```
+   Confronta ciò che è cambiato con la tabella "se hai cambiato X aggiorna Y" di
+   `docs/WORKFLOW.md`: codice e comandi → `docs/DEVELOPMENT.md`; colori e layout →
+   `docs/STYLEGUIDE.md`; comportamento del prodotto → `docs/PRODUCT.md`; cosa funziona davvero →
+   `docs/MIGRATION.md`.
+
+   Se qualcosa è disallineato, **aggiornalo adesso e committa sul ramo**: fa parte dell'attività e
+   deve finire nello stesso squash. Se il disallineamento è fuori dal perimetro dell'attività,
+   proponi all'utente di annotarlo in `docs/TODO.md` invece di allargare il ramo.
+
+4. **Review pre-merge.** Mostra all'utente cosa entrerà in `develop` e **chiedi conferma
    esplicita**:
    ```bash
    git log develop..HEAD --format="- %s" --reverse
@@ -32,23 +46,22 @@ tag avvengono solo alla v2.0.0, in un'attività dedicata e con approvazione espl
    Se l'utente chiede altre modifiche, valuta se tenerle nello stesso ramo o aprirne uno nuovo, e
    proponi la soluzione. **Non procedere senza OK.**
 
-4. **Squash merge in `develop`** (tutti i commit del ramo → uno solo):
+5. **Squash merge in `develop`** (tutti i commit del ramo → uno solo):
    ```bash
    git checkout develop
    git pull --ff-only
    git merge --squash <tipo>/<nome>
    ```
 
-5. **Commit unico.** [Conventional Commits](https://www.conventionalcommits.org/) con prefisso
-   maiuscolo, prima riga di ~70 caratteri in italiano e minuscola dopo i due punti. Nel corpo si
+6. **Commit unico**, nel formato definito da `docs/WORKFLOW.md`, sezione "Commit". Nel corpo si
    sintetizza **cosa e perché**, filtrando i passi intermedi:
    ```
    Tipo: titolo descrittivo dell'attività
 
-   Cosa cambia e perché, in due o tre righe.
+   Cosa cambia e perché, entro il limite di righe previsto.
    ```
 
-6. **Push e pulizia:**
+7. **Push e pulizia:**
    ```bash
    git push
    git branch -d <tipo>/<nome>
@@ -56,4 +69,4 @@ tag avvengono solo alla v2.0.0, in un'attività dedicata e con approvazione espl
    ```
    La cancellazione del ramo remoto vale solo se il ramo era stato pushato.
 
-Esegui i passi 4-6 in autonomia dopo l'OK al merge, senza chiedere ulteriori permessi.
+Esegui i passi 5-7 in autonomia dopo l'OK al merge, senza chiedere ulteriori permessi.

@@ -1,4 +1,4 @@
-// Package setup implementa il wizard di onboarding di Donkey (vedi AGENTS.md §2.1).
+// Package setup implementa il wizard di onboarding di Donkey (vedi docs/PRODUCT.md §2.1).
 package setup
 
 import (

@@ -237,7 +237,7 @@ Puoi rieseguire `./setup.sh` senza problemi. Lo script rileva cosa è già insta
 
 ## Per Sviluppatori
 
-Per documentazione tecnica dettagliata (architettura, convenzioni, configurazione UI, flussi operativi), consulta [CLAUDE.md](CLAUDE.md).
+Per la documentazione tecnica (architettura, comandi, test) consulta [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Il punto d'ingresso di tutta la documentazione è [AGENTS.md](AGENTS.md).
 
 ### Quick Reference
 
